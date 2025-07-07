@@ -1,0 +1,32 @@
+.tagBar {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.tagButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  background-color: transparent;
+  color: #5e4b3c;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tagButton:hover {
+  background-color: #f0ece8;
+}
+
+.tagButton.active {
+  background-color: #5e4b3c;
+  color: white;
+  font-weight: bold;
+}

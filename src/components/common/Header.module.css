@@ -1,0 +1,85 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+  background-color: white;
+  color: #4d3b30;
+  border-bottom: 1px solid #eee;
+  height: 60px;
+  font-family: "Pretendard", sans-serif;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.logoIcon {
+  font-size: 24px;
+  margin-right: 8px;
+  color: #5e4b3c;
+}
+
+.logoText {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.centerSection {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e0ddd9;
+  border-radius: 16px;
+  padding: 4px 12px;
+  min-width: 400px;
+  max-width: 500px;
+  justify-content: space-between;
+  background-color: #fff;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 6px 10px;
+  font-size: 14px;
+  color: #5e4b3c;
+}
+
+.searchSelect {
+  border: none;
+  background: transparent;
+  color: #5e4b3c;
+  font-weight: 600;
+  font-size: 14px;
+  padding-left: 10px;
+  cursor: pointer;
+  appearance: none;
+}
+
+.searchSelect:focus {
+  outline: none;
+}
+
+/* 오른쪽 아이콘 구역 */
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.iconButton {
+  font-size: 18px;
+  color: #5e4b3c;
+  cursor: pointer;
+}

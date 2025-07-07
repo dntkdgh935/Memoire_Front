@@ -1,0 +1,36 @@
+.sidebar {
+  width: 60px;
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  border-right: 1px solid #eee;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+/* 공통 메뉴 버튼 박스 */
+.menuWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* 선택된 메뉴 (배경색 추가) */
+.menuWrapper.active {
+  background-color: #5c4b3b;
+}
+
+/* 아이콘 이미지 */
+.menuWrapper img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
