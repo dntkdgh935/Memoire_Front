@@ -1,0 +1,15 @@
+/* src/components/common/CollGrid.module.css */
+.myMasonryGrid {
+  display: flex;
+  margin-left: -30px; /* adjust as needed */
+  margin-right: -30px; /* adjust as needed */
+  width: auto;
+}
+
+.myMasonryGridColumn {
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-bottom: 30px; /* adjust bottom spacing between items */
+  margin-top: 20px; /* adjust top spacing between items */
+  /* adjust the column width and other styles as needed */
+}
