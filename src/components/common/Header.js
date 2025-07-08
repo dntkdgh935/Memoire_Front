@@ -41,12 +41,14 @@
 
 // export default Header;
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaThLarge, FaUserCircle, FaBell, FaMoon } from "react-icons/fa";
 import styles from "./Header.module.css";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const navigate = useNavigate();
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
@@ -58,6 +60,10 @@ function Header() {
     if (e.key === "Enter") {
       handleSearch();
     }
+  };
+  // 유저 아이콘 클릭 시 로그인 페이지로 이동
+  const handleUserIconClick = () => {
+    navigate("/login");
   };
 
   return (
@@ -93,7 +99,10 @@ function Header() {
       {/* 오른쪽: 아이콘 */}
       <div className={styles.rightSection}>
         <FaMoon className={styles.iconButton} />
-        <FaUserCircle className={styles.iconButton} />
+        <FaUserCircle
+          className={styles.iconButton}
+          onClick={handleUserIconClick}
+        />
         <FaBell className={styles.iconButton} />
       </div>
     </header>
