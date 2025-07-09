@@ -5,24 +5,10 @@ function CollCard({ collection }) {
   const cover = collection.thumbnailPath; // collection에서 동적으로 이미지 경로 받기
   console.log(cover);
   const isImage = collection.thumbType == "image";
+  const isText = collection.thumbType === "text";
   console.log(collection.thumbType);
   return (
     <div className={styles.card}>
-      {/* 동적으로 경로를 받아서 이미지를 출력 */}
-      {/* <img
-        src={cover} // src에 dynamic하게 경로 사용
-        alt={collection.collectionTitle}
-        className={styles.image}
-      /> */}
-      {/* 동적으로 경로를 받아서 이미지를 출력 (thumbType이 img인 경우) */}
-      {/* {collection.thumbType == "img" && (
-        <img
-          src={`http://localhost:8080${cover}`} // 예: /upload_files/memory_img/abc.jpg
-          alt={collection.collectionTitle}
-          className={styles.image}
-          //style={{ width: "100%", height: "auto", objectFit: "cover" }}
-        />
-      )} */}
       {isImage ? (
         <img
           src={`http://localhost:8080${cover}`}
@@ -30,9 +16,12 @@ function CollCard({ collection }) {
           className={styles.image}
           style={{ width: "100%", height: "auto", objectFit: "cover" }}
         />
+      ) : isText ? (
+        <div className={styles.textContent}>
+          <p>{collection.textContent}</p>
+        </div>
       ) : (
         <div className={styles.placeholder}>
-          {/* 필요 시 썸네일 아이콘 / 타입 텍스트 */}
           <p className={styles.typeText}>
             {collection.thumbType?.toUpperCase() || "NO IMAGE"}
           </p>
