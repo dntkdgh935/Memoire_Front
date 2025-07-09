@@ -1,0 +1,14 @@
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-main: #a89f99;
+    --color-secondary-main: #bfb5a6;
+    --color-semi-white: #2b2b2b;
+    --color-white: #1a1a1a;
+    --color-normal-text: #cccccc;
+    --color-collcard-bg: #2a2a2a;
+    --color-bright-outline: #5a5a5a;
+    --color-dark-hover: rgba(255, 255, 255, 0.1);
+    --color-selected-text: #7ee5d4;
+    --color-selected-checkbox: #03dac5;
+  }
+}

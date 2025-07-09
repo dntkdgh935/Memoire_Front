@@ -1,6 +1,8 @@
 - npm install
-- npm start
 - npm install react-icons: 관련 이모티콘
+- npm install axios : 요청 보내기
+
+- npm start
 
 # npm install
 

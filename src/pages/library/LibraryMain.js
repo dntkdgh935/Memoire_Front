@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
 import CollCard from "../../components/common/CollCard";
@@ -8,7 +9,24 @@ import styles from "./LibraryMain.module.css"; // ✅
 function LibraryMain() {
   //tag bar 관련 states
   const [selectedTag, setSelectedTag] = useState("전체");
-  const [topTags] = useState(["임시", "임시2", "임시3"]);
+  const [topTags, setTopTags] = useState([]);
+
+  // top 5 태그 가져오기
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:8080/api/library/top5tags"
+        );
+        console.log("📦 tags:", res.data);
+        setTopTags(res.data.map((tag) => tag.tagName));
+      } catch (err) {
+        console.error("🚨 태그 불러오기 실패", err);
+      }
+    };
+
+    fetchTags();
+  }, []);
 
   // Collection 목록 states
   // 하드코딩된 추천 컬렉션 데이터
