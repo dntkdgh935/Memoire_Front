@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./CollCard.module.css";
+import LibCollLabel from "../library/LibCollLabel";
 
 function CollCard({ collection }) {
   const cover = collection.thumbnailPath; // collection에서 동적으로 이미지 경로 받기
@@ -28,13 +29,7 @@ function CollCard({ collection }) {
         </div>
       )}
 
-      <div className={styles.overlay}>
-        <div className={styles.label}>
-          <h3>{collection.collectionTitle}</h3>
-          {/* collectionTitle 동적으로 사용 */}
-          <p>{collection.authorid}</p> {/* authorid 동적으로 사용 */}
-        </div>
-      </div>
+      <LibCollLabel coll={collection} />
     </div>
   );
 }
