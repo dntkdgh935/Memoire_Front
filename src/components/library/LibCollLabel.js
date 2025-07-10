@@ -10,6 +10,8 @@ import CollActionButton from "../common/CollActionBtn";
 function LibCollLabel({ coll }) {
   const [isLiked, setIsLiked] = useState(coll.isLiked || false); // 좋아요 상태 관리
   const [isBookmarked, setIsBookmarked] = useState(coll.isBookmarked || false); // 북마크 상태 관리
+  const [likeCount, setLikeCount] = useState(coll.likeCount);
+  const [bookmarkCount, setBookmarkCount] = useState(coll.bookmarkCount);
 
   const toggleLikeClick = async () => {
     try {
@@ -62,8 +64,18 @@ function LibCollLabel({ coll }) {
         <h3>{coll.collectionTitle}</h3>
         <p>{coll.createdDate}</p>
         <div className={styles.actionButtons}>
-          <CollActionButton type="like" onClick={toggleLikeClick} />
-          <CollActionButton type="bookmark" onClick={toggleBMClick} />
+          <CollActionButton
+            type="like"
+            count={coll.likeCount}
+            onClick={toggleLikeClick}
+            isClicked={isLiked}
+          />
+          <CollActionButton
+            type="bookmark"
+            count={coll.bookmarkCount}
+            onClick={toggleBMClick}
+            isClicked={isBookmarked}
+          />
         </div>
       </div>
     </div>
