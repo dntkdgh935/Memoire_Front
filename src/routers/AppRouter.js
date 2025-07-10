@@ -9,14 +9,14 @@ import LibraryMain from "../pages/library/LibraryMain";
 
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
-import userRouter from "./UserRouter";
+import UserRouter from "./UserRouter";
 
 function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<LibraryMain />} />
       <Route path="/library/*" element={<LibraryRouter />} />
-      {userRouter}
+      <Route path="/user/*" element={<UserRouter />} />
       {/* <Route path="/archive" element={<Archive />} />
       <Route path="/atelier" element={<Atelier />} /> */}
       {/* 추가 페이지도 여기에 등록 가능 */}

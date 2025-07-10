@@ -5,7 +5,7 @@ import axios from "axios";
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
   headers: {
-    "Content-Type": "applicateion/json",
+    "Content-Type": "application/json",
   },
   withCredentials: true, // 쿠키 포함 함
 });
