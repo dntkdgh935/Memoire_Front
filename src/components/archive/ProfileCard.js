@@ -5,6 +5,7 @@ import styles from "./ProfileCard.module.css";
 
 const ProfileCard = () => {
   const { userid } = useContext(AuthContext);
+
   const [stats, setStats] = useState({
     collections: 0,
     memories: 0,
@@ -18,10 +19,51 @@ const ProfileCard = () => {
   const [avatarClicked, setAvatarClicked] = useState(false);
 
   useEffect(() => {
+    if (!userid) return;
+
     setTimeout(() => {
       setIsVisible(true);
     }, 100);
-  }, []);
+
+    const fetchStats = async () => {
+      try {
+        const collectionNum = await apiClient.get(`/archive/numCollections`, {
+          // TODO: Add a method to call user info and add it to params
+          params: { userid: userid },
+        });
+
+        const memoriesNum = await apiClient.get(`/archive/numMemory`, {
+          // TODO: Add a method to call user info and add it to params
+          params: { userid: userid },
+        });
+        const followingNum = await apiClient.get(`/archive/numFollowing`, {
+          // TODO: Add a method to call user info and add it to params
+          params: { userid: userid },
+        });
+        const followerNum = await apiClient.get(`/archive/numFollowers`, {
+          // TODO: Add a method to call user info and add it to params
+          params: { userid: userid },
+        });
+        console.log(collectionNum.data);
+        console.log(memoriesNum.data);
+        console.log(followingNum.data);
+        console.log(followerNum.data);
+
+        setStats({
+          collections: collectionNum.data.count,
+          memories: memoriesNum.data.count,
+          following: followingNum.data.count,
+          followers: followerNum.data.count,
+        });
+      } catch (error) {
+        console.error("Error fetching user stats:", error);
+        setStatusMessage("사용자 정보를 불러오는 데 실패했습니다.");
+      }
+    };
+    if (userid) {
+      fetchStats();
+    }
+  }, [userid]);
 
   const handleEditProfile = () => {
     alert("프로필 수정 기능이 실행됩니다!");
