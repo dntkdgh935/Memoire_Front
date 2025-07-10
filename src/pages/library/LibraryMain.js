@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
@@ -7,6 +8,7 @@ import styles from "./LibraryMain.module.css"; // ✅
 // src/pages/library/LibraryMain.js
 function LibraryMain() {
   //tag bar 관련 states
+  const { isLoggedIn, userid } = useContext(AuthContext);
   const [selectedTag, setSelectedTag] = useState("전체");
   const [topTags, setTopTags] = useState([]);
 
@@ -45,7 +47,6 @@ function LibraryMain() {
   }, []);
 
   // Collection 목록 states
-  // 하드코딩된 추천 컬렉션 데이터
   const [recColls, setRecColls] = useState([]);
   const [recPage, setRecPage] = useState(0); // 현재 페이지 (스크롤용)
   const [hasMore, setHasMore] = useState(true); // 더 불러올 게 있는지
