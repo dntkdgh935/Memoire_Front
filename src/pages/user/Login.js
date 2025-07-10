@@ -101,6 +101,7 @@ function Login({ onLoginSuccess }) {
     } finally {
       setIsLoggedIn(false);
     }
+    navigate("/");
   };
 
   // TODO: Add your JSX for the login form here, using loginId, password, handleLogin, handleKeyDown, etc.
@@ -146,7 +147,7 @@ function Login({ onLoginSuccess }) {
             className={styles.loginButton}
             onClick={handleLogin}
             disabled={isLoggedIn}
-            type="submit"
+            type="button"
           >
             로그인
           </button>

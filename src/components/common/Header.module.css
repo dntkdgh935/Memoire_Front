@@ -82,4 +82,34 @@
   font-size: 18px;
   color: #5e4b3c;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+.iconButton:hover {
+  color: #7d6a5e; /* 호버 시 약간 더 어두운 색상 */
+}
+
+/* 새로 추가된 로그인/로그아웃 버튼 스타일 */
+.authButton {
+  /* 배경색을 로고 색상과 유사하게 맞추고 투명도를 주어 부드럽게 */
+  background-color: rgba(94, 75, 60, 0.9); /* #5e4b3c의 90% 투명도 */
+  color: white; /* 글자색 */
+  border: none;
+  border-radius: 5px; /* 기존 디자인의 둥근 모서리 유지 */
+  padding: 8px 15px;
+  margin-left: 10px; /* 다른 아이콘과의 간격 (조금 줄임) */
+  cursor: pointer;
+  font-size: 14px; /* 다른 텍스트와 어울리도록 폰트 크기 조정 */
+  font-weight: 600; /* 굵게 */
+  transition: background-color 0.2s ease; /* 부드러운 전환 효과 */
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 은은한 그림자 추가 */
+}
+
+.authButton:hover {
+  background-color: #4d3b30; /* 호버 시 로고 텍스트 색상과 유사하게 변경 */
+}
+
+.authButton:active {
+  background-color: #352a23; /* 클릭 시 더 어둡게 */
+  transform: translateY(1px); /* 살짝 눌리는 효과 */
 }

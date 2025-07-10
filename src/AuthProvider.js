@@ -16,7 +16,15 @@ const parseAccessToken = (token) => {
         .map((c) => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
         .join("")
     );
-    return JSON.parse(jsonPayload);
+    const parsed = JSON.parse(jsonPayload);
+
+    const now = Date.now() / 1000;
+    if (parsed.exp < now) {
+      console.warn("AccessToken이 이미 만료되었습니다.");
+      return null;
+    }
+
+    return parsed;
   } catch (error) {
     console.error("AccessToken 파싱오류 : ", error);
     return null;
@@ -32,35 +40,11 @@ export const AuthProvider = ({ children }) => {
     autoLoginFlag: "",
   });
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    console.log("useEffect : ", accessToken, refreshToken);
-
-    if (accessToken && refreshToken) {
-      const parsedToken = parseAccessToken(accessToken);
-      console.log("useEffect 실행 : ", parsedToken);
-
-      if (parsedToken) {
-        setAuthInfo({
-          isLoggedIn: true,
-          role: parsedToken.role,
-          name: parsedToken.name,
-          userid: parsedToken.userId,
-          autoLoginFlag: parsedToken.autoLoginFlag,
-        });
-        console.log("받은 내역 확인", setAuthInfo);
-      } else {
-        //파싱 실패
-        logoutAndRedirect();
-      }
-    }
-  }, []);
-
-  const logoutAndRedirect = () => {
-    if (!authInfo.isLoggedIn) return;
-
-    localStorage.clear();
+  const logout = () => {
+    console.log("로그아웃 실행: 로컬 스토리지 비우기 및 인증 정보 초기화");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("autoLoginFlag"); // 자동 로그인 플래그도 함께 삭제하는 것이 좋습니다.
     setAuthInfo({
       isLoggedIn: false,
       role: "",
@@ -68,15 +52,71 @@ export const AuthProvider = ({ children }) => {
       userid: "",
       autoLoginFlag: "",
     });
-    window.location.href = "/";
-  }; // logoutAndRedirect
+    // window.location.href = "/"; // 필요한 경우, 로그아웃 후 리다이렉트
+  };
 
-  //로그인 성공시
+  // 기존 logoutAndRedirect 함수는 logout 함수를 활용
+  const logoutAndRedirect = () => {
+    if (!authInfo.isLoggedIn && !localStorage.getItem("accessToken")) return; // 불필요한 호출 방지
+    logout();
+    window.location.href = "/"; // 메인 페이지나 로그인 페이지로 리다이렉트
+  };
+
   const updateTokens = (accessToken, refreshToken) => {
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
       const parsedToken = parseAccessToken(accessToken);
-      console.log("AuthProvider updateToken : ", parsedToken);
+
+      if (parsedToken) {
+        setAuthInfo({
+          isLoggedIn: true,
+          role: parsedToken.role,
+          name: parsedToken.name, // 페이로드에 name이 있다면
+          userid: parsedToken.userId,
+          autoLoginFlag: parsedToken.autoLoginFlag, // 서버에서 받은 autoLoginFlag 값을 여기에 저장
+        });
+        // ✅ 서버에서 받은 autoLoginFlag 값을 localStorage에 저장
+        localStorage.setItem("autoLoginFlag", parsedToken.autoLoginFlag);
+      } else {
+        logoutAndRedirect();
+      }
+    }
+    if (refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+  };
+
+  useEffect(() => {
+    const storedAccessToken = localStorage.getItem("accessToken");
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+    // ✅ localStorage에서 autoLoginFlag 값을 가져옵니다.
+    const storedAutoLoginFlag = localStorage.getItem("autoLoginFlag");
+
+    console.log(
+      "useEffect 실행: storedAccessToken=",
+      storedAccessToken,
+      "storedRefreshToken=",
+      storedRefreshToken,
+      "storedAutoLoginFlag=",
+      storedAutoLoginFlag
+    );
+
+    // ✅ 자동 로그인 플래그가 'N'이고, 토큰이 존재한다면 즉시 로그아웃 처리
+    if (
+      storedAutoLoginFlag === "N" &&
+      (storedAccessToken || storedRefreshToken)
+    ) {
+      console.log(
+        "자동 로그인 아님 (N) -> 로컬 스토리지 토큰 삭제 및 로그아웃 처리"
+      );
+      logout(); // 토큰을 지우고 상태를 초기화합니다.
+      return; // 이후 로직 실행하지 않음
+    }
+
+    // ✅ 'Y'이거나 autoLoginFlag가 없거나 토큰이 없는 경우에만 아래 로직 실행
+    if (storedAccessToken && storedRefreshToken) {
+      const parsedToken = parseAccessToken(storedAccessToken);
+      console.log("useEffect: parsedAccessToken=", parsedToken);
 
       if (parsedToken) {
         setAuthInfo({
@@ -84,18 +124,27 @@ export const AuthProvider = ({ children }) => {
           role: parsedToken.role,
           name: parsedToken.name,
           userid: parsedToken.userId,
-          autoLoginFlag: parsedToken.autoLoginFlag,
+          autoLoginFlag: storedAutoLoginFlag || "N", // 저장된 플래그 사용
         });
-        console.log("authInfo : ", authInfo);
+        console.log("AuthInfo 업데이트 성공: ", parsedToken);
       } else {
-        logoutAndRedirect();
+        // AccessToken이 만료되었거나 파싱 실패한 경우
+        // RefreshToken으로 재발급 시도 또는 바로 로그아웃
+        console.log("AccessToken 유효하지 않음. 재발급 시도 또는 로그아웃");
+        handleReissueTokens(storedAutoLoginFlag === "Y") // storedAutoLoginFlag 값에 따라 extendLogin 전달
+          .catch(() => {
+            console.log("토큰 재발급 실패. 로그아웃 처리.");
+            logoutAndRedirect();
+          });
       }
+    } else {
+      // 토큰이 아예 없는 경우 (처음 방문했거나 이미 로그아웃된 상태)
+      // 명시적으로 isLoggedIn: false로 설정되어 있으므로 추가적인 logout() 호출은 불필요할 수 있으나,
+      // 일관성을 위해 호출해도 무방합니다.
+      // setAuthInfo가 이미 초기값으로 설정되어 있으므로 명시적 호출은 생략 가능
+      console.log("토큰 없음. 로그인 상태 아님.");
     }
-
-    if (refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
-    }
-  }; //updateToken
+  }, []); // 의존성 배열 비워두어 컴포넌트 마운트 시 한 번만 실행
 
   // 공통으로 사용할 서버측 API 요청 처리용 함수 (로그인 상태에서 요청하는 서비스들)
   // 요청 전에 토큰만요 확인, accessToken 만료시 refreshToken 으로 토큰 재발급 요청
@@ -265,6 +314,8 @@ export const AuthProvider = ({ children }) => {
         setAuthInfo,
         secureApiRequest,
         updateTokens,
+        logout,
+        logoutAndRedirect,
       }}
     >
       {children}
