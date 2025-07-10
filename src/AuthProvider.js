@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
           isLoggedIn: true,
           role: parsedToken.role,
           name: parsedToken.name, // 페이로드에 name이 있다면
-          userid: parsedToken.userId,
+          userid: parsedToken.userid,
           autoLoginFlag: parsedToken.autoLoginFlag, // 서버에서 받은 autoLoginFlag 값을 여기에 저장
           nickname: parsedToken.nickname,
         });
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }) => {
           isLoggedIn: true,
           role: parsedToken.role,
           name: parsedToken.name,
-          userid: parsedToken.userId,
+          userid: parsedToken.userid,
           autoLoginFlag: storedAutoLoginFlag || "N", // 저장된 플래그 사용
           nickname: parsedToken.nickname,
         });
