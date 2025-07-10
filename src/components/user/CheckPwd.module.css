@@ -1,0 +1,36 @@
+/* src/components/user/CheckPwd.module.css */
+
+/* SignUp.module.css의 .inputGroup과 동일하게 설정하여 일관성 유지 */
+.inputGroup {
+  margin-bottom: 4px; /* 입력 필드 간의 아래쪽 여백 */
+}
+
+/* SignUp.module.css의 .input과 동일하게 설정 */
+.input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e0ddd9; /* 기존 스타일과 동일 */
+  border-radius: 8px; /* 기존 스타일과 동일 */
+  font-size: 16px;
+  color: #4d3b30;
+  box-sizing: border-box; /* 패딩이 width에 포함되도록 */
+  transition: border-color 0.2s ease;
+}
+
+.input::placeholder {
+  color: #a09990;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #5e4b3c; /* 포커스 시 색상 변경 */
+}
+
+/* 비밀번호 불일치 메시지 스타일 */
+.errorMessage {
+  color: #d9534f; /* 빨간색 계열 */
+  font-size: 0.85rem;
+  margin-top: 3px;
+  text-align: left;
+  padding-left: 3px;
+}

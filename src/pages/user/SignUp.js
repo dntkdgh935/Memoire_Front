@@ -1,20 +1,26 @@
-//src/pages/user/SignUp.js
+// src/pages/user/SignUp.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/axios";
-import styles from "./SignUp.module.css"; // Import the CSS module
+import styles from "./SignUp.module.css";
+import CheckPwd from "../../components/user/CheckPwd";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function Signup() {
   const [formData, setFormData] = useState({
     loginId: "",
     password: "",
     confirmPwd: "",
-    userName: "",
+    name: "",
     birthday: "",
-    roll: "",
+    nickname: "",
+    role: "USER", // 초기값을 "USER"로 설정하여 불필요한 조건문 제거
     phone: "",
   });
   const [isIdAvailable, setIsIdAvailable] = useState(null);
+  // ✅ CheckPwd 컴포넌트의 유효성 상태를 받을 새로운 상태 추가
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const navigate = useNavigate();
 
@@ -46,17 +52,28 @@ function Signup() {
     }
   };
 
+  // ✅ validate 함수는 이제 CheckPwd의 유효성도 함께 확인합니다.
   const validate = () => {
-    if (formData.password !== formData.confirmPwd) {
-      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다. 다시 입력하세요.");
+    // 비밀번호 유효성 (CheckPwd 컴포넌트에서 전달받은 상태 사용)
+    if (!isPasswordValid) {
+      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
       return false;
     }
+    // 다른 유효성 검사 (필요하면 추가)
     return true;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // ✅ CheckPwd 컴포넌트에서 유효성 상태를 받아올 함수
+  const handlePasswordValidationChange = (isValid) => {
+    setIsPasswordValid(isValid);
+  };
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, birthday: date });
   };
 
   const handleSubmit = async (e) => {
@@ -71,13 +88,16 @@ function Signup() {
       alert("아이디 중복검사를 필수로 하여야 합니다.");
       return;
     }
+
+    // ✅ validate 함수 호출 시 CheckPwd의 유효성도 검사
     if (!validate()) {
       return;
     }
-    // 권한이 선택되지 않았을 경우 기본값 설정 (선택 사항)
-    if (!formData.roll) {
-      setFormData((prev) => ({ ...prev, roll: "USER" }));
-    }
+
+    // `formData.role`의 초기값을 "USER"로 설정했으므로 이 조건문은 더 이상 필요 없습니다.
+    // if (!formData.role) {
+    //   setFormData((prev) => ({ ...prev, role: "USER" }));
+    // }
 
     try {
       const response = await apiClient.post("/user/signup", formData);
@@ -91,9 +111,14 @@ function Signup() {
       alert("회원 가입에 실패했습니다. 다시 시도해 주세요");
     }
   };
-  //권한 수정 관련
+
+  // 권한 수정 관련 (기존 코드와 동일, 변수명 roll -> role로 변경)
   const [showPermissions, setShowPermissions] = useState(false);
-  const [selectedPermission, setSelectedPermission] = useState("USER"); // 기본값 설정
+  const [selectedPermission, setSelectedPermission] = useState(formData.role); // formData.role 초기값 사용
+
+  useEffect(() => {
+    setSelectedPermission(formData.role); // formData.role이 변경될 때마다 UI 업데이트
+  }, [formData.role]);
 
   const handleTogglePermissions = () => {
     setShowPermissions(!showPermissions);
@@ -101,9 +126,8 @@ function Signup() {
 
   const handleSelectPermission = (permission) => {
     setSelectedPermission(permission);
-    // 이 부분이 추가/변경되었습니다: 선택된 권한을 formData.roll에 저장
-    setFormData((prev) => ({ ...prev, roll: permission }));
-    setShowPermissions(false); // 선택 후 슬라이드 닫기
+    setFormData((prev) => ({ ...prev, role: permission })); // roll -> role
+    setShowPermissions(false);
   };
 
   return (
@@ -130,49 +154,7 @@ function Signup() {
               아이디 중복 확인
             </button>
           </div>
-          <div className={styles.inputGroup}>
-            <input
-              type="password"
-              name="password"
-              className={styles.input}
-              placeholder="비밀번호"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <input
-              type="password"
-              name="confirmPwd"
-              className={styles.input}
-              placeholder="비밀번호 확인"
-              value={formData.confirmPwd}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <input
-              type="text"
-              name="userName"
-              className={styles.input}
-              placeholder="이름"
-              value={formData.userName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className={styles.inputGroup}>
-            <input
-              type="date"
-              name="birthday"
-              className={styles.input}
-              value={formData.birthday}
-              onChange={handleChange}
-              required
-            />
-          </div>
+
           <div className={styles.inputGroup}>
             <input
               type="text"
@@ -180,6 +162,50 @@ function Signup() {
               className={styles.input}
               placeholder="전화번호"
               value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* ✅ CheckPwd 컴포넌트 사용 */}
+          <CheckPwd
+            password={formData.password}
+            confirmPwd={formData.confirmPwd}
+            onChange={handleChange}
+            onValidationChange={handlePasswordValidationChange}
+          />
+
+          <div className={styles.inputGroup}>
+            <input
+              type="text"
+              name="name"
+              className={styles.input}
+              placeholder="이름"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <DatePicker
+              selected={formData.birthday}
+              onChange={handleDateChange}
+              placeholderText="생년월일"
+              dateFormat="yyyy-MM-dd"
+              className={styles.input}
+              maxDate={new Date()}
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={100}
+            />
+          </div>
+          <div className={styles.inputGroup}>
+            <input
+              type="text"
+              name="nickname"
+              className={styles.input}
+              placeholder="닉네임"
+              value={formData.nickname}
               onChange={handleChange}
               required
             />
