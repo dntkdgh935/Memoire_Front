@@ -9,6 +9,7 @@ import ArchiveMain from "../pages/archive/ArchiveMain";
 
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
+import UserRouter from "./UserRouter";
 
 function AppRouter() {
   return (
@@ -16,8 +17,7 @@ function AppRouter() {
       <Route path="/" element={<LibraryMain />} />
       <Route path="/library/*" element={<LibraryRouter />} />
       <Route path="/archive" element={<ArchiveMain />} />
-      {/* <Route path="/atelier" element={<Atelier />} /> */}
-      {/* 추가 페이지도 여기에 등록 가능 */}
+      <Route path="/user/*" element={<UserRouter />} />
     </Routes>
   );
 }

@@ -1,0 +1,111 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: white;
+  padding: 20px;
+}
+
+.loginBox {
+  background-color: #fdfaf6;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid #e0dcd7;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fffdfb;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #b0a49b;
+  box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
+}
+
+.checkboxGroup {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  accent-color: #5b4534;
+}
+
+.loginButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.loginButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.loginButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.signUpLink {
+  margin-top: 16px;
+}
+
+.signUpLink span {
+  font-size: 14px;
+  color: #5b4f46;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.signUpLink span:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,12 @@
+:root {
+  --color-main: #5b4f46;
+  --color-secondary-main: #d4ccbb;
+  --color-semi-white: #fdfbf8;
+  --color-white: #ffffff;
+  --color-normal-text: #4c4c4c;
+  --color-collcard-bg: #f3f3f3;
+  --color-bright-outline: #e3ded9;
+  --color-dark-hover: rgba(0, 0, 0, 0.5);
+  --color-selected-text: #339187;
+  --color-selected-checkbox: #03dac5;
+}

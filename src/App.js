@@ -8,6 +8,10 @@ import AppRouter from "./routers/AppRouter";
 
 import "./App.css";
 
+// color system import
+import "./assets/styles/variables-light.css";
+import "./assets/styles/variables-dark.css";
+
 function App() {
   return (
     <Router>
