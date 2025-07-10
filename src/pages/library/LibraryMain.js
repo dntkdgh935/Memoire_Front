@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
-import CollCard from "../../components/common/CollCard";
 import styles from "./LibraryMain.module.css"; // ✅
 
 // src/pages/library/LibraryMain.js
