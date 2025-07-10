@@ -1,0 +1,221 @@
+.profile-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e1e5e9;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.profile-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  margin-right: 12px;
+}
+
+.avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.avatar-img:hover {
+  transform: scale(1.05);
+}
+
+.avatar-img.avatar-clicked {
+  transform: scale(1.1);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 2px 0;
+}
+
+.handle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.status-bubble {
+  background: #f8f9fa;
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.status-bubble:hover {
+  background: #f1f3f4;
+}
+
+.status-bubble p {
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.4;
+  margin: 0 0 4px 0;
+}
+
+.status-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 0 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 8px;
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  background-color: #f8f9fa;
+}
+
+.stat-item:active {
+  transform: translateY(0);
+}
+
+.stat-number {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.edit-profile-btn {
+  width: 100%;
+  background: #d4b896;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.edit-profile-btn:hover {
+  background: #c4a886;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(212, 184, 150, 0.3);
+}
+
+.edit-profile-btn:active {
+  background: #b49876;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(212, 184, 150, 0.3);
+}
+
+.edit-profile-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 184, 150, 0.3);
+}
+
+@keyframes statChange {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    color: #d4b896;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.stat-number.updating {
+  animation: statChange 0.5s ease;
+}
+
+@media (max-width: 360px) {
+  .profile-card {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .stats-container {
+    padding: 0 4px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-item {
+    padding: 6px 2px;
+  }
+}
+
+.profile-card.loading {
+  pointer-events: none;
+}
+
+.profile-card.loading .avatar-img,
+.profile-card.loading .stat-number {
+  opacity: 0.6;
+}
+
+.profile-card.error {
+  border-color: #ff6b6b;
+}
+
+.profile-card.error .edit-profile-btn {
+  background: #ff6b6b;
+}
+
+.profile-card.error .edit-profile-btn:hover {
+  background: #ff5252;
+}
