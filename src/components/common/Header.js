@@ -63,7 +63,7 @@ function Header() {
   };
   // 유저 아이콘 클릭 시 로그인 페이지로 이동
   const handleUserIconClick = () => {
-    navigate("/login");
+    navigate("/user/login");
   };
 
   return (

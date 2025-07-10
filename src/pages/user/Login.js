@@ -7,7 +7,7 @@ import styles from "./Login.module.css";
 
 function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
+  const [loginId, setloginId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [autoLogin, setAutoLogin] = useState(false);
@@ -46,7 +46,7 @@ function Login({ onLoginSuccess }) {
   };
 
   const handleSignUp = () => {
-    navigate("/SingUp");
+    navigate("/user/signUp");
   };
 
   //로그인 처리
@@ -55,15 +55,15 @@ function Login({ onLoginSuccess }) {
 
     setIsLoggedIn(true);
     try {
-      const response = await apiClient.post("/Login", {
-        userId: userId,
+      const response = await apiClient.post("/login", {
+        loginId: loginId,
         password: password,
         autoLoginFlag: autoLogin ? "Y" : "N",
       });
 
       console.log("서버 응답 데이터 : ", response);
 
-      const { accessToken, refreshToken, userId, name, role, autoLoginFlag } =
+      const { accessToken, refreshToken, userId, role, autoLoginFlag } =
         response.data;
 
       const tokenPayload = base64DecodeUnicode(accessToken.split(".")[1]);
@@ -103,7 +103,7 @@ function Login({ onLoginSuccess }) {
     }
   };
 
-  // TODO: Add your JSX for the login form here, using userId, password, handleLogin, handleKeyDown, etc.
+  // TODO: Add your JSX for the login form here, using loginId, password, handleLogin, handleKeyDown, etc.
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
@@ -113,8 +113,8 @@ function Login({ onLoginSuccess }) {
             <input
               className={styles.input}
               type="text"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              value={loginId}
+              onChange={(e) => setloginId(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="아이디"
               aria-label="User ID"
