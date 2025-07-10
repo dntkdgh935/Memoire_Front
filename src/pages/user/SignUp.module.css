@@ -44,6 +44,8 @@
   border-radius: 8px;
   background-color: #fffdfb;
   transition: border-color 0.3s ease;
+  width: 100%; /* ← 꼭 추가하세요 */
+  box-sizing: border-box;
 }
 
 .input:focus {

@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
     name: "",
     userid: "",
     autoLoginFlag: "",
+    nickname: "",
   });
 
   const logout = () => {
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }) => {
       name: "",
       userid: "",
       autoLoginFlag: "",
+      nickname: "",
     });
     // window.location.href = "/"; // 필요한 경우, 로그아웃 후 리다이렉트
   };
@@ -74,6 +76,7 @@ export const AuthProvider = ({ children }) => {
           name: parsedToken.name, // 페이로드에 name이 있다면
           userid: parsedToken.userId,
           autoLoginFlag: parsedToken.autoLoginFlag, // 서버에서 받은 autoLoginFlag 값을 여기에 저장
+          nickname: parsedToken.nickname,
         });
         // ✅ 서버에서 받은 autoLoginFlag 값을 localStorage에 저장
         localStorage.setItem("autoLoginFlag", parsedToken.autoLoginFlag);
@@ -125,6 +128,7 @@ export const AuthProvider = ({ children }) => {
           name: parsedToken.name,
           userid: parsedToken.userId,
           autoLoginFlag: storedAutoLoginFlag || "N", // 저장된 플래그 사용
+          nickname: parsedToken.nickname,
         });
         console.log("AuthInfo 업데이트 성공: ", parsedToken);
       } else {
