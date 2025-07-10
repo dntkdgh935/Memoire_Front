@@ -1,0 +1,19 @@
+.actionButtons {
+  display: flex;
+  justify-content: space-between; /* 버튼들 간의 간격을 고르게 배치 */
+  align-items: center;
+  width: 100%; /* 부모 요소를 꽉 채우도록 */
+  padding: 10px 20px; /* 버튼들이 충분한 여백을 가질 수 있도록 */
+  box-sizing: border-box; /* padding이 포함되도록 */
+}
+
+.actionButtons > div {
+  flex: 1; /* 각 버튼을 동일한 크기로 설정 */
+  display: flex;
+  justify-content: center; /* 버튼 안의 텍스트와 아이콘을 중앙에 배치 */
+  gap: 10px; /* 버튼 내부에서 아이콘과 텍스트 사이 간격 추가 */
+}
+
+.actionButtons > div:not(:last-child) {
+  margin-right: 10px; /* 버튼 간의 간격을 추가 */
+}
