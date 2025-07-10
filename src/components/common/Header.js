@@ -40,15 +40,18 @@
 // }
 
 // export default Header;
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaThLarge, FaUserCircle, FaBell, FaMoon } from "react-icons/fa";
 import styles from "./Header.module.css";
+import { AuthContext } from "../../AuthProvider";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
   const [searchKeyword, setSearchKeyword] = useState("");
   const navigate = useNavigate();
+
+  const { isLoggedIn, logout } = useContext(AuthContext);
 
   const handleSearch = () => {
     if (!searchKeyword.trim()) return;
@@ -64,6 +67,17 @@ function Header() {
   // 유저 아이콘 클릭 시 로그인 페이지로 이동
   const handleUserIconClick = () => {
     navigate("/user/login");
+  };
+
+  const handleAuthButtonClick = () => {
+    if (isLoggedIn) {
+      // 로그인 상태이면 로그아웃 처리
+      logout();
+      navigate("/"); // 로그아웃 후 메인 페이지 또는 로그인 페이지로 리다이렉트
+    } else {
+      // 로그아웃 상태이면 로그인 페이지로 이동
+      navigate("/user/login");
+    }
   };
 
   return (
@@ -104,6 +118,12 @@ function Header() {
           onClick={handleUserIconClick}
         />
         <FaBell className={styles.iconButton} />
+        <button
+          className={styles.authButton} // 스타일 클래스 추가
+          onClick={handleAuthButtonClick}
+        >
+          {isLoggedIn ? "로그아웃" : "로그인"}
+        </button>
       </div>
     </header>
   );
