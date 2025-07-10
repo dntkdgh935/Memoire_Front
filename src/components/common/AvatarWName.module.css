@@ -1,0 +1,48 @@
+/* inCollLabel (작은 버전) */
+.inCollLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatarSmall {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.usernameSmall {
+  font-size: 14px;
+  color: #333;
+}
+
+/* inUserCard (큰 버전) */
+.inUserCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatarLarge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userTextBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.usernameLarge {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.displayId {
+  font-size: 14px;
+  color: #666;
+}

@@ -1,6 +1,7 @@
 - npm install
 - npm install react-icons: 관련 이모티콘
 - npm install axios : 요청 보내기
+- npm install react-masonry-css: grid 만들기
 
 - npm start
 
