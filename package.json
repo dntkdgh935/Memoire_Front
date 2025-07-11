@@ -8,11 +8,13 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.10.0",
+    "cleave.js": "^1.6.0",
     "date-fns": "^4.1.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "libphonenumber-js": "^1.12.9",
     "prettier": "^3.6.2",
     "react": "^19.1.0",
     "react-datepicker": "^8.4.0",
@@ -25,7 +27,8 @@
     "recoil": "^0.7.7",
     "redux": "^5.0.1",
     "styled-components": "^6.1.19",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zxcvbn": "^4.4.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -56,6 +59,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.2.0",
+    "react-app-rewired": "^2.2.1",
     "typescript-eslint": "^8.35.1"
   },
   "proxy": "http://localhost:8080"

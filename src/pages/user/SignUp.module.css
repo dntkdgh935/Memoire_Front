@@ -1,3 +1,4 @@
+/* src/pages/user/SignUp.module.css */
 .container {
   display: flex;
   justify-content: center;
@@ -28,9 +29,10 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
+/* 기존 inputGroup (다른 입력 필드에 적용) */
 .inputGroup {
   display: flex;
   flex-direction: column;
@@ -44,7 +46,7 @@
   border-radius: 8px;
   background-color: #fffdfb;
   transition: border-color 0.3s ease;
-  width: 100%; /* ← 꼭 추가하세요 */
+  width: 100%;
   box-sizing: border-box;
 }
 
@@ -54,6 +56,45 @@
   box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
 }
 
+/* 아이디 입력 및 중복 확인 버튼 그룹 스타일 */
+.idInputGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.idInputGroup .input {
+  flex: 7;
+}
+
+.idCheckButton {
+  flex: 3;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.idCheckButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.idCheckButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 기존 스타일 유지 (나머지 부분) */
 .checkboxGroup {
   display: flex;
   justify-content: flex-start;
