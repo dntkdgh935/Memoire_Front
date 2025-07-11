@@ -2,14 +2,18 @@ import React from "react";
 import styles from "./CollCard.module.css";
 import LibCollLabel from "../library/LibCollLabel";
 
-function CollCard({ collection, onActionChange }) {
+function CollCard({ collection, onActionChange, onCollClick }) {
   const cover = collection.thumbnailPath; // collection에서 동적으로 이미지 경로 받기
   console.log(cover);
   const isImage = collection.thumbType == "image";
   const isText = collection.thumbType === "text";
   console.log(collection.thumbType);
+
   return (
-    <div className={styles.card}>
+    <div
+      className={styles.card}
+      onClick={() => onCollClick(collection.collectionid)}
+    >
       {isImage ? (
         <img
           src={`http://localhost:8080${cover}`}

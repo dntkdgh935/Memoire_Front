@@ -1,5 +1,7 @@
 // src/pages/library/LibraryMain.js
 import React, { useState, useEffect, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import TagBar from "../../components/library/TagBar";
@@ -7,6 +9,9 @@ import CollGrid from "../../components/common/CollGrid";
 import styles from "./LibraryMain.module.css"; // ✅
 
 function LibraryMain() {
+  // 페이지 이동용
+  const navigate = useNavigate();
+
   // 유저 관련 states
   const { isLoggedIn, userid } = useContext(AuthContext);
 
@@ -97,6 +102,10 @@ function LibraryMain() {
     );
   };
 
+  const handleCollClick = (collectionId) => {
+    navigate(`detail/${collectionId}`);
+  };
+
   return (
     <>
       {/* <h2>hello</h2> */}
@@ -105,7 +114,11 @@ function LibraryMain() {
         onTagSelect={setSelectedTag}
         savedTags={topTags}
       />
-      <CollGrid colls={recColls} onActionChange={handleActionChange} />
+      <CollGrid
+        colls={recColls}
+        onActionChange={handleActionChange}
+        onCollClick={handleCollClick}
+      />
       {/* <CollCard /> */}
     </>
   );
