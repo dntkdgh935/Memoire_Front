@@ -66,12 +66,33 @@ function LibCollDetailView() {
     return <div>로딩 중...</div>; // 컬렉션 데이터가 없을 때 로딩 화면을 표시합니다.
   }
 
+  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
+  const handleActionChange = async (collectionId, actionType) => {
+    // Spring에 DB 변경 요청
+    const isLiked =
+      actionType === "userlike" ? !collection.userlike : undefined;
+    const isBookmarked =
+      actionType === "userbookmark" ? !collection.userbookmark : undefined;
+
+    if (actionType === "userlike") {
+      await axios.post(
+        `http://localhost:8080/api/library/togglelike?collectionId=${collectionId}&isLiked=${isLiked}`
+      );
+    }
+    if (actionType === "userbookmark") {
+      await axios.post(
+        `http://localhost:8080/api/library/togglebm?collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+      );
+    }
+  };
+
   return (
     <div className={StyleSheet.Page}>
       <LibCollCard
         coll={collection}
         memoryList={memoryList}
         onMemoryClick={handleMemoryClick}
+        onActionChange={handleActionChange}
       />
       <MemoryView memory={selectedMemory} />
     </div>
