@@ -6,6 +6,7 @@ import styles from "./SignUp.module.css";
 import CheckPwd from "../../components/user/CheckPwd";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import UserVerification from "../../components/user/UserVerification";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ function Signup() {
   const [isIdAvailable, setIsIdAvailable] = useState(null);
   // ✅ CheckPwd 컴포넌트의 유효성 상태를 받을 새로운 상태 추가
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [passwordScore, setPasswordScore] = useState(0);
 
   const navigate = useNavigate();
 
@@ -56,7 +58,11 @@ function Signup() {
   const validate = () => {
     // 비밀번호 유효성 (CheckPwd 컴포넌트에서 전달받은 상태 사용)
     if (!isPasswordValid) {
-      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      alert("비밀번호 일치하지 않습니다.");
+      return false;
+    }
+    if (passwordScore < 3) {
+      alert("비밀번호 강도가 약합니다. '강함' 이상으로 설정해주세요.");
       return false;
     }
     // 다른 유효성 검사 (필요하면 추가)
@@ -69,8 +75,9 @@ function Signup() {
   };
 
   // ✅ CheckPwd 컴포넌트에서 유효성 상태를 받아올 함수
-  const handlePasswordValidationChange = (isValid) => {
-    setIsPasswordValid(isValid);
+  const handlePasswordValidationChange = (isValidMatch, score) => {
+    setIsPasswordValid(isValidMatch); // isValidMatch는 이제 일치 여부만
+    setPasswordScore(score); // 강도 점수도 받아옴
   };
   const handleDateChange = (date) => {
     setFormData({ ...formData, birthday: date });
@@ -126,7 +133,7 @@ function Signup() {
 
   const handleSelectPermission = (permission) => {
     setSelectedPermission(permission);
-    setFormData((prev) => ({ ...prev, role: permission })); // roll -> role
+    setFormData((prev) => ({ ...prev, role: permission }));
     setShowPermissions(false);
   };
 
@@ -135,7 +142,10 @@ function Signup() {
       <div className={styles.loginBox}>
         <h2 className={styles.title}>Sign Up</h2>
         <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.inputGroup}>
+          {/* 아이디 입력과 중복 체크 버튼을 감싸는 새로운 inputGroup */}
+          <div className={styles.idInputGroup}>
+            {" "}
+            {/* 이 부분 수정 */}
             <input
               type="text"
               name="loginId"
@@ -144,35 +154,30 @@ function Signup() {
               value={formData.loginId}
               onChange={handleChange}
               required
+              maxLength={12}
             />
             <button
               type="button"
               onClick={handleIdCheck}
-              className={styles.loginButton}
-              style={{ marginTop: "8px" }}
+              className={styles.idCheckButton}
             >
-              아이디 중복 확인
+              중복 확인
             </button>
           </div>
 
-          <div className={styles.inputGroup}>
-            <input
-              type="text"
-              name="phone"
-              className={styles.input}
-              placeholder="전화번호"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <UserVerification
+            phone={formData.phone}
+            setPhone={(val) => setFormData({ ...formData, phone: val })}
+          />
 
           {/* ✅ CheckPwd 컴포넌트 사용 */}
           <CheckPwd
             password={formData.password}
             confirmPwd={formData.confirmPwd}
             onChange={handleChange}
-            onValidationChange={handlePasswordValidationChange}
+            onValidationChange={(isValid, score) =>
+              handlePasswordValidationChange(isValid, score)
+            }
           />
 
           <div className={styles.inputGroup}>
@@ -184,6 +189,7 @@ function Signup() {
               value={formData.name}
               onChange={handleChange}
               required
+              maxLength={5}
             />
           </div>
           <div className={styles.inputGroup}>
@@ -208,6 +214,7 @@ function Signup() {
               value={formData.nickname}
               onChange={handleChange}
               required
+              maxLength={8}
             />
           </div>
           <div

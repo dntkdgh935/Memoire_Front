@@ -27,7 +27,8 @@
     "recoil": "^0.7.7",
     "redux": "^5.0.1",
     "styled-components": "^6.1.19",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zxcvbn": "^4.4.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -58,6 +59,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.2.0",
+    "react-app-rewired": "^2.2.1",
     "typescript-eslint": "^8.35.1"
   },
   "proxy": "http://localhost:8080"

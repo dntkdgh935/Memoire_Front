@@ -3,8 +3,14 @@ import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
 import styles from "./ProfileCard.module.css";
 
-const ProfileCard = () => {
+function ProfileCard() {
   const { userid } = useContext(AuthContext);
+
+  const [user, setUser] = useState({
+    loginId: "",
+    nickname: "",
+    profileImage: "",
+  });
 
   const [stats, setStats] = useState({
     collections: 0,
@@ -14,6 +20,8 @@ const ProfileCard = () => {
   });
 
   const [statusMessage, setStatusMessage] = useState("");
+  const [isEditingStatus, setIsEditingStatus] = useState(false);
+  const [editStatusMessage, setEditStatusMessage] = useState("");
 
   const [isVisible, setIsVisible] = useState(false);
   const [avatarClicked, setAvatarClicked] = useState(false);
@@ -25,23 +33,32 @@ const ProfileCard = () => {
       setIsVisible(true);
     }, 100);
 
-    const fetchStats = async () => {
+    const fetchStuff = async () => {
       try {
+        const userInfo = await apiClient.get("/archive/userinfo", {
+          params: { userid: userid },
+        });
+        console.log(userInfo.data);
+
+        setUser({
+          loginId: userInfo.data.loginId,
+          nickname: userInfo.data.nickname,
+          profileImage: userInfo.data.profileImagePath,
+        });
+
+        setStatusMessage(userInfo.data.statusMessage || "");
+
         const collectionNum = await apiClient.get(`/archive/numCollections`, {
-          // TODO: Add a method to call user info and add it to params
           params: { userid: userid },
         });
 
         const memoriesNum = await apiClient.get(`/archive/numMemory`, {
-          // TODO: Add a method to call user info and add it to params
           params: { userid: userid },
         });
         const followingNum = await apiClient.get(`/archive/numFollowing`, {
-          // TODO: Add a method to call user info and add it to params
           params: { userid: userid },
         });
         const followerNum = await apiClient.get(`/archive/numFollowers`, {
-          // TODO: Add a method to call user info and add it to params
           params: { userid: userid },
         });
         console.log(collectionNum.data);
@@ -50,19 +67,16 @@ const ProfileCard = () => {
         console.log(followerNum.data);
 
         setStats({
-          collections: collectionNum.data.count,
-          memories: memoriesNum.data.count,
-          following: followingNum.data.count,
-          followers: followerNum.data.count,
+          collections: collectionNum.data,
+          memories: memoriesNum.data,
+          following: followingNum.data,
+          followers: followerNum.data,
         });
       } catch (error) {
         console.error("Error fetching user stats:", error);
-        setStatusMessage("사용자 정보를 불러오는 데 실패했습니다.");
       }
     };
-    if (userid) {
-      fetchStats();
-    }
+    fetchStuff();
   }, [userid]);
 
   const handleEditProfile = () => {
@@ -74,16 +88,50 @@ const ProfileCard = () => {
   };
 
   const handleStatusClick = () => {
-    const originalMessage = [...statusMessage];
-    setStatusMessage(["상태 메시지를 클릭했습니다!"]);
-    setTimeout(() => {
-      setStatusMessage(originalMessage);
-    }, 2000);
+    setEditStatusMessage(statusMessage);
+    setIsEditingStatus(true);
   };
 
   const handleAvatarClick = () => {
     setAvatarClicked(true);
     setTimeout(() => setAvatarClicked(false), 200);
+  };
+
+  const handleStatusSave = async () => {
+    try {
+      await apiClient.post("/archive/updateStatusMessage", null, {
+        params: {
+          userid: userid,
+          statusMessage: editStatusMessage,
+        },
+      });
+
+      setStatusMessage(editStatusMessage);
+      setIsEditingStatus(false);
+    } catch (error) {
+      console.error("상태 메시지 저장 실패", error);
+      alert("상태 메시지 저장에 실패했습니다.");
+    }
+  };
+
+  const handleStatusCancel = () => {
+    setIsEditingStatus(false);
+    setEditStatusMessage("");
+  };
+
+  const handleStatusKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const input = e.target.value;
+      const byteLength = new Blob([input]).size;
+      if (byteLength <= 200) {
+        handleStatusSave();
+      } else {
+        alert("상태 메시지는 최대 200바이트까지만 입력 가능합니다.");
+      }
+    } else if (e.key === "Escape") {
+      handleStatusCancel();
+    }
   };
 
   return (
@@ -93,20 +141,41 @@ const ProfileCard = () => {
       <div className={styles["profile-header"]}>
         <div className={styles["profile-avatar"]}>
           <img
-            src="https://static.mothership.sg/1/2021/07/cat.jpg"
+            src={
+              user.profileImage
+                ? `http://localhost:8080/upload_files/user_profile/${user.profileImage}`
+                : "https://static.mothership.sg/1/2021/07/cat.jpg"
+            }
             alt="Profile"
             className={`${styles["avatar-img"]} ${avatarClicked ? styles["avatar-clicked"] : ""}`}
             onClick={handleAvatarClick}
           />
         </div>
         <div className={styles["profile-info"]}>
-          <h2 className={styles["username"]}>username</h2>
-          <p className={styles["handle"]}>@memo_jeong</p>
+          <h2 className={styles["username"]}>
+            {user.nickname ? user.nickname : userid}
+          </h2>
+          <p className={styles["handle"]}>@{user.loginId}</p>
         </div>
       </div>
 
-      <div className={styles["status-bubble"]} onClick={handleStatusClick}>
-        <p>{statusMessage}</p>
+      <div className={styles["status-bubble"]}>
+        {isEditingStatus ? (
+          <>
+            <textarea
+              value={editStatusMessage}
+              onChange={(e) => setEditStatusMessage(e.target.value)}
+              rows={3}
+              className={styles["status-textarea"]}
+              autoFocus
+              onKeyDown={handleStatusKeyDown}
+            />
+          </>
+        ) : (
+          <p onClick={handleStatusClick} style={{ cursor: "pointer" }}>
+            {statusMessage || "상태메시지를 입력하세요."}
+          </p>
+        )}
       </div>
 
       <div className={styles["stats-container"]}>
@@ -148,6 +217,6 @@ const ProfileCard = () => {
       </button>
     </div>
   );
-};
+}
 
 export default ProfileCard;

@@ -33,7 +33,7 @@ const parseAccessToken = (token) => {
 
 export const AuthProvider = ({ children }) => {
   const [authInfo, setAuthInfo] = useState({
-    isLoggedIn: false,
+    isLoggedIn: null,
     role: "",
     name: "",
     userid: "",
@@ -143,10 +143,8 @@ export const AuthProvider = ({ children }) => {
       }
     } else {
       // 토큰이 아예 없는 경우 (처음 방문했거나 이미 로그아웃된 상태)
-      // 명시적으로 isLoggedIn: false로 설정되어 있으므로 추가적인 logout() 호출은 불필요할 수 있으나,
-      // 일관성을 위해 호출해도 무방합니다.
-      // setAuthInfo가 이미 초기값으로 설정되어 있으므로 명시적 호출은 생략 가능
       console.log("토큰 없음. 로그인 상태 아님.");
+      logout();
     }
   }, []); // 의존성 배열 비워두어 컴포넌트 마운트 시 한 번만 실행
 

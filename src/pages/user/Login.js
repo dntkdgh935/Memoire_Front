@@ -10,7 +10,7 @@ function Login({ onLoginSuccess }) {
   const [loginId, setloginId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [autoLogin, setAutoLogin] = useState(false);
+  const [autoLogin, setAutoLogin] = useState("");
 
   // AuthProvider 에서 가져온 updateTokens 함수 사용 선언함
   const { updateTokens } = useContext(AuthContext);

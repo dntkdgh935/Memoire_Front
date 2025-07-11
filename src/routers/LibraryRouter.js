@@ -12,9 +12,9 @@ function LibraryRouter() {
       {/* <Route path="/library" element={<LibraryMain />} />
       <Route path="/library/detail/:id" element={<LibCollDetailView />} />
       <Route path="/library/archive/:id" element={<ArchiveVisit />} /> */}
-      <Route path="" element={<LibraryMain />} />
-      <Route path="detail/:id" element={<LibCollDetailView />} />
-      <Route path="archive/:id" element={<ArchiveVisit />} />
+      <Route path="/" element={<LibraryMain />} />
+      <Route path="/detail/:id" element={<LibCollDetailView />} />
+      <Route path="/archive/:id" element={<ArchiveVisit />} />
     </Routes>
   );
 }
