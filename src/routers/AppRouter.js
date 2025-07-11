@@ -14,7 +14,7 @@ import UserRouter from "./UserRouter";
 function AppRouter() {
   return (
     <Routes>
-      {/* <Route path="/" element={<LibraryMain />} /> */}
+      <Route path="/" element={<LibraryMain />} />
       <Route path="/library/*" element={<LibraryRouter />} />
       <Route path="/archive" element={<ArchiveMain />} />
       <Route path="/user/*" element={<UserRouter />} />

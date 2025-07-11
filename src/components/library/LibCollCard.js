@@ -5,7 +5,7 @@ import MemoryList from "../../components/common/MemoryList";
 import CollActionBtn from "../../components/common/CollActionBtn";
 import AvatarWName from "../common/AvatarWName";
 
-function LibCollCard({ coll, memoryList, onMemoryClick }) {
+function LibCollCard({ coll, memoryList, onMemoryClick, onActionChange }) {
   if (!coll) {
     return <div>로딩 중...</div>; // 컬렉션 데이터가 없을 때 로딩 화면을 표시합니다.
   }
@@ -22,13 +22,22 @@ function LibCollCard({ coll, memoryList, onMemoryClick }) {
           }}
         />
 
+        {/* authorid로 loginId 조회해 와야서 출력하는 걸로 고쳐야 함~~~*/}
         <div className={styles.userName}>{coll.authorid}</div>
         <div className={styles.collectionDate}>{coll.createdDate}</div>
       </div>
 
       <div className={styles.cardFooter}>
-        <CollActionBtn btnType="like" coll={coll} />
-        <CollActionBtn btnType="bookmark" coll={coll} />
+        <CollActionBtn
+          btnType="like"
+          coll={coll}
+          onActionChange={onActionChange}
+        />
+        <CollActionBtn
+          btnType="bookmark"
+          coll={coll}
+          onActionChange={onActionChange}
+        />
       </div>
 
       <div className={styles.cardTags}>

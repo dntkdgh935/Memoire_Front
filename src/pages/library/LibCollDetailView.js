@@ -84,7 +84,49 @@ function LibCollDetailView() {
         `http://localhost:8080/api/library/togglebm?collectionId=${collectionId}&isBookmarked=${isBookmarked}`
       );
     }
+    // 여기에 맞게 수정
+    setCollection(
+      collection.collectionid === collectionId
+        ? {
+            ...collection,
+            [actionType]: !collection[actionType], // 상태 토글
+            // 좋아요/북마크 카운트 업데이트
+            [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+              collection[actionType] === true
+                ? collection[
+                    actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                  ] - 1
+                : collection[
+                    actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                  ] + 1,
+          }
+        : collection
+    );
   };
+
+  /*
+  setRecColls((prevState) =>
+      prevState.map((coll) =>
+        coll.collectionid === collectionId
+          ? {
+              ...coll,
+              [actionType]: !coll[actionType], // 상태 토글
+              // 좋아요/북마크 카운트 업데이트
+              [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+                coll[actionType] === true
+                  ? coll[
+                      actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                    ] - 1
+                  : coll[
+                      actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                    ] + 1,
+            }
+          : coll
+      )
+    );
+  };
+  
+  */
 
   return (
     <div className={StyleSheet.Page}>
