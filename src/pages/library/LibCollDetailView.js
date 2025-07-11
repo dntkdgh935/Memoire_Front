@@ -19,10 +19,11 @@ function LibCollDetailView() {
         const res = await axios.get(
           `http://localhost:8080/api/library/collection/${id}`
         );
-        console.log("선택한 컬렉션: " + res.data);
+        console.log(res.data);
         setCollection(res.data);
-        // 컬렉션에 속한 메모리 리스트 불러오기
-        fetchMemoryList(res.data.collectionId); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
+        // // 컬렉션에 속한 메모리 리스트 불러오기
+        // console.log("** id는: " + collection.collectionid);
+        fetchMemoryList(res.data.collectionid); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
       } catch (err) {
         console.error("🚨 컬렉션 정보 불러오기 실패", err);
       }
@@ -31,10 +32,10 @@ function LibCollDetailView() {
   }, [id]);
 
   // 2. coll 내부의 메모리 리스트 불러오기 함수
-  const fetchMemoryList = async (collectionId) => {
+  const fetchMemoryList = async (collectionid) => {
     try {
       const res = await axios.get(
-        `http://localhost:8080/api/library/collection/${collectionId}/memories`
+        `http://localhost:8080/api/library/collection/memories/${collectionid}`
       );
       console.log("메모리 리스트:", res.data);
     } catch (err) {
