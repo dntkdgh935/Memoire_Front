@@ -2,7 +2,7 @@
 import React from "react";
 import styles from "./MemoryList.module.css";
 
-function MemoryList() {
+function MemoryList(memoryList, onMemoryClick) {
   return <div></div>;
 }
 
