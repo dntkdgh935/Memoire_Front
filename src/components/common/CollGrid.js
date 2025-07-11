@@ -4,7 +4,7 @@ import Masonry from "react-masonry-css";
 import CollCard from "./CollCard";
 import styles from "./CollGrid.module.css";
 
-function CollGrid({ colls }) {
+function CollGrid({ colls, onActionChange }) {
   const breakpointColumnsObj = {
     default: 4,
     1200: 3,
@@ -21,7 +21,11 @@ function CollGrid({ colls }) {
       columnClassName={styles.myMasonryGridColumn}
     >
       {colls.map((coll) => (
-        <CollCard key={coll.collectionid} collection={coll} />
+        <CollCard
+          key={coll.collectionid}
+          collection={coll}
+          onActionChange={onActionChange}
+        />
       ))}
     </Masonry>
   );

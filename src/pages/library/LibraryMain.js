@@ -1,3 +1,4 @@
+// src/pages/library/LibraryMain.js
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
@@ -5,14 +6,18 @@ import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
 import styles from "./LibraryMain.module.css"; // ✅
 
-// src/pages/library/LibraryMain.js
 function LibraryMain() {
-  //tag bar 관련 states
+  // 유저 관련 states
   const { isLoggedIn, userid } = useContext(AuthContext);
+
+  //tag bar 관련 states
   const [selectedTag, setSelectedTag] = useState("전체");
   const [topTags, setTopTags] = useState([]);
 
-  // top 5 태그 가져오기
+  // Collection 목록 states
+  const [recColls, setRecColls] = useState([]);
+
+  // TagBar: top 5 태그 가져오기
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -46,11 +51,51 @@ function LibraryMain() {
     fetchCollections();
   }, []);
 
-  // Collection 목록 states
-  const [recColls, setRecColls] = useState([]);
-  const [recPage, setRecPage] = useState(0); // 현재 페이지 (스크롤용)
-  const [hasMore, setHasMore] = useState(true); // 더 불러올 게 있는지
-  const [loading, setLoading] = useState(false); // 중복 호출 방지
+  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
+  const handleActionChange = async (collectionId, actionType) => {
+    // Spring에 DB 변경 요청
+    const isLiked =
+      actionType === "userlike"
+        ? !recColls.find((coll) => coll.collectionid === collectionId).userlike
+        : undefined;
+    const isBookmarked =
+      actionType === "userbookmark"
+        ? !recColls.find((coll) => coll.collectionid === collectionId)
+            .userbookmark
+        : undefined;
+
+    if (actionType === "userlike") {
+      await axios.post(
+        `http://localhost:8080/api/library/togglelike?collectionId=${collectionId}&isLiked=${isLiked}`
+      );
+    }
+    if (actionType === "userbookmark") {
+      await axios.post(
+        `http://localhost:8080/api/library/togglebm?collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+      );
+    }
+
+    // UI 상태 변경
+    setRecColls((prevState) =>
+      prevState.map((coll) =>
+        coll.collectionid === collectionId
+          ? {
+              ...coll,
+              [actionType]: !coll[actionType], // 상태 토글
+              // 좋아요/북마크 카운트 업데이트
+              [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+                coll[actionType] === true
+                  ? coll[
+                      actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                    ] - 1
+                  : coll[
+                      actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                    ] + 1,
+            }
+          : coll
+      )
+    );
+  };
 
   return (
     <>
@@ -60,7 +105,7 @@ function LibraryMain() {
         onTagSelect={setSelectedTag}
         savedTags={topTags}
       />
-      <CollGrid colls={recColls} />
+      <CollGrid colls={recColls} onActionChange={handleActionChange} />
       {/* <CollCard /> */}
     </>
   );

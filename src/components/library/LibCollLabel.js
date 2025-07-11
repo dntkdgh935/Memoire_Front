@@ -7,48 +7,46 @@ import AvatarWName from "../common/AvatarWName"; // 이 import도 필요합니�
 import CollActionButton from "../common/CollActionBtn";
 // 좋아요 클릭 시 처리 함수
 
-function LibCollLabel({ coll }) {
-  const [isLiked, setIsLiked] = useState(coll.isLiked || false); // 좋아요 상태 관리
-  const [isBookmarked, setIsBookmarked] = useState(coll.isBookmarked || false); // 북마크 상태 관리
-  const [likeCount, setLikeCount] = useState(coll.likeCount);
-  const [bookmarkCount, setBookmarkCount] = useState(coll.bookmarkCount);
+function LibCollLabel({ coll, onActionChange }) {
+  // const [isLiked, setIsLiked] = useState(coll.isLiked || false); // 좋아요 상태 관리
+  // const [isBookmarked, setIsBookmarked] = useState(coll.isBookmarked || false); // 북마크 상태 관리
 
-  const toggleLikeClick = async () => {
-    try {
-      // const response = await axios.post("/api/library/likecoll", {
-      //   collectionId: coll.collectionid,
-      //   isLiked: !isLiked,
-      // });
-      const response = await axios.post(
-        `/api/library/likecoll?collectionId=${coll.collectionid}&isLiked=${!isLiked}`
-      );
+  // const toggleLikeClick = async () => {
+  //   try {
+  //     // const response = await axios.post("/api/library/likecoll", {
+  //     //   collectionId: coll.collectionid,
+  //     //   isLiked: !isLiked,
+  //     // });
+  //     const response = await axios.post(
+  //       `/api/library/likecoll?collectionId=${coll.collectionid}&isLiked=${!isLiked}`
+  //     );
 
-      if (response.status === 200) {
-        setIsLiked(!isLiked); // 상태를 토글
-      } else {
-        console.error("Error liking the collection");
-      }
-    } catch (error) {
-      console.error("Error sending like request", error);
-    }
-  };
+  //     if (response.status === 200) {
+  //       setIsLiked(!isLiked); // 상태를 토글
+  //     } else {
+  //       console.error("Error liking the collection");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending like request", error);
+  //   }
+  // };
 
-  // 북마크 클릭 시 처리 함수
-  const toggleBMClick = async () => {
-    try {
-      const response = await axios.post(
-        `/api/library/bmcoll?collectionId=${coll.collectionid}&isBookmarked=${!isBookmarked}`
-      );
+  // // 북마크 클릭 시 처리 함수
+  // const toggleBMClick = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `/api/library/bmcoll?collectionId=${coll.collectionid}&isBookmarked=${!isBookmarked}`
+  //     );
 
-      if (response.status === 200) {
-        setIsBookmarked(!isBookmarked); // 상태를 토글
-      } else {
-        console.error("Error bookmarking the collection");
-      }
-    } catch (error) {
-      console.error("Error sending bookmark request", error);
-    }
-  };
+  //     if (response.status === 200) {
+  //       setIsBookmarked(!isBookmarked); // 상태를 토글
+  //     } else {
+  //       console.error("Error bookmarking the collection");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending bookmark request", error);
+  //   }
+  // };
 
   return (
     <div className={styles.overlay}>
@@ -65,16 +63,14 @@ function LibCollLabel({ coll }) {
         <p>{coll.createdDate}</p>
         <div className={styles.actionButtons}>
           <CollActionButton
-            type="like"
-            count={coll.likeCount}
-            onClick={toggleLikeClick}
-            isClicked={isLiked}
+            coll={coll}
+            btnType="like"
+            onActionChange={onActionChange}
           />
           <CollActionButton
-            type="bookmark"
-            count={coll.bookmarkCount}
-            onClick={toggleBMClick}
-            isClicked={isBookmarked}
+            coll={coll}
+            btnType="bookmark"
+            onActionChange={onActionChange}
           />
         </div>
       </div>

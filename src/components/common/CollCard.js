@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./CollCard.module.css";
 import LibCollLabel from "../library/LibCollLabel";
 
-function CollCard({ collection }) {
+function CollCard({ collection, onActionChange }) {
   const cover = collection.thumbnailPath; // collection에서 동적으로 이미지 경로 받기
   console.log(cover);
   const isImage = collection.thumbType == "image";
@@ -29,7 +29,7 @@ function CollCard({ collection }) {
         </div>
       )}
 
-      <LibCollLabel coll={collection} />
+      <LibCollLabel coll={collection} onActionChange={onActionChange} />
     </div>
   );
 }
