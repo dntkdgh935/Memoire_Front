@@ -8,46 +8,6 @@ import CollActionButton from "../common/CollActionBtn";
 // 좋아요 클릭 시 처리 함수
 
 function LibCollLabel({ coll, onActionChange }) {
-  // const [isLiked, setIsLiked] = useState(coll.isLiked || false); // 좋아요 상태 관리
-  // const [isBookmarked, setIsBookmarked] = useState(coll.isBookmarked || false); // 북마크 상태 관리
-
-  // const toggleLikeClick = async () => {
-  //   try {
-  //     // const response = await axios.post("/api/library/likecoll", {
-  //     //   collectionId: coll.collectionid,
-  //     //   isLiked: !isLiked,
-  //     // });
-  //     const response = await axios.post(
-  //       `/api/library/likecoll?collectionId=${coll.collectionid}&isLiked=${!isLiked}`
-  //     );
-
-  //     if (response.status === 200) {
-  //       setIsLiked(!isLiked); // 상태를 토글
-  //     } else {
-  //       console.error("Error liking the collection");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error sending like request", error);
-  //   }
-  // };
-
-  // // 북마크 클릭 시 처리 함수
-  // const toggleBMClick = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `/api/library/bmcoll?collectionId=${coll.collectionid}&isBookmarked=${!isBookmarked}`
-  //     );
-
-  //     if (response.status === 200) {
-  //       setIsBookmarked(!isBookmarked); // 상태를 토글
-  //     } else {
-  //       console.error("Error bookmarking the collection");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error sending bookmark request", error);
-  //   }
-  // };
-
   return (
     <div className={styles.overlay}>
       <div className={styles.label}>

@@ -10,6 +10,7 @@ function LibCollDetailView() {
 
   const [collection, setCollection] = useState(null); // 컬렉션 정보 상태
   const [selectedMemory, setSelectedMemory] = useState(null); // 메모리 리스트에서 선택된 메모리(view에 나타날 메모리)
+  const [memoryList, setMemoryList] = useState(null);
 
   //1.  컬렉션 정보 및 내부 메모리 목록 가져오기
   useEffect(() => {
@@ -23,6 +24,7 @@ function LibCollDetailView() {
         setCollection(res.data);
         // // 컬렉션에 속한 메모리 리스트 불러오기
         // console.log("** id는: " + collection.collectionid);
+        console.log(collection);
         fetchMemoryList(res.data.collectionid); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
       } catch (err) {
         console.error("🚨 컬렉션 정보 불러오기 실패", err);
@@ -60,9 +62,17 @@ function LibCollDetailView() {
   // 메모리 선택 처리
   const handleMemorySelect = (memoryId) => {};
 
+  if (!collection) {
+    return <div>로딩 중...</div>; // 컬렉션 데이터가 없을 때 로딩 화면을 표시합니다.
+  }
+
   return (
     <div className={StyleSheet.Page}>
-      <LibCollCard coll={collection} onMemoryClick={handleMemoryClick} />
+      <LibCollCard
+        coll={collection}
+        memoryList={memoryList}
+        onMemoryClick={handleMemoryClick}
+      />
       <MemoryView memory={selectedMemory} />
     </div>
   );
