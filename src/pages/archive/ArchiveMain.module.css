@@ -1,0 +1,17 @@
+.profileContainer {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 32px;
+  width: 100%;
+  align-items: start;
+}
+
+.sidebar {
+  display: fles;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.content {
+  width: 100%;
+}
