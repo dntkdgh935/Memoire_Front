@@ -1,0 +1,61 @@
+.memoryListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'Pretendard', sans-serif;
+  color: #4d3b30;
+}
+
+.selectBox {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e5ded7;
+  border-radius: 8px;
+  background-color: #fefcfb;
+  font-size: 14px;
+  color: #4d3b30;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'><path d='M1 1l4 4 4-4' stroke='%234d3b30' stroke-width='1.5' fill='none' fill-rule='evenodd'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 10px 6px;
+}
+
+.memoryListTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.memoryCount {
+  font-size: 12px;
+  color: #a0958c;
+  margin-bottom: 8px;
+}
+
+.memoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.memoryItem {
+  padding: 12px 16px;
+  background-color: #fdfaf7;
+  border: 1px solid #e5ded7;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.memoryItem:hover {
+  background-color: #f1ece7;
+}
+
+.selected {
+  background-color: #4d3b30;
+  color: white;
+  font-weight: 500;
+  border: 1px solid #4d3b30;
+}
