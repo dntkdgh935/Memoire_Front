@@ -1,0 +1,35 @@
+/* src/components/user/UserVerification.module.css */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 4px;
+  position: relative; /* errorText를 절대 위치로 배치하기 위해 relative 설정 */
+}
+
+.input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fffdfb;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #b0a49b;
+  box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
+}
+
+.errorText {
+  font-size: 11px;
+  color: #d9534f;
+  padding-left: 4px;
+  position: absolute; /* 절대 위치로 변경 */
+  top: 100%; /* input 바로 아래에 배치 */
+  left: 0;
+  margin-top: 1px; /* input과의 간격 유지 */
+}

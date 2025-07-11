@@ -1,19 +1,12 @@
 /* src/components/user/CheckPwd.module.css */
-
-/* SignUp.module.css의 .inputGroup과 동일하게 설정하여 일관성 유지 */
-.inputGroup {
-  margin-bottom: 4px; /* 입력 필드 간의 아래쪽 여백 */
-}
-
-/* SignUp.module.css의 .input과 동일하게 설정 */
 .input {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #e0ddd9; /* 기존 스타일과 동일 */
-  border-radius: 8px; /* 기존 스타일과 동일 */
+  border: 1px solid #e0ddd9;
+  border-radius: 8px;
   font-size: 16px;
   color: #4d3b30;
-  box-sizing: border-box; /* 패딩이 width에 포함되도록 */
+  box-sizing: border-box;
   transition: border-color 0.2s ease;
 }
 
@@ -23,14 +16,63 @@
 
 .input:focus {
   outline: none;
-  border-color: #5e4b3c; /* 포커스 시 색상 변경 */
+  border-color: #5e4b3c;
+}
+
+.inputGroup {
+  position: relative;
+}
+
+/* 메시지 래퍼 스타일 */
+.messageWrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 1px;
+  text-align: left;
 }
 
 /* 비밀번호 불일치 메시지 스타일 */
 .errorMessage {
-  color: #d9534f; /* 빨간색 계열 */
-  font-size: 0.85rem;
-  margin-top: 3px;
-  text-align: left;
+  color: #d9534f;
+  font-size: 11px;
+  margin: 0;
   padding-left: 3px;
+}
+
+/* 비밀번호 강도 메시지 스타일 */
+.strength-weak {
+  color: #d9534f;
+  font-size: 11px;
+  margin: 0;
+  padding-left: 3px;
+}
+
+.strength-medium {
+  color: #f0ad4e;
+  font-size: 11px;
+  margin: 0;
+  padding-left: 3px;
+}
+
+.strength-strong {
+  color: #ffcc00;
+  font-size: 11px;
+  margin: 0;
+  padding-left: 3px;
+}
+
+.strength-veryStrong {
+  color: #5cb85c;
+  font-size: 11px;
+  margin: 0;
+  padding-left: 3px;
+}
+
+/* 메시지 공통 클래스 */
+.messageSpace {
+  margin: 0;
+  padding-left: 3px;
+  font-size: 11px;
+  text-align: left;
 }
