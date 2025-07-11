@@ -1,0 +1,74 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Pretendard', sans-serif;
+  color: #4d3b30;
+  background-color: #fdfaf7;
+}
+
+.memoryInfo {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.memoryTitle {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.memoryContent {
+  font-size: 14px;
+  white-space: pre-wrap;
+  color: #444;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.selectBox {
+  padding: 10px;
+  border: 1px solid #e5ded7;
+  border-radius: 8px;
+  background-color: #fffaf5;
+  font-size: 14px;
+  color: #4d3b30;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5ded7;
+  border-radius: 8px;
+  background-color: #fffaf5;
+  font-size: 14px;
+  resize: vertical;
+  color: #4d3b30;
+}
+
+.generateButton {
+  padding: 12px;
+  background-color: #4d3b30;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.generateButton:disabled {
+  background-color: #ccc2ba;
+  cursor: not-allowed;
+}
+
+.generateButton:hover:not(:disabled) {
+  background-color: #3e2f26;
+}
