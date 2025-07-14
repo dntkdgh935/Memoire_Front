@@ -10,16 +10,21 @@ import VisitProfileCard from "../../components/library/VisitProfileCard";
 function ArchiveVisit() {
   const { userid: ownerid } = useParams();
   const { userid: myid } = useContext(AuthContext);
+
   const [isFollowing, setIsFollowing] = useState(false);
 
   // 해당 아카이브 소유자에 대한 팔로우 상태 가져옴
   useEffect(() => {
+    if (!myid || !ownerid) return; // ⭐ 유효한 경우만 진행
     const fetchFollowStatus = async () => {
+      console.log("**myid: " + myid);
       try {
-        const res = await apiClient.get(`/library/checkFollow`, {
+        // `http://localhost:8080/api/library/collection/${id}`
+        const res = await apiClient.get(`api/library/getRelationshipStatus`, {
           params: { userid: myid, targetid: ownerid },
         });
         setIsFollowing(res.data);
+        console.log("^^^팔로우 상태 확인 성공!~~:", res.data);
       } catch (e) {
         console.error("팔로우 상태 확인 실패", e);
       }
