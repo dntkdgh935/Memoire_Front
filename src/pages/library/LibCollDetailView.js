@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import LibCollCard from "../../components/library/LibCollCard";
 import MemoryView from "../../components/common/MemoryView";
+import styles from "./LibCollDetailView.module.css"; // ✅
 
 function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
@@ -12,6 +13,10 @@ function LibCollDetailView() {
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [selectedMemory, setSelectedMemory] = useState(null); // 메모리 리스트에서 선택된 메모리(view에 나타날 메모리)
   const [memoryList, setMemoryList] = useState(null);
+
+  useEffect(() => {
+    console.log("✅ [변경됨] selectedMemory updated:", selectedMemory);
+  }, [selectedMemory]);
 
   //1.  컬렉션 정보 및 내부 메모리 목록 가져오기
   useEffect(() => {
@@ -42,10 +47,6 @@ function LibCollDetailView() {
       );
       setMemoryList(res.data);
       console.log("1째 메모리 - " + res.data[0].title);
-
-      //불러온 메모리 중 1째가 default로 선택되어 있게 함.
-      // setSelectedMemory(res.data[0]);
-      console.log("selected Memory: " + selectedMemory);
     } catch (err) {
       console.error("🚨 메모리 리스트 불러오기 실패", err);
     }
@@ -59,6 +60,7 @@ function LibCollDetailView() {
         `http://localhost:8080/api/library/memory/${memoryid}` // 메모리 아이디로 메모리 상세 요청
       );
       setSelectedMemory(res.data); // 응답 데이터를 selectedMemory에 저장
+      console.log("선택된 메모리 디테일:" + res.data);
       console.log("선택된 메모리 디테일:" + selectedMemory);
     } catch (err) {
       console.error("🚨 메모리 불러오기 실패", err); // 에러 핸들링
@@ -108,7 +110,7 @@ function LibCollDetailView() {
   };
 
   return (
-    <div className={StyleSheet.Page}>
+    <div className={styles.detailContainer}>
       <LibCollCard
         coll={collection}
         memoryList={memoryList}
@@ -116,7 +118,7 @@ function LibCollDetailView() {
         onActionChange={handleActionChange}
         selectedMemoryId={selectedMemoryId}
       />
-      <MemoryView memory={selectedMemory} />
+      <MemoryView selectedMemory={selectedMemory} />
     </div>
   );
 }
