@@ -1,4 +1,3 @@
-// src/pages/user/Login.js : 로그인 페이지
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/axios";
@@ -7,21 +6,19 @@ import styles from "./Login.module.css";
 
 function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
-  const [loginId, setloginId] = useState("");
+  const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [autoLogin, setAutoLogin] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 진행 중 상태
+  const [autoLogin, setAutoLogin] = useState(false); // 체크박스 상태로 변경
+  const [isSocialLoginProcessing, setIsSocialLoginProcessing] = useState(false); // 소셜 로그인 진행 중 상태
 
-  // AuthProvider 에서 가져온 updateTokens 함수 사용 선언함
   const { updateTokens } = useContext(AuthContext);
 
-  // 로그인 상태일 시 메인페이지로
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) navigate("/");
   }, [navigate]);
 
-  // Base64 디코딩 함수 추가
   const base64DecodeUnicode = (base64Url) => {
     try {
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -38,7 +35,6 @@ function Login({ onLoginSuccess }) {
     }
   };
 
-  // enter 키 누르면 로그인 실행 처리 함수 추가
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleLogin();
@@ -49,62 +45,68 @@ function Login({ onLoginSuccess }) {
     navigate("/user/signUp");
   };
 
-  //로그인 처리
   const handleLogin = async () => {
     if (isLoggedIn) return;
 
     setIsLoggedIn(true);
     try {
       const response = await apiClient.post("/login", {
-        loginId: loginId,
-        password: password,
+        loginId,
+        password,
         autoLoginFlag: autoLogin ? "Y" : "N",
       });
 
-      console.log("서버 응답 데이터 : ", response);
+      const { accessToken, refreshToken } = response.data; // userId, role, autoLoginFlag는 AuthProvider에서 처리
+      // const tokenPayload = base64DecodeUnicode(accessToken.split(".")[1]); // AuthProvider에서 처리
 
-      const { accessToken, refreshToken, userId, role, autoLoginFlag } =
-        response.data;
-
-      const tokenPayload = base64DecodeUnicode(accessToken.split(".")[1]);
-      if (!tokenPayload) {
-        console.error("JWT 페이로드 디코딩 실패.");
-        throw new Error("JWT 페이로드 디코딩 실패"); //catch 로 넘어가게 함
-      }
-      console.log("JWT 페이로드 : ", tokenPayload);
-
-      try {
-        updateTokens(accessToken, refreshToken); // 전역 상태 관리 업데이트
-        console.log("로컬스토리지 저장 성공.");
-        console.log("AuthContext 에 로그인 상태 정보 업데이트 성공.");
-      } catch (storageError) {
-        console.error(
-          "로컬 스토리지 저장 실패 또는 전역 상태 업데이트 실패.",
-          storageError
-        );
-        throw storageError; // 바깥 catch 로 넘김
-      }
+      updateTokens(accessToken, refreshToken);
       if (onLoginSuccess) onLoginSuccess();
+      navigate("/"); // 로그인 성공 시 메인 페이지로 이동
     } catch (error) {
       console.error("로그인 실패 : ", error);
-
       if (error.response) {
-        console.error("서버측 에러 응답 데이터 : ", error.response.data);
         alert(error.response.data.error || "서버 오류로 인해 로그인 실패!");
       } else if (error instanceof Error) {
-        console.error("에러 메세지 :", error.message);
         alert(error.message);
       } else {
-        console.error("예상치 못한 오류 : ", error);
         alert("알 수 없는 오류 발생.");
       }
     } finally {
       setIsLoggedIn(false);
     }
-    navigate("/");
   };
 
-  // TODO: Add your JSX for the login form here, using loginId, password, handleLogin, handleKeyDown, etc.
+  // ✅ 소셜 로그인 핸들러 추가
+  const handleSocialLogin = async (socialType) => {
+    if (isSocialLoginProcessing) return;
+
+    setIsSocialLoginProcessing(true);
+    try {
+      // 백엔드에 해당 socialType의 인가 URL을 요청
+      const response = await apiClient.post("/user/social", { socialType });
+      const { authorizationUrl } = response.data; // 백엔드에서 반환할 인가 URL
+
+      if (authorizationUrl) {
+        // 인가 URL로 사용자 리다이렉트
+        window.location.href = authorizationUrl;
+      } else {
+        alert("소셜 로그인 URL을 가져오는 데 실패했습니다.");
+      }
+    } catch (error) {
+      console.error(`Error initiating ${socialType} login:`, error);
+      if (error.response) {
+        alert(
+          error.response.data.error ||
+            `소셜 로그인 (${socialType}) 시작 중 오류 발생!`
+        );
+      } else {
+        alert(`소셜 로그인 (${socialType}) 시작 중 알 수 없는 오류 발생.`);
+      }
+    } finally {
+      setIsSocialLoginProcessing(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
@@ -115,7 +117,7 @@ function Login({ onLoginSuccess }) {
               className={styles.input}
               type="text"
               value={loginId}
-              onChange={(e) => setloginId(e.target.value)}
+              onChange={(e) => setLoginId(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="아이디"
               aria-label="User ID"
@@ -146,12 +148,48 @@ function Login({ onLoginSuccess }) {
           <button
             className={styles.loginButton}
             onClick={handleLogin}
-            disabled={isLoggedIn}
+            disabled={isLoggedIn || isSocialLoginProcessing} // 소셜 로그인 중에도 비활성화
             type="button"
           >
-            로그인
+            {isLoggedIn ? "로그인 중..." : "로그인"}
+          </button>
+          <button
+            className={styles.faceIdButton}
+            type="button"
+            disabled={isSocialLoginProcessing} // 소셜 로그인 중에도 비활성화
+          >
+            Face ID
           </button>
         </form>
+        <div className={styles.socialLogin}>
+          <button
+            className={styles.socialButton}
+            aria-label="Login with Naver"
+            onClick={() => handleSocialLogin("naver")} // ✅ 네이버 소셜 로그인
+            disabled={isLoggedIn || isSocialLoginProcessing}
+          >
+            <span className={styles.naverIcon}></span>
+          </button>
+          <button
+            className={styles.socialButton}
+            aria-label="Login with Google"
+            onClick={() => handleSocialLogin("google")} // ✅ 구글 소셜 로그인
+            disabled={isLoggedIn || isSocialLoginProcessing}
+          >
+            <span className={styles.googleIcon}></span>
+          </button>
+          <button
+            className={styles.socialButton}
+            aria-label="Login with Kakao"
+            onClick={() => handleSocialLogin("kakao")} // ✅ 카카오 소셜 로그인
+            disabled={isLoggedIn || isSocialLoginProcessing}
+          >
+            <span className={styles.kakaoIcon}></span>
+          </button>
+        </div>
+        <div className={styles.additionalText}>
+          아이디 또는 비밀번호를 잊으셨나요?
+        </div>
         <div className={styles.signUpLink}>
           <span
             onClick={handleSignUp}
