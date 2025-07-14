@@ -1,8 +1,9 @@
 // src/components/common/MemoryView.js
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
 import styles from "./MemoryView.module.css";
 
-function MemoryView({ selectedMemory }) {
+function MemoryView({ selectedMemory, authorid }) {
   console.log("🧪 [MemoryView] selectedMemory:", selectedMemory); // ✅ 정확한 확인용
   // useEffect(() => {
   //   console.log("메모리 뷰: " + selectedMemory); // ✅ 여긴 string + object니까 그냥 "[object Object]" 찍힘
@@ -11,9 +12,18 @@ function MemoryView({ selectedMemory }) {
   //   }
   // }, [selectedMemory]);
 
+  const { isLoggedIn, userid, role } = useContext(AuthContext);
   if (!selectedMemory) {
     return <div className={styles.loading}>로딩중...</div>;
   }
+
+  const handleEditClick = () => {
+    alert("수정버튼을 클릭했습니다");
+  };
+
+  const handleDeleteClick = () => {
+    alert("삭제버튼을 클릭했습니다");
+  };
 
   const { createdDate, title, memoryType, content, filepath } = selectedMemory;
 
@@ -25,6 +35,16 @@ function MemoryView({ selectedMemory }) {
         </span>
         <h2 className={styles.title}>{title}</h2>
         <hr className={styles.divider} />
+        {isLoggedIn && (role === "ADMIN" || userid === authorid) && (
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={handleEditClick}>
+              수정
+            </button>
+            <button className={styles.button} onClick={handleDeleteClick}>
+              삭제
+            </button>
+          </div>
+        )}
       </div>
 
       {memoryType === "text" && (

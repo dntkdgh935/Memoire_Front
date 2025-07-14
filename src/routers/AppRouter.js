@@ -13,6 +13,7 @@ import ImageToVideoMain from "../pages/atelier/ImageToVideoMain";
 
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
+import ArchiveRouter from "./ArchiveRouter";
 import UserRouter from "./UserRouter";
 
 function AppRouter() {
@@ -20,7 +21,7 @@ function AppRouter() {
     <Routes>
       {/* <Route path="/" element={<LibraryMain />} /> */}
       <Route path="/library/*" element={<LibraryRouter />} />
-      <Route path="/archive" element={<ArchiveMain />} />
+      <Route path="/archive/*" element={<ArchiveRouter />} />
       <Route path="/user/*" element={<UserRouter />} />
       {/* 아틀리에 홈 */}
       <Route path="/atelier" element={<AtelierHome />} />
