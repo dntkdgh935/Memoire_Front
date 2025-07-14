@@ -1,0 +1,49 @@
+.listContainer {
+  width: 100%;
+  font-size: 14px;
+  color: #333;
+}
+
+.titleBar {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-weight: bold;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.memoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+
+.memoryItem {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.memoryItem:hover {
+  background-color: #f0f0f0;
+}
+
+/* .memoryItem {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+} */
+
+.memoryItem:hover {
+  background-color: #f3f3f3;
+}
+
+.selected {
+  background-color: #d8eaff; /* 선택된 항목 강조 색상 */
+  font-weight: bold;
+}

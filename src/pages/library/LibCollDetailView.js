@@ -1,5 +1,5 @@
 // src/pages/library/LibCollDetailView.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import LibCollCard from "../../components/library/LibCollCard";
@@ -9,6 +9,7 @@ function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
 
   const [collection, setCollection] = useState(null); // 컬렉션 정보 상태
+  const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [selectedMemory, setSelectedMemory] = useState(null); // 메모리 리스트에서 선택된 메모리(view에 나타날 메모리)
   const [memoryList, setMemoryList] = useState(null);
 
@@ -39,28 +40,30 @@ function LibCollDetailView() {
       const res = await axios.get(
         `http://localhost:8080/api/library/collection/memories/${collectionid}`
       );
-      console.log("메모리 리스트:", res.data);
+      setMemoryList(res.data);
+      console.log("1째 메모리 - " + res.data[0].title);
+
+      //불러온 메모리 중 1째가 default로 선택되어 있게 함.
+      // setSelectedMemory(res.data[0]);
+      console.log("selected Memory: " + selectedMemory);
     } catch (err) {
       console.error("🚨 메모리 리스트 불러오기 실패", err);
     }
   };
 
   // 메모리 선택 시 selectedMemory 상태를 업데이트하고, 해당 메모리를 axios로 불러와서 세팅
-  const handleMemoryClick = async (memoryId) => {
+  const handleMemoryClick = async (memoryid) => {
+    setSelectedMemoryId(memoryid); // ✅ 스타일에 바로 반영됨
     try {
       const res = await axios.get(
-        `http://localhost:8080/api/library/memory/${memoryId}` // 메모리 아이디로 메모리 상세 요청
+        `http://localhost:8080/api/library/memory/${memoryid}` // 메모리 아이디로 메모리 상세 요청
       );
       setSelectedMemory(res.data); // 응답 데이터를 selectedMemory에 저장
+      console.log("선택된 메모리 디테일:" + selectedMemory);
     } catch (err) {
       console.error("🚨 메모리 불러오기 실패", err); // 에러 핸들링
     }
   };
-
-  // ****** 메모리 리스트 불러 요청하는 함수 위치
-
-  // 메모리 선택 처리
-  const handleMemorySelect = (memoryId) => {};
 
   if (!collection) {
     return <div>로딩 중...</div>; // 컬렉션 데이터가 없을 때 로딩 화면을 표시합니다.
@@ -84,6 +87,24 @@ function LibCollDetailView() {
         `http://localhost:8080/api/library/togglebm?collectionId=${collectionId}&isBookmarked=${isBookmarked}`
       );
     }
+
+    // UI 상태 변경
+    setCollection((prev) => {
+      if (!prev) return prev;
+
+      const updated = {
+        ...prev,
+        [actionType]: !prev[actionType], // userlike 또는 userbookmark 토글
+        [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+          prev[actionType] === true
+            ? prev[actionType === "userlike" ? "likeCount" : "bookmarkCount"] -
+              1
+            : prev[actionType === "userlike" ? "likeCount" : "bookmarkCount"] +
+              1,
+      };
+
+      return updated;
+    });
   };
 
   return (
@@ -93,6 +114,7 @@ function LibCollDetailView() {
         memoryList={memoryList}
         onMemoryClick={handleMemoryClick}
         onActionChange={handleActionChange}
+        selectedMemoryId={selectedMemoryId}
       />
       <MemoryView memory={selectedMemory} />
     </div>
