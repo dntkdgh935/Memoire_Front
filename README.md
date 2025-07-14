@@ -4,6 +4,8 @@
 - npm install react-masonry-css: grid 만들기
 - npm install react-datepicker : 달력 관련
 - npm install date-fns : 달력관련
+- npm remove date-fns
+- npm install date-fns@2.30.0 : 버전 다운그레이드 (임시)
 - npm install libphonenumber-js cleave.js : 전화번호 유효성 및 하이픈'-' 자동 추가 lib
 - npm install zxcvbn : 비밀번호 강도 확인용
 - npm start
