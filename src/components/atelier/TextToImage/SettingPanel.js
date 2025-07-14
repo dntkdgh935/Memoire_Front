@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "./SettingPanel.module.css";
 
 function SettingPanel({ selectedMemory, onGenerate }) {
@@ -8,28 +8,27 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const handleGenerate = () => {
     if (!selectedMemory) return;
 
-    fetch("/api/atelier/text/generate", {
+    fetch("/api/atelier/image/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         memoryId: selectedMemory.memoryid,
         collectionId: selectedMemory.collectionid,
-        style: style,
-        prompt: prompt,
         originalText: selectedMemory.content,
         title: selectedMemory.title,
         userId: selectedMemory.userId || "demo",
 
-        // 🔥 추가된 필드 (FastAPI 요구 필드)
-        inputText: selectedMemory.content,         // GPT에 보낼 원문
-        memoryType: "text",                        // 고정
-        memoryOrder: 0,                            // 우선 0으로 고정 (필요시 조정)
-        saveToMemory: true                         // 저장 여부 (기본 true로 전송)
+        // 이미지 전용 필드
+        style: style,
+        prompt: prompt,
+        memoryType: "image",
+        memoryOrder: 0,
+        saveToMemory: true,
       }),
     })
-      .then(res => res.json())
-      .then(data => onGenerate(data))
-      .catch(err => console.error("GPT generate error", err));
+      .then((res) => res.json())
+      .then((data) => onGenerate(data))
+      .catch((err) => console.error("DALL·E generate error", err));
   };
 
   return (
@@ -59,9 +58,8 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           <div className={styles.field}>
             <label>메모리 변환 옵션</label>
             <div className={styles.optionButtons}>
-              <button className={styles.option}>이대로 저장</button>
-              <button className={styles.optionActive}>AI 텍스트 변환</button>
-              <button className={styles.option}>AI 이미지 변환</button>
+              <button className={styles.option}>AI 텍스트 변환</button>
+              <button className={styles.optionActive}>AI 이미지 변환</button>
             </div>
           </div>
 
@@ -70,9 +68,9 @@ function SettingPanel({ selectedMemory, onGenerate }) {
             <input
               type="text"
               value={style}
-              onChange={e => setStyle(e.target.value)}
+              onChange={(e) => setStyle(e.target.value)}
               className={styles.input}
-              placeholder="예: 노래 스타일"
+              placeholder="예: 실사풍, 음식 광고 스타일"
             />
           </div>
 
@@ -80,10 +78,10 @@ function SettingPanel({ selectedMemory, onGenerate }) {
             <label>기타 요청</label>
             <textarea
               value={prompt}
-              onChange={e => setPrompt(e.target.value)}
+              onChange={(e) => setPrompt(e.target.value)}
               className={styles.textarea}
               rows={3}
-              placeholder="예: 슬픈 발라드 가사 형식으로 작성"
+              placeholder="예: 따뜻하고 먹음직스러운 분위기, 약간의 광택 강조"
             />
           </div>
 

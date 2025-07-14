@@ -1,54 +1,46 @@
-import React, { useEffect, useState } from "react";
+// src/components/atelier/common/MemoryList.js
+
+import React from "react";
 import styles from "./MemoryList.module.css";
 
 function MemoryList({
   collections,
-  selectedCollectionId,
   memories,
+  selectedCollectionId,
   selectedMemoryId,
   onSelectCollection,
   onSelectMemory,
 }) {
-  const [filteredMemories, setFilteredMemories] = useState([]);
-
-  useEffect(() => {
-    if (selectedCollectionId) {
-      const filtered = memories.filter(
-        (m) => m.collectionId === selectedCollectionId
-      );
-      setFilteredMemories(filtered);
-    } else {
-      setFilteredMemories([]);
-    }
-  }, [selectedCollectionId, memories]);
-
   return (
     <div className={styles.memoryListContainer}>
+      {/* 컬렉션 셀렉트 박스 */}
       <select
         className={styles.selectBox}
         value={selectedCollectionId}
         onChange={(e) => onSelectCollection(e.target.value)}
       >
-        <option value="">컬렉션: 선택 없음</option>
-        {collections.map((coll) => (
-          <option key={coll.id} value={coll.id}>
-            {coll.title}
+        {collections.map((col) => (
+          <option key={col.id} value={col.id}>
+            {col.title}
           </option>
         ))}
       </select>
 
+      {/* 메모리 목록 타이틀 */}
       <div className={styles.memoryListTitle}>원본 메모리 목록</div>
-      <div className={styles.memoryCount}>{filteredMemories.length}개</div>
+      <div className={styles.memoryCount}>{memories.length}개</div>
+
+      {/* 메모리 리스트 */}
       <div className={styles.memoryList}>
-        {filteredMemories.map((memory) => (
+        {memories.map((mem) => (
           <div
-            key={memory.id}
+            key={mem.memoryid}
             className={`${styles.memoryItem} ${
-              selectedMemoryId === memory.id ? styles.selected : ""
+              selectedMemoryId === mem.memoryid ? styles.selected : ""
             }`}
-            onClick={() => onSelectMemory(memory.id)}
+            onClick={() => onSelectMemory(mem.memoryid)}
           >
-            {memory.title}
+            {mem.title}
           </div>
         ))}
       </div>

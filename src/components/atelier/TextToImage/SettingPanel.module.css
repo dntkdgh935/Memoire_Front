@@ -12,14 +12,24 @@
   gap: 6px;
 }
 
-.input {
+.input,
+.select {
   padding: 10px 14px;
   border: 1px solid #e5ded7;
   border-radius: 8px;
   background: #fefcfb;
   font-size: 14px;
-  color: #4d3b30; /* ✅ 텍스트 색상 고정 */
+  color: #4d3b30;
   font-family: 'Pretendard', sans-serif;
+}
+
+/* 셀렉트 박스 공통 */
+.select {
+  appearance: none;
+  background-image: url("../../../assets/images/chevron-down.svg");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
 }
 
 .textarea {
@@ -29,7 +39,7 @@
   background: #fefcfb;
   resize: none;
   font-size: 14px;
-  color: #4d3b30; /* ✅ 텍스트 색상 고정 */
+  color: #4d3b30;
   font-family: 'Pretendard', sans-serif;
 }
 
