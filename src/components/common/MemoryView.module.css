@@ -1,0 +1,62 @@
+/*MemoryView.module.css*/
+.memoryContainer {
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #fefefe;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.06);
+  margin: 16px 0;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  flex: 1 1 600px;
+  max-width: 800px;
+}
+
+.metaInfo {
+  margin-bottom: 12px;
+}
+
+.date {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 8px 0 16px 0;
+}
+
+.textContent {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.imageWrapper,
+.videoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.imageContent {
+  max-width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.videoContent {
+  max-width: 100%;
+  border-radius: 12px;
+}

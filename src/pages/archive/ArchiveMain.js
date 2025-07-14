@@ -13,6 +13,8 @@ function ArchiveMain() {
   const { isLoggedIn, userid } = useContext(AuthContext);
 
   const [collections, setCollections] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
+  const [activeTab, setActiveTab] = useState("myColl");
 
   const navigate = useNavigate();
 
@@ -34,16 +36,90 @@ function ArchiveMain() {
           console.log(collectionsInfo.data);
           setCollections(collectionsInfo.data);
         } catch (error) {
-          console.error("Error fetching user stats:", error);
+          console.error("Error fetching user collections:", error);
+        }
+        try {
+          const bookmarksInfo = await apiClient.get(
+            "/archive/bookmarkCollections",
+            {
+              params: {
+                userid: userid,
+              },
+            }
+          );
+          console.log(bookmarksInfo.data);
+          setBookmarks(bookmarksInfo.data);
+        } catch (error) {
+          console.error("Error fetching user bookmarks:", error);
         }
       };
 
       fetchStuff();
     }
   }, [isLoggedIn, userid, navigate]);
+
   if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
     return <div>로딩중...</div>;
   }
+
+  const handleActionChange = async (collectionId, actionType) => {
+    const targetList = activeTab === "myColl" ? collections : bookmarks;
+    const setTargetList =
+      activeTab === "myColl" ? setCollections : setBookmarks;
+
+    const targetItem = targetList.find(
+      (coll) => coll.collectionid === collectionId
+    );
+    if (!targetItem) return;
+
+    const isLiked =
+      actionType === "userlike" ? !targetItem.userlike : undefined;
+    const isBookmarked =
+      actionType === "userbookmark" ? !targetItem.userbookmark : undefined;
+
+    try {
+      if (actionType === "userlike") {
+        await apiClient.post(`/api/library/togglelike`, null, {
+          params: { collectionId, isLiked },
+        });
+      } else if (actionType === "userbookmark") {
+        await apiClient.post(`/api/library/togglebm`, null, {
+          params: { collectionId, isBookmarked },
+        });
+      }
+
+      // 상태 업데이트
+      setTargetList((prevState) =>
+        prevState.map((coll) =>
+          coll.collectionid === collectionId
+            ? {
+                ...coll,
+                [actionType]: !coll[actionType],
+                [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+                  coll[actionType]
+                    ? coll[
+                        actionType === "userlike"
+                          ? "likeCount"
+                          : "bookmarkCount"
+                      ] - 1
+                    : coll[
+                        actionType === "userlike"
+                          ? "likeCount"
+                          : "bookmarkCount"
+                      ] + 1,
+              }
+            : coll
+        )
+      );
+    } catch (error) {
+      console.error("상태 변경 중 오류 발생:", error);
+    }
+  };
+
+  const handleCollClick = (collectionid) => {
+    alert(collectionid);
+  };
+
   return (
     <div className={styles.profileContainer}>
       <div className={styles.sidebar}>
@@ -51,7 +127,25 @@ function ArchiveMain() {
         <FollowingFollower />
       </div>
       <div className={styles.content}>
-        <CollGrid colls={collections} />
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
+            onClick={() => setActiveTab("myColl")}
+          >
+            내 컬렉션
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
+            onClick={() => setActiveTab("bookmarkColl")}
+          >
+            북마크한 컬렉션
+          </button>
+        </div>
+        <CollGrid
+          colls={activeTab == "myColl" ? collections : bookmarks}
+          onActionChange={handleActionChange}
+          onCollClick={handleCollClick}
+        />
       </div>
     </div>
   );
