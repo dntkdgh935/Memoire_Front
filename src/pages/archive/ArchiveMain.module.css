@@ -15,3 +15,26 @@
 .content {
   width: 100%;
 }
+
+.tabs {
+  display: flex;
+  max-width: 300px;
+  border: 1px solid #e1e5e9;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  background-color: #fafafa;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #666;
+  font-size: 12px;
+}
+
+.tab.active {
+  background-color: white;
+  color: #ac9054;
+  font-weight: 600;
+}
