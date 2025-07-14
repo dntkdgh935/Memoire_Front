@@ -14,6 +14,7 @@ function ArchiveVisit() {
 
   const [relStatus, setRelStatus] = useState("3");
   const [relBtnMsg, setRelBtnMsg] = useState(""); // 버튼에 나타날 텍스트
+  const [blockBtnMsg, setBlockBtnMsg] = useState("");
 
   // 해당 아카이브 소유자에 대한 팔로우 상태 가져옴
   useEffect(() => {
@@ -51,7 +52,7 @@ function ArchiveVisit() {
         setRelBtnMsg("팔로잉");
         break;
       case "2":
-        setRelBtnMsg("차단됨");
+        setRelBtnMsg("차단 해제");
         break;
       case "3":
         setRelBtnMsg("팔로우 요청");
@@ -105,6 +106,40 @@ function ArchiveVisit() {
   useEffect(() => {
     //console.log("방문한 아카이브 주인: " + userid);
   });
+
+  //db작업 요청 추가해야 함(위 팔로우 토글과 겹치나..?)
+  const handleBlockClick = async () => {
+    let nextStatus = null;
+    switch (relStatus) {
+      case "0": // 0: 요청됨/ 1: 팔로잉/ 2: 차단 / 3: 없음
+        setRelStatus("2"); // 차단 상태로 변경
+        nextStatus = "2";
+        break;
+      case "1": // 팔로잉 상태에서 '차단하기' 버튼 누를시..차단
+        setRelStatus("2"); // 차단 상태로 변경
+        nextStatus = "2";
+        break;
+      case "2":
+        alert("이미 차단되었습니다");
+        setRelStatus("2");
+        nextStatus = "2";
+        break; // <- 이 경우 apiclient로 요청 안보내게 하려면?
+      case "3": // 아무 관계 없는 상태에서 '차단하기' 버튼 누를시..
+        setRelStatus("2");
+        nextStatus = "2";
+    }
+    if (nextStatus !== null) {
+      await apiClient.post(`api/library/toggleFollow`, null, {
+        params: {
+          userid: myid,
+          targetid: ownerid,
+          nextRel: nextStatus,
+        },
+      });
+    }
+    setRelStatus(nextStatus);
+  };
+
   return (
     <div>
       <VisitProfileCard
@@ -112,6 +147,7 @@ function ArchiveVisit() {
         relStatus={relStatus}
         relBtnMsg={relBtnMsg}
         onFollowBtnClick={handleToggleFollow}
+        onBlockClick={handleBlockClick}
       />
     </div>
   );

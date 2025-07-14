@@ -13,7 +13,13 @@ import styles from "./VisitProfileCard.module.css";
         />
     </div>
 /> */
-function VisitProfileCard({ ownerid, relStatus, relBtnMsg, onFollowBtnClick }) {
+function VisitProfileCard({
+  ownerid,
+  relStatus,
+  relBtnMsg,
+  onFollowBtnClick,
+  onBlockClick,
+}) {
   // 방문자 id
   //   const { userid } = useContext(AuthContext);
 
@@ -170,7 +176,7 @@ function VisitProfileCard({ ownerid, relStatus, relBtnMsg, onFollowBtnClick }) {
       <button className={styles["follow-btn"]} onClick={onFollowBtnClick}>
         {relBtnMsg}
       </button>
-      <span>차단하기</span>
+      <p onClick={onBlockClick}>차단하기</p>
     </div>
   );
 }
