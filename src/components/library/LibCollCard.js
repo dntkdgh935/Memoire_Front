@@ -5,7 +5,20 @@ import MemoryList from "../../components/common/MemoryList";
 import CollActionBtn from "../../components/common/CollActionBtn";
 import AvatarWName from "../common/AvatarWName";
 
-function LibCollCard({ coll, memoryList, onMemoryClick }) {
+/*<LibCollCard
+        coll={collection}
+        memoryList={memoryList}
+        onMemoryClick={handleMemoryClick}
+        onActionChange={handleActionChange}
+        selectedMemory={selectedMemory}
+      /> */
+function LibCollCard({
+  coll,
+  memoryList,
+  onMemoryClick,
+  onActionChange,
+  selectedMemoryId,
+}) {
   if (!coll) {
     return <div>로딩 중...</div>; // 컬렉션 데이터가 없을 때 로딩 화면을 표시합니다.
   }
@@ -19,6 +32,7 @@ function LibCollCard({ coll, memoryList, onMemoryClick }) {
             username: coll.authorname,
             displayId: `@${coll.authorid}`,
             profileImageUrl: coll.authorProfileImage,
+            userid: coll.authorid,
           }}
         />
 
@@ -27,8 +41,16 @@ function LibCollCard({ coll, memoryList, onMemoryClick }) {
       </div>
 
       <div className={styles.cardFooter}>
-        <CollActionBtn btnType="like" coll={coll} />
-        <CollActionBtn btnType="bookmark" coll={coll} />
+        <CollActionBtn
+          btnType="like"
+          coll={coll}
+          onActionChange={onActionChange}
+        />
+        <CollActionBtn
+          btnType="bookmark"
+          coll={coll}
+          onActionChange={onActionChange}
+        />
       </div>
 
       <div className={styles.cardTags}>
@@ -40,7 +62,11 @@ function LibCollCard({ coll, memoryList, onMemoryClick }) {
       </div>
 
       <div className={styles.memoryList}>
-        <MemoryList memoryList={memoryList} onMemoryClick={onMemoryClick} />
+        <MemoryList
+          memoryList={memoryList}
+          onMemoryClick={onMemoryClick}
+          selectedMemoryId={selectedMemoryId}
+        />
       </div>
     </div>
   );

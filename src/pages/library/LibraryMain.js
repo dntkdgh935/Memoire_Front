@@ -6,7 +6,6 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
-import styles from "./LibraryMain.module.css"; // ✅
 
 function LibraryMain() {
   // 페이지 이동용

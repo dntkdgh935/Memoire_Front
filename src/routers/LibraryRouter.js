@@ -14,7 +14,7 @@ function LibraryRouter() {
       <Route path="/library/archive/:id" element={<ArchiveVisit />} /> */}
       <Route path="/" element={<LibraryMain />} />
       <Route path="/detail/:id" element={<LibCollDetailView />} />
-      <Route path="/archive/:id" element={<ArchiveVisit />} />
+      <Route path="/archive/:userid" element={<ArchiveVisit />} />
     </Routes>
   );
 }
