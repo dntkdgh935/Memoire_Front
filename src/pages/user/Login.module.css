@@ -95,6 +95,68 @@
   cursor: not-allowed;
 }
 
+.faceIdButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #e0dcd7;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.faceIdButton:hover {
+  background-color: #d3cec9;
+}
+
+.socialLogin {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.socialButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: transparent;
+  transition: transform 0.3s ease;
+}
+
+.socialButton:hover {
+  transform: scale(1.1);
+}
+
+.naverIcon {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: url("../../assets/images/naver.png") no-repeat center;
+  background-size: contain;
+}
+
+.googleIcon {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: url("../../assets/images/google.png") no-repeat center;
+  background-size: contain;
+}
+
+.kakaoIcon {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: url("../../assets/images/kakao.png") no-repeat center;
+  background-size: contain;
+}
+
 .signUpLink {
   margin-top: 16px;
 }
@@ -108,4 +170,10 @@
 
 .signUpLink span:hover {
   text-decoration: underline;
+}
+
+.additionalText {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #5b4f46;
 }

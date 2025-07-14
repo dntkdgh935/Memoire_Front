@@ -1,14 +1,29 @@
-/* src/components/user/UserVerification.module.css */
+/* === 입력 그룹 공통 === */
 .inputGroup {
   display: flex;
   flex-direction: column;
   text-align: left;
   gap: 4px;
-  position: relative; /* errorText를 절대 위치로 배치하기 위해 relative 설정 */
+  position: relative;
+  margin-bottom: 15px;
+  box-sizing: border-box;
 }
 
+.errorText {
+  font-size: 11px;
+  color: #d9534f;
+  padding-left: 4px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+/* === 📌 input 공통 스타일 === */
 .input {
-  padding: 12px;
+  height: 48px;
+  padding: 0 12px;
   font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -24,12 +39,132 @@
   box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
 }
 
-.errorText {
-  font-size: 11px;
-  color: #d9534f;
-  padding-left: 4px;
-  position: absolute; /* 절대 위치로 변경 */
-  top: 100%; /* input 바로 아래에 배치 */
-  left: 0;
-  margin-top: 1px; /* input과의 간격 유지 */
+.input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+/* === ✅ 버튼 공통 === */
+.actionButton {
+  height: 48px;
+  width: 120px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  position: relative;
+  top: 1px; /* 버튼 살짝 내려서 시각적 정렬 맞춤 */
+}
+
+.actionButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.actionButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.actionButton.loading {
+  background-color: #6c757d;
+  cursor: wait;
+}
+
+/* === 전화번호 + 버튼 그룹 (수정된 부분) === */
+.phoneInputWithButton,
+.verificationInputGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+  position: relative;
+  width: 100%;
+  max-width: 500px; /* 입력 라인 최대 너비 제한 */
+  box-sizing: border-box;
+}
+
+.phoneInputWithButton .input,
+.verificationInputGroup .input {
+  flex-grow: 1;
+  min-width: 0; /* overflow 방지 */
+  width: auto; /* width 고정 해제 */
+}
+
+.phoneInputWithButton .actionButton,
+.verificationInputGroup .actionButton {
+  flex: none;
+  width: 120px;
+}
+
+/* === 타이머 표시 === */
+.timerDisplay {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* === 메시지 박스 === */
+.messageBox {
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.messageBox.success {
+  background-color: #e6ffe6;
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+.messageBox.error {
+  background-color: #ffe6e6;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.messageBox.info {
+  background-color: #e6f7ff;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.highlightText {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.boldHighlight {
+  font-weight: bold;
+  color: #dc3545;
+}
+
+/* === 인증 완료 메시지 === */
+.verifiedMessage {
+  background-color: #e6ffe6;
+  color: #28a745;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #28a745;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
 }

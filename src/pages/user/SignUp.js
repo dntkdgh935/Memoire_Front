@@ -6,7 +6,7 @@ import styles from "./SignUp.module.css";
 import CheckPwd from "../../components/user/CheckPwd";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import UserVerification from "../../components/user/UserVerification";
+import UserVerification from "../../components/user/UserVerification"; // UserVerification 임포트
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -16,13 +16,13 @@ function Signup() {
     name: "",
     birthday: "",
     nickname: "",
-    role: "USER", // 초기값을 "USER"로 설정하여 불필요한 조건문 제거
+    role: "USER",
     phone: "",
   });
   const [isIdAvailable, setIsIdAvailable] = useState(null);
-  // ✅ CheckPwd 컴포넌트의 유효성 상태를 받을 새로운 상태 추가
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordScore, setPasswordScore] = useState(0);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false); // ✅ 휴대폰 인증 상태 추가
 
   const navigate = useNavigate();
 
@@ -54,18 +54,44 @@ function Signup() {
     }
   };
 
-  // ✅ validate 함수는 이제 CheckPwd의 유효성도 함께 확인합니다.
   const validate = () => {
-    // 비밀번호 유효성 (CheckPwd 컴포넌트에서 전달받은 상태 사용)
+    if (!isIdAvailable) {
+      // 아이디 중복 확인 필수
+      alert("아이디 중복검사를 필수로 하여야 합니다.");
+      return false;
+    }
+    if (!isIdAvailable === true) {
+      // 아이디 중복 확인 결과가 사용 가능이어야 함
+      alert("사용 가능한 아이디가 아닙니다. 아이디를 다시 확인하세요.");
+      return false;
+    }
     if (!isPasswordValid) {
-      alert("비밀번호 일치하지 않습니다.");
+      alert("비밀번호가 일치하지 않거나 유효하지 않습니다.");
       return false;
     }
     if (passwordScore < 3) {
       alert("비밀번호 강도가 약합니다. '강함' 이상으로 설정해주세요.");
       return false;
     }
-    // 다른 유효성 검사 (필요하면 추가)
+    if (!isPhoneVerified) {
+      // ✅ 휴대폰 인증 여부 확인
+      alert("휴대폰 인증을 완료해주세요.");
+      return false;
+    }
+    // 나머지 필드 유효성 검사 (필요하면 추가)
+    if (!formData.name) {
+      alert("이름을 입력해주세요.");
+      return false;
+    }
+    if (!formData.birthday) {
+      alert("생년월일을 선택해주세요.");
+      return false;
+    }
+    if (!formData.nickname) {
+      alert("닉네임을 입력해주세요.");
+      return false;
+    }
+
     return true;
   };
 
@@ -74,37 +100,27 @@ function Signup() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ CheckPwd 컴포넌트에서 유효성 상태를 받아올 함수
   const handlePasswordValidationChange = (isValidMatch, score) => {
-    setIsPasswordValid(isValidMatch); // isValidMatch는 이제 일치 여부만
-    setPasswordScore(score); // 강도 점수도 받아옴
+    setIsPasswordValid(isValidMatch);
+    setPasswordScore(score);
   };
+
   const handleDateChange = (date) => {
     setFormData({ ...formData, birthday: date });
+  };
+
+  // ✅ UserVerification에서 호출될 인증 완료 콜백 함수
+  const handlePhoneVerificationComplete = (verified) => {
+    setIsPhoneVerified(verified);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isIdAvailable === false) {
-      alert("이미 사용중인 아이디입니다. 아이디를 다시 작성하세요.");
-      return;
-    }
-
-    if (isIdAvailable === null) {
-      alert("아이디 중복검사를 필수로 하여야 합니다.");
-      return;
-    }
-
-    // ✅ validate 함수 호출 시 CheckPwd의 유효성도 검사
+    // 모든 유효성 검사를 여기서 수행
     if (!validate()) {
       return;
     }
-
-    // `formData.role`의 초기값을 "USER"로 설정했으므로 이 조건문은 더 이상 필요 없습니다.
-    // if (!formData.role) {
-    //   setFormData((prev) => ({ ...prev, role: "USER" }));
-    // }
 
     try {
       const response = await apiClient.post("/user/signup", formData);
@@ -115,24 +131,14 @@ function Signup() {
       }
     } catch (error) {
       console.error("회원가입 실패 : ", error);
+      // 백엔드에서 특정 오류 메시지를 보낸다면 파싱하여 표시 가능
       alert("회원 가입에 실패했습니다. 다시 시도해 주세요");
     }
   };
 
-  // 권한 수정 관련 (기존 코드와 동일, 변수명 roll -> role로 변경)
   const [showPermissions, setShowPermissions] = useState(false);
-  const [selectedPermission, setSelectedPermission] = useState(formData.role); // formData.role 초기값 사용
-
-  useEffect(() => {
-    setSelectedPermission(formData.role); // formData.role이 변경될 때마다 UI 업데이트
-  }, [formData.role]);
-
-  const handleTogglePermissions = () => {
-    setShowPermissions(!showPermissions);
-  };
 
   const handleSelectPermission = (permission) => {
-    setSelectedPermission(permission);
     setFormData((prev) => ({ ...prev, role: permission }));
     setShowPermissions(false);
   };
@@ -142,10 +148,7 @@ function Signup() {
       <div className={styles.loginBox}>
         <h2 className={styles.title}>Sign Up</h2>
         <form className={styles.form} onSubmit={handleSubmit}>
-          {/* 아이디 입력과 중복 체크 버튼을 감싸는 새로운 inputGroup */}
           <div className={styles.idInputGroup}>
-            {" "}
-            {/* 이 부분 수정 */}
             <input
               type="text"
               name="loginId"
@@ -165,12 +168,13 @@ function Signup() {
             </button>
           </div>
 
+          {/* ✅ UserVerification 컴포넌트 사용 */}
           <UserVerification
             phone={formData.phone}
             setPhone={(val) => setFormData({ ...formData, phone: val })}
+            onVerificationComplete={handlePhoneVerificationComplete} // 콜백 함수 전달
           />
 
-          {/* ✅ CheckPwd 컴포넌트 사용 */}
           <CheckPwd
             password={formData.password}
             confirmPwd={formData.confirmPwd}
@@ -216,12 +220,6 @@ function Signup() {
               required
               maxLength={8}
             />
-          </div>
-          <div
-            className={styles.permissionButton}
-            onClick={handleTogglePermissions}
-          >
-            권한 수정: {selectedPermission}
           </div>
 
           {showPermissions && (
