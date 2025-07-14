@@ -32,6 +32,7 @@ function LibCollCard({
             username: coll.authorname,
             displayId: `@${coll.authorid}`,
             profileImageUrl: coll.authorProfileImage,
+            userid: coll.authorid,
           }}
         />
 
