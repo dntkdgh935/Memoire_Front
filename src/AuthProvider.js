@@ -178,7 +178,7 @@ export const AuthProvider = ({ children }) => {
 
       // 서버 측 서비스 요청 보내고 결과 받기
       const response = await apiClient({
-        URL,
+        url: URL,
         method,
         headers: {
           Authorization: `Bearer ${accessToken}`,
