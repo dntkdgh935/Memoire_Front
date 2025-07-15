@@ -1,35 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "./SettingPanel.module.css";
 
 function SettingPanel({ selectedMemory, onGenerate }) {
   const [style, setStyle] = useState("");
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(""); // 실제로는 option 필드로 사용
 
   const handleGenerate = () => {
     if (!selectedMemory) return;
 
     fetch("/api/atelier/text/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        memoryId: selectedMemory.memoryid,
-        collectionId: selectedMemory.collectionid,
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    inputText: selectedMemory.content,
+        content: selectedMemory.content,
         style: style,
-        prompt: prompt,
-        originalText: selectedMemory.content,
+        memoryType: "text",
+        collectionId: selectedMemory.collectionid,
+        memoryOrder: 0,
+        saveToMemory: true,
+        // 선택적으로 추가 가능
         title: selectedMemory.title,
-        userId: selectedMemory.userId || "demo",
-
-        // 🔥 추가된 필드 (FastAPI 요구 필드)
-        inputText: selectedMemory.content,         // GPT에 보낼 원문
-        memoryType: "text",                        // 고정
-        memoryOrder: 0,                            // 우선 0으로 고정 (필요시 조정)
-        saveToMemory: true                         // 저장 여부 (기본 true로 전송)
+        option: prompt,
+        memoryId: selectedMemory.memoryid,
+        userId: selectedMemory.userId || "demo"
       }),
     })
-      .then(res => res.json())
-      .then(data => onGenerate(data))
-      .catch(err => console.error("GPT generate error", err));
+      .then(res => {
+        if (!res.ok) throw new Error("응답 실패");
+        return res.json();
+      })
+      .then(data => {
+        console.log("✅ FastAPI 응답 성공:", data);
+        onGenerate(data);
+      })
+      .catch(err => {
+        console.error("❌ GPT generate error", err);
+      });
   };
 
   return (
