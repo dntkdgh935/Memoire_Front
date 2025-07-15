@@ -82,7 +82,7 @@ function ArchiveNewCollection() {
         </div>
 
         <div className={styles.rightColumn}>
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleNext}>
             <input
               type="text"
               name="collectionTitle"
@@ -114,8 +114,7 @@ function ArchiveNewCollection() {
               required
             />
             <div>
-              <input type="submit" value="다음" onClick={handleNext} /> &nbsp;
-              &nbsp;
+              <input type="submit" value="다음" /> &nbsp; &nbsp;
               <input
                 type="button"
                 value="뒤로가기"
