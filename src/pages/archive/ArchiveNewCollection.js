@@ -1,11 +1,76 @@
 // src/components/CollectionForm.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
 import { useNavigate } from "react-router-dom";
 import styles from "./ArchiveNewCollection.module.css";
 
 function ArchiveNewCollection() {
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
+
+  const [collection, setCollection] = useState({
+    authorid: "",
+    collectionTitle: "",
+    visibility: "",
+    color: "",
+  });
+
   const navigate = useNavigate();
-  const [collection, setCollection] = useState(null);
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+
+    setCollection((prevCollection) => ({
+      ...prevCollection,
+      authorid: userid, //AuthProvider 에서 가져온 userid
+      color: "#000000",
+    }));
+  }, [isLoggedIn, userid]);
+
+  if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
+    return <div>로딩중...</div>;
+  }
+
+  const handleNext = async (e) => {
+    e.preventDefault();
+
+    const byteLength = new Blob([collection.collectionTitle]).size;
+    if (byteLength > 255) {
+      alert("컬렉션 제목은 최대 255바이트까지만 입력 가능합니다.");
+      return;
+    }
+
+    navigate("/archive/newmem", { state: collection });
+    // 여기말고 메모리 생성까지 완료해야 디비에 데이터를 저장함
+    // const data = new FormData();
+    // data.append("authorid", collection.authorid);
+    // data.append("collectionTitle", collection.collectionTitle);
+    // data.append("visibility", collection.visibility);
+    // data.append("color", collection.color);
+
+    // try {
+    //   await secureApiRequest("/archive/newColl", {
+    //     method: "POST",
+    //     body: data,
+    //   });
+    //   alert("새 컬렉션 등록 완료");
+    //   navigate("/archive");
+    // } catch (error) {
+    //   console.error("새 컬렉션 등록 실패", error);
+    //   alert("새 컬렉션 등록에 실패했습니다");
+    // }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setCollection((prevCollection) => ({
+      ...prevCollection,
+      [name]: value,
+    }));
+  };
 
   return (
     <>
@@ -17,30 +82,50 @@ function ArchiveNewCollection() {
         </div>
 
         <div className={styles.rightColumn}>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="텍스트를 입력하세요"
-          />
+          <form className={styles.form}>
+            <input
+              type="text"
+              name="collectionTitle"
+              onChange={handleChange}
+              className={styles.input}
+              value={collection.collectionTitle}
+              placeholder="텍스트를 입력하세요"
+              required
+            />
 
-          <select className={styles.select} required>
-            <option value="">공유범위: 선택 없음</option>
-            <option value="1">전체공개</option>
-            <option value="2">팔로워</option>
-            <option value="3">비공개</option>
-          </select>
-          <input type="color" className={styles.colorPicker} />
+            <select
+              name="visibility"
+              onChange={handleChange}
+              className={styles.select}
+              value={collection.visibility}
+              required
+            >
+              <option value="">공유범위: 선택 없음</option>
+              <option value="1">전체공개</option>
+              <option value="2">팔로워</option>
+              <option value="3">비공개</option>
+            </select>
+            <input
+              type="color"
+              name="color"
+              onChange={handleChange}
+              className={styles.colorPicker}
+              value={collection.color}
+              required
+            />
+            <div>
+              <input type="submit" value="다음" onClick={handleNext} /> &nbsp;
+              &nbsp;
+              <input
+                type="button"
+                value="뒤로가기"
+                onClick={() => {
+                  navigate(-1);
+                }}
+              />
+            </div>
+          </form>
         </div>
-      </div>
-      <div>
-        <input type="submit" value="등록하기" /> &nbsp; &nbsp;
-        <input
-          type="button"
-          value="뒤로가기"
-          onClick={() => {
-            navigate(-1);
-          }}
-        />
       </div>
     </>
   );

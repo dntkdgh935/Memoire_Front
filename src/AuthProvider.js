@@ -212,7 +212,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const response = await apiClient({
-        URL,
+        url: URL,
         method,
         headers: {
           Authorization: `Bearer ${accessToken}`,

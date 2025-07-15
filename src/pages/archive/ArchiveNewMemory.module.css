@@ -1,0 +1,121 @@
+/* src/components/ArchiveNewMemory.module.css */
+.container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  font-family: "Pretendard", sans-serif;
+}
+
+.leftPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rightPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+}
+
+.titleInput {
+  padding: 0.7rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.tabGroup {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  width: fit-content;
+  background-color: #eee;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  background-color: #eee;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.activeTab {
+  background-color: #d6cdbf;
+  font-weight: bold;
+}
+
+.fileDropZone {
+  border: 2px dashed #c3b8a9;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #888;
+  background-color: #fcf9f5;
+}
+
+.textArea {
+  width: 100%;
+  height: 300px;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  resize: none;
+  white-space: pre-wrap;
+}
+
+.previewCard {
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  background-color: white;
+}
+
+.previewTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.previewImage {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.previewText {
+  white-space: pre-wrap;
+  font-size: 1rem;
+  color: #333;
+}
+
+.visibilityBtns {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.uploadBtn {
+  margin-top: 1rem;
+  padding: 0.7rem 2rem;
+  background-color: #5b4431;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
