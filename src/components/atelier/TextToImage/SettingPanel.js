@@ -8,23 +8,25 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const handleGenerate = () => {
     if (!selectedMemory) return;
 
+    const requestBody = {
+      memoryId: selectedMemory.memoryid,
+      collectionId: selectedMemory.collectionid,
+      title: selectedMemory.title || "",
+      userId: selectedMemory.userId || "demo",
+      style: style,
+      prompt: prompt,
+      memoryType: "image",
+      memoryOrder: 0,
+      saveToMemory: true,
+
+      // ✅ null 방지: 빈 문자열로 content 설정
+      content: selectedMemory.content || ""
+    };
+
     fetch("/api/atelier/image/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        memoryId: selectedMemory.memoryid,
-        collectionId: selectedMemory.collectionid,
-        originalText: selectedMemory.content,
-        title: selectedMemory.title,
-        userId: selectedMemory.userId || "demo",
-
-        // 이미지 전용 필드
-        style: style,
-        prompt: prompt,
-        memoryType: "image",
-        memoryOrder: 0,
-        saveToMemory: true,
-      }),
+      body: JSON.stringify(requestBody),
     })
       .then((res) => res.json())
       .then((data) => onGenerate(data))
@@ -48,7 +50,7 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           <div className={styles.field}>
             <label>내용</label>
             <textarea
-              value={selectedMemory.content}
+              value={selectedMemory.content || ""}
               readOnly
               className={styles.textarea}
               rows={8}
