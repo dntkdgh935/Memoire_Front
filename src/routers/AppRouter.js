@@ -1,6 +1,6 @@
 // src/routers/AppRouter.js
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 //sidebar를 통한 메인 이동
 import LibraryMain from "../pages/library/LibraryMain";
@@ -21,7 +21,9 @@ import UserRouter from "./UserRouter";
 function AppRouter() {
   return (
     <Routes>
-      <Route path="/" element={<LibraryMain />} />
+
+      <Route path="/" element={<Navigate to="/library" />} />
+
       <Route path="/library/*" element={<LibraryRouter />} />
       <Route path="/archive/*" element={<ArchiveRouter />} />
       <Route path="/user/*" element={<UserRouter />} />

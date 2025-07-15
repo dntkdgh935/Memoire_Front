@@ -1,20 +1,30 @@
 // src/pages/library/ArchiveVisit.js
 import React, { useState, useEffect, memo, useContext } from "react";
+import { useParams } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import styles from "./LibCollDetailView.module.css"; // ✅
+import styles from "./ArchiveVisit.module.css";
 import VisitProfileCard from "../../components/library/VisitProfileCard";
+import CollGrid from "../../components/common/CollGrid";
+import { useNavigate } from "react-router-dom";
 import { useResetRecoilState } from "recoil";
 
 function ArchiveVisit() {
   const { userid: ownerid } = useParams();
   const { userid: myid } = useContext(AuthContext);
+  const navigate = useNavigate();
 
+  // 방문한 아카이브 소유자 정보
   const [relStatus, setRelStatus] = useState("3");
   const [relBtnMsg, setRelBtnMsg] = useState(""); // 버튼에 나타날 텍스트
-  const [blockBtnMsg, setBlockBtnMsg] = useState("");
+
+  // 아카이브 소유자 컬렉션 유형 선택 탭
+  const [activeTab, setActiveTab] = useState("유저 제작 컬렉션");
+
+  //아카이브 소유자 컬렉션 목록
+  const [collections, setCollections] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
 
   // 해당 아카이브 소유자에 대한 팔로우 상태 가져옴
   useEffect(() => {
@@ -63,6 +73,45 @@ function ArchiveVisit() {
     }
   }, [relStatus]); // relStatus만 의존
 
+  //아카이브 소유자의 컬렉션 목록 가져옴
+  useEffect(() => {
+    console.log("owner id: " + ownerid);
+    if (ownerid) {
+      const fetchStuff = async () => {
+        try {
+          const collectionsInfo = await apiClient.get("/archive/collections", {
+            params: {
+              userid: ownerid,
+            },
+          });
+          console.log(collectionsInfo.data);
+          setCollections(collectionsInfo.data);
+        } catch (error) {
+          console.error("Error fetching user collections: ", error);
+        }
+        try {
+          const bookmarksInfo = await apiClient.get(
+            "/archive/bookmarkCollections",
+            {
+              params: {
+                userid: ownerid,
+              },
+            }
+          );
+          console.log(bookmarksInfo.data);
+          setBookmarks(bookmarksInfo.data);
+        } catch (error) {
+          console.error("Error fetching user bookmarks:", error);
+        }
+      };
+      fetchStuff();
+    }
+  }, [ownerid, navigate]);
+
+  //  if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
+  //    return <div>로딩중...</div>;
+  //  }
+
   // 팔로우 상태 변경 (수정요망)
   const handleToggleFollow = async () => {
     try {
@@ -107,7 +156,7 @@ function ArchiveVisit() {
     //console.log("방문한 아카이브 주인: " + userid);
   });
 
-  //db작업 요청 추가해야 함(위 팔로우 토글과 겹치나..?)
+  // 차단 버튼
   const handleBlockClick = async () => {
     let nextStatus = null;
     switch (relStatus) {
@@ -140,15 +189,133 @@ function ArchiveVisit() {
     setRelStatus(nextStatus);
   };
 
+  //탭 클릭시 owner가 생성한 컬렉션을 가져오도록 함
+  const handleMyCollClick = async () => {
+    setActiveTab("myColl");
+    try {
+      const collectionsInfo = await apiClient.get("/archive/collections", {
+        params: {
+          userid: ownerid,
+        },
+      });
+      console.log(collectionsInfo.data);
+      setCollections(collectionsInfo.data);
+    } catch (error) {
+      console.error("Error fetching user collections:", error);
+    }
+  };
+
+  // 탭 클릭시 owner가 북마크한 컬렉션을 가져오도록 함
+  const handleBookmarkCollClick = async () => {
+    setActiveTab("bookmarkColl");
+    try {
+      const bookmarksInfo = await apiClient.get(
+        "/archive/bookmarkCollections",
+        {
+          params: {
+            userid: ownerid,
+          },
+        }
+      );
+      console.log(bookmarksInfo.data);
+      setBookmarks(bookmarksInfo.data);
+    } catch (error) {
+      console.error("Error fetching user bookmarks:", error);
+    }
+  };
+
+  // 컬렉션 좋아요/ 북마크 클릭시 처리
+  const handleActionChange = async (collectionId, actionType) => {
+    const targetList = activeTab === "myColl" ? collections : bookmarks;
+    const setTargetList =
+      activeTab === "myColl" ? setCollections : setBookmarks;
+
+    const targetItem = targetList.find(
+      (coll) => coll.collectionid === collectionId
+    );
+    if (!targetItem) return;
+
+    const isLiked =
+      actionType === "userlike" ? !targetItem.userlike : undefined;
+    const isBookmarked =
+      actionType === "userbookmark" ? !targetItem.userbookmark : undefined;
+
+    try {
+      if (actionType === "userlike") {
+        await apiClient.post(`/api/library/togglelike`, null, {
+          params: { collectionId, isLiked },
+        });
+      } else if (actionType === "userbookmark") {
+        await apiClient.post(`/api/library/togglebm`, null, {
+          params: { collectionId, isBookmarked },
+        });
+      }
+
+      // 상태 업데이트
+      setTargetList((prevState) =>
+        prevState.map((coll) =>
+          coll.collectionid === collectionId
+            ? {
+                ...coll,
+                [actionType]: !coll[actionType],
+                [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+                  coll[actionType]
+                    ? coll[
+                        actionType === "userlike"
+                          ? "likeCount"
+                          : "bookmarkCount"
+                      ] - 1
+                    : coll[
+                        actionType === "userlike"
+                          ? "likeCount"
+                          : "bookmarkCount"
+                      ] + 1,
+              }
+            : coll
+        )
+      );
+    } catch (error) {
+      console.error("상태 변경 중 오류 발생:", error);
+    }
+  };
+
+  // TODO
+  const handleCollClick = (collectionid) => {
+    alert(collectionid);
+  };
+
   return (
-    <div>
-      <VisitProfileCard
-        ownerid={ownerid}
-        relStatus={relStatus}
-        relBtnMsg={relBtnMsg}
-        onFollowBtnClick={handleToggleFollow}
-        onBlockClick={handleBlockClick}
-      />
+    <div className={styles.profileContainer}>
+      <div className={styles.sidebar}>
+        <VisitProfileCard
+          ownerid={ownerid}
+          relStatus={relStatus}
+          relBtnMsg={relBtnMsg}
+          onFollowBtnClick={handleToggleFollow}
+          onBlockClick={handleBlockClick}
+        />
+      </div>
+      <div className={styles.content}>
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
+            onClick={handleMyCollClick}
+          >
+            유저의 컬렉션
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
+            onClick={handleBookmarkCollClick}
+          >
+            유저가 북마크한 컬렉션
+          </button>
+        </div>
+        <CollGrid
+          colls={activeTab == "myColl" ? collections : bookmarks}
+          onActionChange={handleActionChange}
+          onCollClick={handleCollClick}
+        />
+      </div>
     </div>
   );
 }

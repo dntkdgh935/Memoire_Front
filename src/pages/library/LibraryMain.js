@@ -1,6 +1,7 @@
 // src/pages/library/LibraryMain.js
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import apiClient from "../../utils/axios";
 
 import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
@@ -12,7 +13,7 @@ function LibraryMain() {
   const navigate = useNavigate();
 
   // 유저 관련 states
-  const { isLoggedIn, userid } = useContext(AuthContext);
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
   //tag bar 관련 states
   const [selectedTag, setSelectedTag] = useState("전체");
@@ -20,6 +21,43 @@ function LibraryMain() {
 
   // Collection 목록 states
   const [recColls, setRecColls] = useState([]);
+
+  // 1. 로그인 상태에 따라 - selectedTag 탭에 해당하는 추천 요청
+  useEffect(() => {
+    if (isLoggedIn) {
+      //로그인됐을 경우, 로그인 아이디 보내기
+      console.log("로그인 회원 추천");
+      const fetchCollections = async () => {
+        // TODO: 전체/ 팔로잉 <-- 이런 태그는 만들 수 없게 하기
+        try {
+          const res = await apiClient.get(
+            `api/library/discover/${selectedTag}/${userid}`
+          );
+          setRecColls(res.data);
+        } catch (err) {
+          console.error("🚨 컬렉션 불러오기 실패", err);
+        }
+      };
+      fetchCollections();
+    }
+
+    //로그인되지 않았을 경우, 전체 컬렉션 불러오기
+    else {
+      console.log("비회원 추천");
+      const fetchCollections = async () => {
+        try {
+          const res = await apiClient(`api/library/discover/${selectedTag}`);
+          setRecColls(res.data);
+          console.log("비회원 추천 내용:", res.data);
+        } catch (err) {
+          console.error("🚨 컬렉션 불러오기 실패", err);
+        }
+      };
+      fetchCollections();
+    }
+  }, [isLoggedIn, userid, selectedTag]);
+
+  //2. TODO: 로그인 상태에 따라 좋아요/ 북마크 버튼 action 바꾸기???
 
   // TagBar: top 5 태그 가져오기
   useEffect(() => {
@@ -38,69 +76,62 @@ function LibraryMain() {
     fetchTags();
   }, []);
 
-  // (로그인 가정)user001에 모든 collection 목록 가져오기
-  useEffect(() => {
-    const fetchCollections = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:8080/api/library/discover/all"
-        );
-        console.log("📦 Collections:", res.data);
-        setRecColls(res.data);
-      } catch (err) {
-        console.error("🚨 컬렉션 불러오기 실패", err);
-      }
-    };
-
-    fetchCollections();
-  }, []);
-
   // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
   const handleActionChange = async (collectionId, actionType) => {
-    // Spring에 DB 변경 요청
-    const isLiked =
-      actionType === "userlike"
-        ? !recColls.find((coll) => coll.collectionid === collectionId).userlike
-        : undefined;
-    const isBookmarked =
-      actionType === "userbookmark"
-        ? !recColls.find((coll) => coll.collectionid === collectionId)
-            .userbookmark
-        : undefined;
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      const isLiked =
+        actionType === "userlike"
+          ? !recColls.find((coll) => coll.collectionid === collectionId)
+              .userlike
+          : undefined;
+      const isBookmarked =
+        actionType === "userbookmark"
+          ? !recColls.find((coll) => coll.collectionid === collectionId)
+              .userbookmark
+          : undefined;
 
-    if (actionType === "userlike") {
-      await axios.post(
-        `http://localhost:8080/api/library/togglelike?collectionId=${collectionId}&isLiked=${isLiked}`
-      );
-    }
-    if (actionType === "userbookmark") {
-      await axios.post(
-        `http://localhost:8080/api/library/togglebm?collectionId=${collectionId}&isBookmarked=${isBookmarked}`
-      );
-    }
+      if (actionType === "userlike") {
+        await axios.post(
+          `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
+        );
+      }
+      if (actionType === "userbookmark") {
+        await axios.post(
+          `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+        );
+      }
 
-    // UI 상태 변경
-    setRecColls((prevState) =>
-      prevState.map((coll) =>
-        coll.collectionid === collectionId
-          ? {
-              ...coll,
-              [actionType]: !coll[actionType], // 상태 토글
-              // 좋아요/북마크 카운트 업데이트
-              [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-                coll[actionType] === true
-                  ? coll[
-                      actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                    ] - 1
-                  : coll[
-                      actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                    ] + 1,
-            }
-          : coll
-      )
-    );
+      // UI 상태 변경
+      setRecColls((prevState) =>
+        prevState.map((coll) =>
+          coll.collectionid === collectionId
+            ? {
+                ...coll,
+                [actionType]: !coll[actionType], // 상태 토글
+                // 좋아요/북마크 카운트 업데이트
+                [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+                  coll[actionType] === true
+                    ? coll[
+                        actionType === "userlike"
+                          ? "likeCount"
+                          : "bookmarkCount"
+                      ] - 1
+                    : coll[
+                        actionType === "userlike"
+                          ? "likeCount"
+                          : "bookmarkCount"
+                      ] + 1,
+              }
+            : coll
+        )
+      );
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
   };
 
+  //TODO: libMain 참고해서 함수 내용 채우기 (Detail View로 이동하도록)
   const handleCollClick = (collectionId) => {
     navigate(`detail/${collectionId}`);
   };

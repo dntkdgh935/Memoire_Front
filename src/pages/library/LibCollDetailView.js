@@ -19,6 +19,8 @@ function LibCollDetailView() {
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  //TODO: 로그인 상태에 따라 다르게 처리 (ex. 좋아요/ 북마크 못하게?)
+
   useEffect(() => {
     console.log("✅ [변경됨] selectedMemory updated:", selectedMemory);
   }, [selectedMemory]);
@@ -68,6 +70,7 @@ function LibCollDetailView() {
   const handleMemoryClick = async (memoryid) => {
     setLoading(true);
     setSelectedMemoryId(memoryid); // ✅ 스타일에 바로 반영됨
+
     try {
       const res = await axios.get(
         `http://localhost:8080/api/library/memory/${memoryid}` // 메모리 아이디로 메모리 상세 요청
@@ -89,40 +92,46 @@ function LibCollDetailView() {
 
   // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
   const handleActionChange = async (collectionId, actionType) => {
-    // Spring에 DB 변경 요청
-    const isLiked =
-      actionType === "userlike" ? !collection.userlike : undefined;
-    const isBookmarked =
-      actionType === "userbookmark" ? !collection.userbookmark : undefined;
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      const isLiked =
+        actionType === "userlike" ? !collection.userlike : undefined;
+      const isBookmarked =
+        actionType === "userbookmark" ? !collection.userbookmark : undefined;
 
-    if (actionType === "userlike") {
-      await axios.post(
-        `http://localhost:8080/api/library/togglelike?collectionId=${collectionId}&isLiked=${isLiked}`
-      );
+      if (actionType === "userlike") {
+        await axios.post(
+          `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
+        );
+      }
+      if (actionType === "userbookmark") {
+        await axios.post(
+          `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+        );
+      }
+
+      // UI 상태 변경
+      setCollection((prev) => {
+        if (!prev) return prev;
+
+        const updated = {
+          ...prev,
+          [actionType]: !prev[actionType], // userlike 또는 userbookmark 토글
+          [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+            prev[actionType] === true
+              ? prev[
+                  actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                ] - 1
+              : prev[
+                  actionType === "userlike" ? "likeCount" : "bookmarkCount"
+                ] + 1,
+        };
+
+        return updated;
+      });
+    } else {
+      alert("로그인 후 사용 가능합니다.");
     }
-    if (actionType === "userbookmark") {
-      await axios.post(
-        `http://localhost:8080/api/library/togglebm?collectionId=${collectionId}&isBookmarked=${isBookmarked}`
-      );
-    }
-
-    // UI 상태 변경
-    setCollection((prev) => {
-      if (!prev) return prev;
-
-      const updated = {
-        ...prev,
-        [actionType]: !prev[actionType], // userlike 또는 userbookmark 토글
-        [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-          prev[actionType] === true
-            ? prev[actionType === "userlike" ? "likeCount" : "bookmarkCount"] -
-              1
-            : prev[actionType === "userlike" ? "likeCount" : "bookmarkCount"] +
-              1,
-      };
-
-      return updated;
-    });
   };
 
   return (
