@@ -62,6 +62,39 @@ function ArchiveMain() {
     return <div>로딩중...</div>;
   }
 
+  const handleMyCollClick = async () => {
+    setActiveTab("myColl");
+    try {
+      const collectionsInfo = await apiClient.get("/archive/collections", {
+        params: {
+          userid: userid,
+        },
+      });
+      console.log(collectionsInfo.data);
+      setCollections(collectionsInfo.data);
+    } catch (error) {
+      console.error("Error fetching user collections:", error);
+    }
+  };
+
+  const handleBookmarkCollClick = async () => {
+    setActiveTab("bookmarkColl");
+    try {
+      const bookmarksInfo = await apiClient.get(
+        "/archive/bookmarkCollections",
+        {
+          params: {
+            userid: userid,
+          },
+        }
+      );
+      console.log(bookmarksInfo.data);
+      setBookmarks(bookmarksInfo.data);
+    } catch (error) {
+      console.error("Error fetching user bookmarks:", error);
+    }
+  };
+
   const handleActionChange = async (collectionId, actionType) => {
     const targetList = activeTab === "myColl" ? collections : bookmarks;
     const setTargetList =
@@ -120,6 +153,10 @@ function ArchiveMain() {
     alert(collectionid);
   };
 
+  const handleNewCollection = () => {
+    navigate("/archive/newcoll");
+  };
+
   return (
     <div className={styles.profileContainer}>
       <div className={styles.sidebar}>
@@ -130,15 +167,18 @@ function ArchiveMain() {
         <div className={styles.tabs}>
           <button
             className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
-            onClick={() => setActiveTab("myColl")}
+            onClick={handleMyCollClick}
           >
             내 컬렉션
           </button>
           <button
             className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
-            onClick={() => setActiveTab("bookmarkColl")}
+            onClick={handleBookmarkCollClick}
           >
             북마크한 컬렉션
+          </button>
+          <button className={styles.button} onClick={handleNewCollection}>
+            새 컬렉션
           </button>
         </div>
         <CollGrid

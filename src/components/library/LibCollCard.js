@@ -1,5 +1,7 @@
 // src/components/library/LibCollCard.js
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
+import apiClient from "../../utils/axios";
 import styles from "./LibCollCard.module.css";
 import MemoryList from "../../components/common/MemoryList";
 import CollActionBtn from "../../components/common/CollActionBtn";
@@ -19,13 +21,31 @@ function LibCollCard({
   onActionChange,
   selectedMemoryId,
 }) {
-  if (!coll) {
-    return <div>로딩 중...</div>; // 컬렉션 데이터가 없을 때 로딩 화면을 표시합니다.
-  }
+  const { isLoggedIn, userid, role } = useContext(AuthContext);
+
+  const handleEditClick = () => {
+    alert("수정버튼을 클릭했습니다");
+  };
+
+  const handleDeleteClick = () => {
+    alert("삭제버튼을 클릭했습니다");
+  };
+
   return (
     <div className={styles.cardContainer}>
       <div className={styles.cardHeader}>
         <div className={styles.collectionTitle}>{coll.collectionTitle}</div>
+        {/* 여기에 로그인상태이고 관리자이거나 해당 게시물 작성자이면 편집 버튼을 넣음 */}
+        {isLoggedIn && (role === "ADMIN" || userid === coll.authorid) && (
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={handleEditClick}>
+              수정
+            </button>
+            <button className={styles.button} onClick={handleDeleteClick}>
+              삭제
+            </button>
+          </div>
+        )}
         <AvatarWName
           type="inCollLabel"
           user={{
