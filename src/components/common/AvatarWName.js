@@ -7,6 +7,7 @@ function AvatarWName({ user, type }) {
   const navigate = useNavigate(); // 이 줄이 반드시 필요!
 
   const { username, displayId, profileImageUrl, userid } = user;
+  console.log("username: " + username + ", userid: " + userid);
   // const { userid } = useContext(AuthContext);
   console.log("[AvatarWName]:" + userid);
   const handleClick = () => {
