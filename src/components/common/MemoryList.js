@@ -1,49 +1,42 @@
-// src/components/atelier/common/MemoryList.js
-import React from "react";
+// src/components/common/MemoryList.js
+
 import styles from "./MemoryList.module.css"; // 있으면 유지
+import React, { useEffect, useState } from "react";
 
-function MemoryList({
-  collections,
-  memories,
-  selectedCollectionId,
-  selectedMemoryId,
-  onSelectCollection,
-  onSelectMemory,
-}) {
+function MemoryList({ memoryList, onMemoryClick, selectedMemoryId }) {
+  const [isLoading, setisLoading] = useState(true);
+
+  useEffect(() => {
+    console.log("🧪 memoryList:", memoryList);
+    console.log(selectedMemoryId);
+    if (memoryList) {
+      setisLoading(false);
+    }
+  }, [memoryList]);
+
+  if (isLoading || !memoryList) {
+    return <div className={styles.loading}>로딩중...</div>;
+  }
+
   return (
-    <div className={styles.wrapper}>
-      {/* 컬렉션 선택 드롭다운 */}
-      <select
-        className={styles.dropdown}
-        value={selectedCollectionId}
-        onChange={(e) => onSelectCollection(e.target.value)}
-      >
-        {collections.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.title}
-          </option>
-        ))}
-      </select>
+    <div className={styles.listContainer}>
+      <div className={styles.titleBar}>
+        <span>📝 메모리 목록</span>
+        <span>{memoryList.length}개</span>
+      </div>
 
-      {/* 메모리 목록 */}
       <div className={styles.memoryList}>
-        <strong>원본 메모리 목록</strong>
-        <p>{memories.length}개</p>
-        <ul className={styles.list}>
-          {memories.map((m) => (
-            <li
-              key={m.memoryid}
-              className={
-                m.memoryid === selectedMemoryId
-                  ? styles.selectedItem
-                  : styles.listItem
-              }
-              onClick={() => onSelectMemory(m.memoryid)}
-            >
-              {m.title}
-            </li>
-          ))}
-        </ul>
+        {memoryList.map((memory, index) => (
+          <div
+            key={index}
+            className={`${styles.memoryItem} ${
+              selectedMemoryId === memory.memoryid ? styles.selected : ""
+            }`}
+            onClick={() => onMemoryClick(memory.memoryid)} // memory가 아니라 memory.memoryid
+          >
+            {memory.title}
+          </div>
+        ))}
       </div>
     </div>
   );

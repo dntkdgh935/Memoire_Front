@@ -3,11 +3,23 @@ import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
 import styles from "./VisitProfileCard.module.css";
 
-/*<VisitProfileCard
+/*
+<div>
+        <VisitProfileCard
         ownerid={ownerid}
+        relStatus={relStatus}
+        relBtnMsg={relBtnMsg}
         onFollowBtnClick={handleToggleFollow}
-      /> */
-function VisitProfileCard({ ownerid, onFollowBtnClick }) {
+        />
+    </div>
+/> */
+function VisitProfileCard({
+  ownerid,
+  relStatus,
+  relBtnMsg,
+  onFollowBtnClick,
+  onBlockClick,
+}) {
   // 방문자 id
   //   const { userid } = useContext(AuthContext);
 
@@ -162,9 +174,9 @@ function VisitProfileCard({ ownerid, onFollowBtnClick }) {
       </div>
 
       <button className={styles["follow-btn"]} onClick={onFollowBtnClick}>
-        팔로우
+        {relBtnMsg}
       </button>
-      <span>차단하기</span>
+      <p onClick={onBlockClick}>차단하기</p>
     </div>
   );
 }
