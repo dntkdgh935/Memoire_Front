@@ -10,6 +10,8 @@ import TextToTextMain from "../pages/atelier/TextToTextMain";
 import TextToImageMain from "../pages/atelier/TextToImageMain";
 import ImageToImageMain from "../pages/atelier/ImageToImageMain";
 import ImageToVideoMain from "../pages/atelier/ImageToVideoMain";
+import OAuth2CallbackSuccess from "../pages/user/OAuth2CallbackSuccess";
+import SocialSignUp from "../pages/user/SocialSignUp";
 
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
@@ -19,10 +21,16 @@ import UserRouter from "./UserRouter";
 function AppRouter() {
   return (
     <Routes>
-      {/* <Route path="/" element={<LibraryMain />} /> */}
+      <Route path="/" element={<LibraryMain />} />
       <Route path="/library/*" element={<LibraryRouter />} />
       <Route path="/archive/*" element={<ArchiveRouter />} />
       <Route path="/user/*" element={<UserRouter />} />
+      <Route
+        path="/oauth2/callback/success"
+        element={<OAuth2CallbackSuccess />}
+      />
+      <Route path="/social-signup" element={<SocialSignUp />} />
+
       {/* 아틀리에 홈 */}
       <Route path="/atelier" element={<AtelierHome />} />
       {/* 서브 기능 페이지 */}
