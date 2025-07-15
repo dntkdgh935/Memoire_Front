@@ -1,0 +1,125 @@
+/* ImgToImg WorkResultPanel CSS 모듈 */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: "Pretendard", sans-serif;
+  color: #4d3b30;
+  background-color: #fdfaf7;
+  padding: 24px;
+  border: 1px solid #e5ded7;
+  border-radius: 12px;
+  height: 100%;
+}
+
+.date {
+  font-size: 14px;
+  color: #6f5d4a;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* 이미지 표시 영역 */
+.imageBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.imageBox img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px solid #ddd0c4;
+}
+
+/* 로딩 상태 */
+.loadingBox {
+  text-align: center;
+  padding: 40px 0;
+  color: #7b6c5f;
+  font-size: 14px;
+}
+
+.loadingBox img {
+  width: 48px;
+  margin-bottom: 12px;
+}
+
+/* 실패 상태 */
+.errorBox {
+  text-align: center;
+  padding: 40px 0;
+  color: #a35e5e;
+  font-size: 14px;
+}
+
+.errorBox img {
+  width: 72px;
+  margin-bottom: 16px;
+}
+
+.errorText {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #a34646;
+}
+
+.errorReason {
+  font-size: 13px;
+  color: #835050;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* 버튼 그룹 */
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: 1px solid #4d3b30;
+}
+
+.primaryBtn {
+  background-color: #4d3b30;
+  color: #fff;
+}
+
+.secondaryBtn {
+  background-color: #fff;
+  color: #4d3b30;
+}
+
+.primaryBtn:hover {
+  background-color: #3e2f26;
+}
+
+.secondaryBtn:hover {
+  background-color: #f1eae3;
+}
+
+.placeholder {
+  font-size: 14px;
+  color: #a79888;
+  text-align: center;
+  margin-top: 60px;
+}
