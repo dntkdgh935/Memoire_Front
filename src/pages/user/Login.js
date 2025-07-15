@@ -82,12 +82,13 @@ function Login({ onLoginSuccess }) {
 
     setIsSocialLoginProcessing(true);
     try {
-      // 백엔드에 해당 socialType의 인가 URL을 요청
       const response = await apiClient.post("/user/social", { socialType });
-      const { authorizationUrl } = response.data; // 백엔드에서 반환할 인가 URL
+      const { authorizationUrl } = response.data; // 백엔드에서 받은 인가 URL
 
       if (authorizationUrl) {
-        // 인가 URL로 사용자 리다이렉트
+        // ✅ authorizationUrl이 이제 'http://localhost:8080/oauth2/authorization/naver' 와 같은
+        //    절대 경로이므로, 브라우저가 올바르게 리다이렉션합니다.
+        console.log(`Redirecting to: ${authorizationUrl}`);
         window.location.href = authorizationUrl;
       } else {
         alert("소셜 로그인 URL을 가져오는 데 실패했습니다.");
