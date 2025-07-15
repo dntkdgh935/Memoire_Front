@@ -1,4 +1,4 @@
-//src/AuthProvider.js
+// src/AuthProvider.js
 import { createContext, useState, useEffect } from "react";
 import apiClient from "./utils/axios";
 
@@ -89,176 +89,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const storedAccessToken = localStorage.getItem("accessToken");
-    const storedRefreshToken = localStorage.getItem("refreshToken");
-    // ✅ localStorage에서 autoLoginFlag 값을 가져옵니다.
-    const storedAutoLoginFlag = localStorage.getItem("autoLoginFlag");
-
-    console.log(
-      "useEffect 실행: storedAccessToken=",
-      storedAccessToken,
-      "storedRefreshToken=",
-      storedRefreshToken,
-      "storedAutoLoginFlag=",
-      storedAutoLoginFlag
-    );
-
-    // ✅ 자동 로그인 플래그가 'N'이고, 토큰이 존재한다면 즉시 로그아웃 처리
-    if (
-      storedAutoLoginFlag === "N" &&
-      (storedAccessToken || storedRefreshToken)
-    ) {
-      console.log(
-        "자동 로그인 아님 (N) -> 로컬 스토리지 토큰 삭제 및 로그아웃 처리"
-      );
-      logout(); // 토큰을 지우고 상태를 초기화합니다.
-      return; // 이후 로직 실행하지 않음
-    }
-
-    // ✅ 'Y'이거나 autoLoginFlag가 없거나 토큰이 없는 경우에만 아래 로직 실행
-    if (storedAccessToken && storedRefreshToken) {
-      const parsedToken = parseAccessToken(storedAccessToken);
-      console.log("useEffect: parsedAccessToken=", parsedToken);
-
-      if (parsedToken) {
-        setAuthInfo({
-          isLoggedIn: true,
-          role: parsedToken.role,
-          name: parsedToken.name,
-          userid: parsedToken.userid,
-          autoLoginFlag: storedAutoLoginFlag || "N", // 저장된 플래그 사용
-          nickname: parsedToken.nickname,
-        });
-        console.log("AuthInfo 업데이트 성공: ", parsedToken);
-      } else {
-        // AccessToken이 만료되었거나 파싱 실패한 경우
-        // RefreshToken으로 재발급 시도 또는 바로 로그아웃
-        console.log("AccessToken 유효하지 않음. 재발급 시도 또는 로그아웃");
-        handleReissueTokens(storedAutoLoginFlag === "Y") // storedAutoLoginFlag 값에 따라 extendLogin 전달
-          .catch(() => {
-            console.log("토큰 재발급 실패. 로그아웃 처리.");
-            logoutAndRedirect();
-          });
-      }
-    } else {
-      // 토큰이 아예 없는 경우 (처음 방문했거나 이미 로그아웃된 상태)
-      console.log("토큰 없음. 로그인 상태 아님.");
-      logout();
-    }
-  }, []); // 의존성 배열 비워두어 컴포넌트 마운트 시 한 번만 실행
-
-  // 공통으로 사용할 서버측 API 요청 처리용 함수 (로그인 상태에서 요청하는 서비스들)
-  // 요청 전에 토큰만요 확인, accessToken 만료시 refreshToken 으로 토큰 재발급 요청
-  // refreshToken  만료시에는 로그인 연장 여부 확인하고, refreshToken 재발급 요청 (안할꺼임 유지)
-  // 두 개의 토큰이 정상일 때 API 요청 처리에 대한 기능 구현
-  const secureApiRequest = async (URL, options = {}, retry = true) => {
-    console.log("AuthProvider.secureApiRequest 실행");
-
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (!accessToken || !refreshToken) {
-      throw new Error("AccessToken 또는 RefreshToken 이 없습니다.");
-    }
-
-    try {
-      const method = options.method || "GET";
-      const data = options.body || null;
-
-      //formData 인지 확인함
-      const isFormData = data instanceof FormData;
-      console.log("FormData 인가 : ", isFormData);
-
-      if (isFormData) {
-        for (let pair of data.entries()) {
-          console.log(pair[0] + ":" + pair[1]);
-        }
-      }
-
-      // 서버 측 서비스 요청 보내고 결과 받기
-      const response = await apiClient({
-        URL,
-        method,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          RefreshToken: `Bearer ${refreshToken}`,
-          ...(isFormData
-            ? { "Content-Type": "multipart/form-data" }
-            : { "Content-Type": "application/json" }),
-        },
-        data,
-      });
-      return response;
-    } catch (error) {
-      console.error("API 요청 실패 - 상태 코드 : ", error.response?.status);
-      console.error("API 응답 해더 : ", error.response?.headers);
-      console.error("API 응답 데이터 : ", error.response?.data);
-
-      const tokenExpiredHeader = error.response?.headers["token-expired"];
-
-      if (error.response?.status === 401 && retry) {
-        // ststus.code : 401 (UnAuthrized 임)
-        // RefreshToken 만료시 로그인 연장 여부 확인
-        if (tokenExpiredHeader === "RefreshToken") {
-          if (authInfo.autoLoginFlag === "Y") {
-            // 자동 연장
-            try {
-              await handleReissueTokens(true);
-              return secureApiRequest(URL, options, false); // 재시도 요청
-            } catch (refreshError) {
-              console.error(
-                "자동 로그인 연장 실패 : ",
-                refreshError.response?.data
-              );
-              alert("로그아웃 되었습니다. 다시 로그인하세요.");
-              logoutAndRedirect();
-            }
-          } else {
-            // N 또는 그 외: 기존처럼 confirm
-            const confirmExtend = window.confirm(
-              "로그인 세션이 만료되었습니다. 로그인 연장하시겠습니까?"
-            );
-            if (confirmExtend) {
-              try {
-                await handleReissueTokens(true);
-                return secureApiRequest(URL, options, false); // 재시도 요청
-              } catch (refreshError) {
-                console.error(
-                  "로그인 연장 실패 : ",
-                  refreshError.response?.data
-                );
-                alert("로그아웃 되었습니다. 다시 로그인하세요.");
-                logoutAndRedirect();
-              }
-            } else {
-              alert("로그인이 연장되지 않았습니다. 다시 로그인하세요.");
-              logoutAndRedirect();
-            }
-          }
-        } // 리프레시토큰 만료되었을 때
-
-        // AccessToken 만료시 RefreshToken 으로 AccessToken 재발급
-        if (tokenExpiredHeader === "AccessToken") {
-          console.warn("AccessToken 만료, RefreshToken 으로 재발급 시도중....");
-          try {
-            await handleReissueTokens();
-            return secureApiRequest(URL, options, false); // API 재호출 시도
-          } catch (accessError) {
-            console.error(
-              "AccessToken 재발급 실패...",
-              accessError.response?.data
-            );
-            logoutAndRedirect();
-          }
-        }
-      }
-
-      throw error; // 다른 에러 처리
-    }
-  }; //secureApiRequest
-
-  //AccessToken or RefreshToken 재발급 처리
+  // AccessToken or RefreshToken 재발급 처리
   const handleReissueTokens = async (extendLogin = false) => {
     let accessToken = localStorage.getItem("accessToken")?.trim();
     let refreshToken = localStorage.getItem("refreshToken")?.trim();
@@ -308,7 +139,154 @@ export const AuthProvider = ({ children }) => {
         logoutAndRedirect();
       }
     }
-  };
+  }; //secureApiRequest
+
+  useEffect(() => {
+    const storedAccessToken = localStorage.getItem("accessToken");
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+    const storedAutoLoginFlag = localStorage.getItem("autoLoginFlag");
+
+    console.log(
+      "AuthProvider useEffect 실행: storedAccessToken=",
+      storedAccessToken,
+      "storedRefreshToken=",
+      storedRefreshToken,
+      "storedAutoLoginFlag=",
+      storedAutoLoginFlag
+    );
+
+    // ✅ 기존 로직 수정: autoLoginFlag가 'N'이라고 해서 즉시 로그아웃하지 않음.
+    // ✅ 토큰이 존재하면 로그인 상태를 설정하고, 없으면 로그아웃 처리.
+    if (storedAccessToken && storedRefreshToken) {
+      const parsedToken = parseAccessToken(storedAccessToken);
+      console.log("AuthProvider useEffect: parsedAccessToken=", parsedToken);
+
+      if (parsedToken) {
+        setAuthInfo({
+          isLoggedIn: true,
+          role: parsedToken.role,
+          name: parsedToken.name,
+          userid: parsedToken.userid,
+          autoLoginFlag: storedAutoLoginFlag || "N", // 저장된 플래그 사용
+          nickname: parsedToken.nickname,
+        });
+        console.log("AuthInfo 업데이트 성공: ", parsedToken);
+      } else {
+        // AccessToken이 만료되었거나 파싱 실패한 경우
+        console.log("AccessToken 유효하지 않음. 재발급 시도 또는 로그아웃");
+        handleReissueTokens(storedAutoLoginFlag === "Y") // storedAutoLoginFlag 값에 따라 extendLogin 전달
+          .catch(() => {
+            console.log("토큰 재발급 실패. 로그아웃 처리.");
+            logoutAndRedirect();
+          });
+      }
+    } else {
+      // 토큰이 아예 없는 경우 (처음 방문했거나 이미 로그아웃된 상태)
+      console.log("토큰 없음. 로그인 상태 아님.");
+      logout();
+    }
+  }, []); // 의존성 배열 비워두어 컴포넌트 마운트 시 한 번만 실행
+
+  // 공통으로 사용할 서버측 API 요청 처리용 함수 (로그인 상태에서 요청하는 서비스들)
+  const secureApiRequest = async (URL, options = {}, retry = true) => {
+    console.log("AuthProvider.secureApiRequest 실행");
+
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!accessToken || !refreshToken) {
+      throw new Error("AccessToken 또는 RefreshToken 이 없습니다.");
+    }
+
+    try {
+      const method = options.method || "GET";
+      const data = options.body || null;
+
+      const isFormData = data instanceof FormData;
+      console.log("FormData 인가 : ", isFormData);
+
+      if (isFormData) {
+        for (let pair of data.entries()) {
+          console.log(pair[0] + ":" + pair[1]);
+        }
+      }
+
+      const response = await apiClient({
+        URL,
+        method,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          RefreshToken: `Bearer ${refreshToken}`,
+          ...(isFormData
+            ? { "Content-Type": "multipart/form-data" }
+            : { "Content-Type": "application/json" }),
+        },
+        data,
+      });
+      return response;
+    } catch (error) {
+      console.error("API 요청 실패 - 상태 코드 : ", error.response?.status);
+      console.error("API 응답 해더 : ", error.response?.headers);
+      console.error("API 응답 데이터 : ", error.response?.data);
+
+      const tokenExpiredHeader = error.response?.headers["token-expired"];
+
+      if (error.response?.status === 401 && retry) {
+        if (tokenExpiredHeader === "RefreshToken") {
+          if (authInfo.autoLoginFlag === "Y") {
+            try {
+              await handleReissueTokens(true);
+              return secureApiRequest(URL, options, false);
+            } catch (refreshError) {
+              console.error(
+                "자동 로그인 연장 실패 : ",
+                refreshError.response?.data
+              );
+              alert("로그아웃 되었습니다. 다시 로그인하세요.");
+              logoutAndRedirect();
+            }
+          } else {
+            const confirmExtend = window.confirm(
+              "로그인 세션이 만료되었습니다. 로그인 연장하시겠습니까?"
+            );
+            if (confirmExtend) {
+              try {
+                await handleReissueTokens(true);
+                return secureApiRequest(URL, options, false);
+              } catch (refreshError) {
+                console.error(
+                  "로그인 연장 실패 : ",
+                  refreshError.response?.data
+                );
+                alert("로그아웃 되었습니다. 다시 로그인하세요.");
+                logoutAndRedirect();
+              }
+            } else {
+              alert("로그인이 연장되지 않았습니다. 다시 로그인하세요.");
+              logoutAndRedirect();
+            }
+          }
+        } // 리프레시토큰 만료되었을 때
+
+        if (tokenExpiredHeader === "AccessToken") {
+          console.warn("AccessToken 만료, RefreshToken 으로 재발급 시도중....");
+          try {
+            await handleReissueTokens();
+            return secureApiRequest(URL, options, false); // API 재호출 시도
+          } catch (accessError) {
+            console.error(
+              "AccessToken 재발급 실패...",
+              accessError.response?.data
+            );
+            logoutAndRedirect();
+          }
+        }
+      }
+
+      throw error; // 다른 에러 처리
+    }
+  }; //secureApiRequest
+
   return (
     <AuthContext.Provider
       value={{
