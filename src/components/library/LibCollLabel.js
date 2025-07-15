@@ -8,13 +8,18 @@ import CollActionButton from "../common/CollActionBtn";
 // 좋아요 클릭 시 처리 함수
 
 function LibCollLabel({ coll, onActionChange }) {
+  useEffect(() => {
+    // coll
+  });
   return (
     <div className={styles.overlay}>
       <div className={styles.label}>
         <AvatarWName
           type="inCollLabel"
           user={{
+            // TODO: 여기에 name이 아니라 authorname을 가진 id를 보내야 함
             username: coll.authorname,
+            userid: coll.authorid,
             displayId: `@${coll.authorid}`,
             profileImageUrl: coll.authorProfileImage,
           }}
