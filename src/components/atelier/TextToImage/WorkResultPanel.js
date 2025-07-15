@@ -38,16 +38,19 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
       return;
     }
     try {
-      const response = await fetch(`/api/atelier/image/update/${originalMemoryId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: originalMemoryTitle,
-          imageUrl: result.imageUrl,
-        }),
-      });
+      const response = await fetch(
+        `/api/atelier/image/update/${originalMemoryId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: originalMemoryTitle,
+            imageUrl: result.imageUrl,
+          }),
+        }
+      );
       if (!response.ok) throw new Error("덮어쓰기 실패");
       alert("원본 메모리가 덮어쓰기 되었습니다!");
       window.location.reload();
@@ -59,14 +62,20 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
 
   return (
     <div className={styles.panel}>
-      <div className={styles.date}>{new Date().toISOString().split("T")[0]}</div>
+      <div className={styles.date}>
+        {new Date().toISOString().split("T")[0]}
+      </div>
       <div className={styles.title}>{originalMemoryTitle || "제목 없음"}</div>
 
       {/* 🔄 로딩 중 */}
       {isLoading && (
         <div className={styles.loadingBox}>
           <img src={loadingImg} alt="로딩 중" />
-          <p>이미지 생성중<br />잠시만 기다려주세요.</p>
+          <p>
+            이미지 생성중
+            <br />
+            잠시만 기다려주세요.
+          </p>
         </div>
       )}
 
@@ -88,10 +97,16 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
         <div className={styles.imageBox}>
           <img src={result.imageUrl} alt="생성된 이미지" />
           <div className={styles.buttonGroup}>
-            <button className={styles.secondaryBtn} onClick={handleOverwriteMemory}>
+            <button
+              className={styles.secondaryBtn}
+              onClick={handleOverwriteMemory}
+            >
               원본 메모리 덮어쓰기
             </button>
-            <button className={styles.primaryBtn} onClick={handleSaveAsNewMemory}>
+            <button
+              className={styles.primaryBtn}
+              onClick={handleSaveAsNewMemory}
+            >
               새 메모리로 저장
             </button>
           </div>
@@ -100,7 +115,9 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
 
       {/* 💤 아무 상태도 아닐 때 */}
       {!result && (
-        <p className={styles.placeholder}>이미지를 생성하려면 오른쪽 버튼을 클릭하세요.</p>
+        <p className={styles.placeholder}>
+          이미지를 생성하려면 오른쪽 버튼을 클릭하세요.
+        </p>
       )}
     </div>
   );

@@ -3,12 +3,57 @@ import styles from "./WorkResultPanel.module.css";
 import loadingImg from "../../../assets/loading_pen.png";
 import errorImg from "../../../assets/error_rain.png";
 
-function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
+function WorkResultPanel({
+  result,
+  originalMemoryId,
+  originalMemoryTitle,
+  selectedCollectionId,
+}) {
   const isLoading = result?.status === "loading";
   const isError = result?.status === "error";
   const isSuccess = result?.videoUrl; // imageUrl → videoUrl 체크
 
-  // …생략: handleSaveAsNewMemory, handleOverwriteMemory 동일…
+  // 새 메모리로 저장
+  const handleSaveAsNewMemory = async () => {
+    if (!result?.resultDto) {
+      alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
+      return;
+    }
+    try {
+      const response = await fetch(`/atelier/imtim/${selectedCollectionId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result.resultDto),
+      });
+      if (!response.ok) throw new Error("새 메모리 저장 실패");
+      alert("새 메모리로 저장되었습니다!");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("저장 중 오류 발생");
+    }
+  };
+
+  // 원본 메모리 덮어쓰기
+  const handleOverwriteMemory = async () => {
+    if (!originalMemoryId || !result?.resultDto) {
+      alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
+      return;
+    }
+    try {
+      const response = await fetch(`/atelier/imtim/save/${originalMemoryId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result.resultDto),
+      });
+      if (!response.ok) throw new Error("덮어쓰기 실패");
+      alert("원본 메모리가 덮어쓰기 되었습니다!");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("업데이트 중 오류 발생");
+    }
+  };
 
   return (
     <div className={styles.panel}>
