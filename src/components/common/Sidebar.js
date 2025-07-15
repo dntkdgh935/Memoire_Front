@@ -39,7 +39,7 @@ function Sidebar() {
         onClick={() => navigate("/atelier")}
       >
         <img
-          src={isActive("/ateliert") ? atelierAct : atelierDe}
+          src={isActive("/atelier") ? atelierAct : atelierDe}
           alt="Atelier"
         />
       </div>

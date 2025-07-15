@@ -1,0 +1,105 @@
+.settingPanel {
+  font-family: "Pretendard", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #4d3b30;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input,
+.select {
+  padding: 10px 14px;
+  border: 1px solid #e5ded7;
+  border-radius: 8px;
+  background: #fefcfb;
+  font-size: 14px;
+  color: #4d3b30;
+  font-family: "Pretendard", sans-serif;
+}
+
+.textarea {
+  padding: 12px 14px;
+  border: 1px solid #e5ded7;
+  border-radius: 8px;
+  background: #fefcfb;
+  resize: none;
+  font-size: 14px;
+  color: #4d3b30;
+  font-family: "Pretendard", sans-serif;
+}
+
+.imagePreview {
+  max-width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.optionButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.option,
+.optionActive {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5ded7;
+  background-color: #fdfaf7;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: "Pretendard", sans-serif;
+}
+
+.optionActive {
+  background-color: #4d3b30;
+  color: white;
+  border-color: #4d3b30;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.generateBtn {
+  background-color: #4d3b30;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.generateBtn:hover {
+  background-color: #3a2c25;
+}
+
+.placeholder {
+  color: #a0958c;
+  font-size: 14px;
+  font-family: "Pretendard", sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+.errorText {
+  color: #a34646;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e5ded7;
+  margin: 16px 0;
+}

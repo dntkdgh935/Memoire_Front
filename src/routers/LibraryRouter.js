@@ -9,10 +9,10 @@ import ArchiveVisit from "../pages/library/ArchiveVisit";
 function LibraryRouter() {
   return (
     <Routes>
-      {/* <Route path="/library" element={<LibraryMain />} />
-      <Route path="/library/detail/:id" element={<LibCollDetailView />} />
-      <Route path="/library/archive/:id" element={<ArchiveVisit />} /> */}
+
       <Route path="/" element={<LibraryMain />} />
+
+      {/* <Route path="/" element={<LibraryMain />} /> */}
       <Route path="/detail/:id" element={<LibCollDetailView />} />
       <Route path="/archive/:userid" element={<ArchiveVisit />} />
     </Routes>
