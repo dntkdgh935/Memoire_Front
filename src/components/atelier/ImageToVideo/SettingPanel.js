@@ -4,19 +4,26 @@ import styles from "./SettingPanel.module.css";
 export default function SettingPanel({
   selectedMemory,
   currentUserId,
-  onGenerate, // 최종 비디오 URL을 받는 콜백
+  onGenerate,
 }) {
-  // 1단계: TTS 설정
-  const [ttsEnabled, setTtsEnabled] = useState(true);
-  const [ttsPrompt, setTtsPrompt] = useState("");
+  // TTS 설정
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [ttsScript, setTtsScript] = useState("");
+  const [ttsStyle, setTtsStyle] = useState("default");
+  const [ttsTone, setTtsTone] = useState("neutral");
+  const [ttsUrl, setTtsUrl] = useState("");
   const [ttsLoading, setTtsLoading] = useState(false);
   const [ttsError, setTtsError] = useState(null);
   const [ttsGenerated, setTtsGenerated] = useState(false);
-  const [ttsUrl, setTtsUrl] = useState("");
 
-  // 2단계: 비디오 설정
+  // tts 미리듣기
+  const [ttsPreviewUrl, setTtsPreviewUrl] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState(null);
+
+  // 비디오 설정
   const [videoPrompt, setVideoPrompt] = useState("");
-  const [extraRequest, setExtraRequest] = useState("");
+  const [extraPrompt, setExtraPrompt] = useState("");
   const [videoLoading, setVideoLoading] = useState(false);
   const [videoError, setVideoError] = useState(null);
 
@@ -27,24 +34,42 @@ export default function SettingPanel({
   const handleGenerateTts = async () => {
     setTtsLoading(true);
     setTtsError(null);
+
     try {
-      const resp = await fetch("/atelier/tts/generate", {
+      const payload = { script: ttsScript, ttsStyle, tone: ttsTone };
+      const res = await fetch("/atelier/video/generate-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          memoryId: selectedMemory.memoryid,
-          userId: currentUserId,
-          prompt: ttsPrompt,
-        }),
+        body: JSON.stringify(payload),
       });
-      if (!resp.ok) throw new Error("TTS 생성 실패");
-      const data = await resp.json();
-      setTtsUrl(data.ttsUrl);
+      if (!res.ok) throw new Error((await res.text()) || "TTS 생성 실패");
+      const url = await res.text();
+      setTtsUrl(url);
       setTtsGenerated(true);
-    } catch (err) {
-      setTtsError(err.message);
+    } catch (e) {
+      setTtsError(e.message);
     } finally {
       setTtsLoading(false);
+    }
+  };
+
+  const handlePreviewTts = async () => {
+    setPreviewLoading(true);
+    setPreviewError(null);
+    try {
+      const payload = { script: ttsScript, ttsStyle, tone: ttsTone };
+      const res = await fetch("/atelier/video/preview-tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error((await res.text()) || "미리듣기 실패");
+      const url = await res.text();
+      setTtsPreviewUrl(url);
+    } catch (e) {
+      setPreviewError(e.message);
+    } finally {
+      setPreviewLoading(false);
     }
   };
 
@@ -54,25 +79,18 @@ export default function SettingPanel({
     try {
       const payload = {
         imageUrl: selectedMemory.imageUrl,
-        stylePrompt: videoPrompt,
-        userId: currentUserId,
-        title: selectedMemory.title,
-        content: selectedMemory.content,
-        filename: selectedMemory.filename,
-        filepath: selectedMemory.filepath,
+        videoPrompt,
+        extraPrompt,
+        ttsUrl: ttsEnabled ? ttsUrl : undefined,
       };
-      // TTS 사용 시 생성된 URL도 함께 전송
-      if (ttsEnabled && ttsGenerated) {
-        payload.ttsUrl = ttsUrl;
-      }
-      const resp = await fetch("/atelier/imtim/generate", {
+      const resp = await fetch("/atelier/video/generate-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!resp.ok) throw new Error("비디오 생성 실패");
-      const data = await resp.json();
-      onGenerate(data.videoUrl);
+      if (!resp.ok) throw new Error((await resp.text()) || "영상 생성 실패");
+      const dto = await resp.json();
+      onGenerate(dto);
     } catch (err) {
       setVideoError(err.message);
     } finally {
@@ -121,35 +139,88 @@ export default function SettingPanel({
       </div>
 
       {ttsEnabled && (
-        <div className={styles.field}>
-          <label>TTS 프롬프트</label>
-          <textarea
-            rows={3}
-            className={styles.textarea}
-            placeholder="예: 부드럽고 따뜻한 내레이션"
-            value={ttsPrompt}
-            onChange={(e) => setTtsPrompt(e.target.value)}
-          />
+        <>
+          {/* 스크립트 */}
+          <div className={styles.field}>
+            <label>내레이션 스크립트</label>
+            <textarea
+              rows={3}
+              className={styles.textarea}
+              placeholder="예: 부드럽고 따뜻한 내레이션"
+              value={ttsScript}
+              onChange={(e) => setTtsScript(e.target.value)}
+            />
+          </div>
+
+          {/* 스타일 */}
+          <div className={styles.field}>
+            <label>TTS 스타일</label>
+            <select
+              className={styles.select}
+              value={ttsStyle}
+              onChange={(e) => setTtsStyle(e.target.value)}
+            >
+              <option value="default">디폴트</option>
+              <option value="warm">Warm</option>
+              <option value="energetic">Energetic</option>
+            </select>
+          </div>
+
+          {/* 톤 */}
+          <div className={styles.field}>
+            <label>톤</label>
+            <select
+              className={styles.select}
+              value={ttsTone}
+              onChange={(e) => setTtsTone(e.target.value)}
+            >
+              <option value="neutral">Neutral</option>
+              <option value="cheerful">Cheerful</option>
+              <option value="serious">Serious</option>
+            </select>
+          </div>
+
           {ttsError && <p className={styles.errorText}>{ttsError}</p>}
-          <button
-            className={styles.generateBtn}
-            onClick={handleGenerateTts}
-            disabled={ttsLoading || !ttsPrompt}
-          >
-            {ttsLoading
-              ? "생성 중..."
-              : ttsGenerated
-                ? "다시 생성"
-                : "음성 생성"}
-          </button>
-        </div>
+          <div className={styles.footer}>
+            <button
+              className={styles.generateBtn}
+              onClick={handleGenerateTts}
+              disabled={ttsLoading || !ttsScript || !ttsStyle || !ttsTone}
+            >
+              {ttsLoading
+                ? "생성 중..."
+                : ttsGenerated
+                  ? "다시 생성"
+                  : "음성 생성"}
+            </button>
+            {/* 미리듣기 버튼 */}
+            {ttsGenerated && (
+              <button
+                className={styles.secondaryBtn}
+                onClick={handlePreviewTts}
+                disabled={previewLoading}
+              >
+                {previewLoading ? "미리듣기 중..." : "미리듣기"}
+              </button>
+            )}
+          </div>
+
+          {/* 오디오 플레이어 */}
+          {ttsPreviewUrl && (
+            <div className={styles.field}>
+              <audio controls src={ttsPreviewUrl} />
+              {previewError && (
+                <p className={styles.errorText}>{previewError}</p>
+              )}
+            </div>
+          )}
+        </>
       )}
 
-      {/* 2단계: 비디오 설정 (TTS skip or done) */}
+      {/* 2단계: 비디오 설정 */}
       {(ttsGenerated || !ttsEnabled) && (
         <>
           <hr />
-
           <div className={styles.field}>
             <label>영상 프롬프트</label>
             <input
@@ -166,8 +237,8 @@ export default function SettingPanel({
               rows={3}
               className={styles.textarea}
               placeholder="예: 은은한 빛깔 강조"
-              value={extraRequest}
-              onChange={(e) => setExtraRequest(e.target.value)}
+              value={extraPrompt}
+              onChange={(e) => setExtraPrompt(e.target.value)}
             />
           </div>
           {videoError && <p className={styles.errorText}>{videoError}</p>}

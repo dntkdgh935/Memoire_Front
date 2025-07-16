@@ -65,17 +65,6 @@ export default function SettingPanel({
         />
       </div>
 
-      {/* 내용 */}
-      <div className={styles.field}>
-        <label>내용</label>
-        <textarea
-          value={selectedMemory.content}
-          readOnly
-          className={styles.textarea}
-          rows={4}
-        />
-      </div>
-
       {/* 스타일 프롬프트 */}
       <div className={styles.field}>
         <label>스타일 프롬프트</label>

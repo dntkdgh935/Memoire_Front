@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import MemoryList from "../../components/atelier/common/MemoryList";
 import SettingPanel from "../../components/atelier/ImageToVideo/SettingPanel";
 import WorkResultPanel from "../../components/atelier/ImageToVideo/WorkResultPanel";
 import styles from "./ImageToVideoMain.module.css";
+import { AuthContext } from "../../AuthProvider";
 
-export default function ImageToVideoMain({ currentUserId }) {
+export default function ImageToVideoMain() {
   const [collections, setCollections] = useState([]);
   const [selectedCollectionId, setSelectedCollectionId] = useState("");
   const [memories, setMemories] = useState([]);
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [result, setResult] = useState(null);
+  const { userid } = useContext(AuthContext);
 
   // 컬렉션 목록 조회
   useEffect(() => {
-    if (!currentUserId) return;
-    fetch(`/atelier/imtim/collections/${currentUserId}`)
+    fetch(`/atelier/video/collections/${userid}`)
       .then((res) => {
         if (!res.ok) throw new Error("컬렉션 조회 실패");
         return res.json();
@@ -28,12 +29,11 @@ export default function ImageToVideoMain({ currentUserId }) {
         if (formatted.length > 0) setSelectedCollectionId(formatted[0].id);
       })
       .catch((err) => console.error("컬렉션 가져오기 오류:", err));
-  }, [currentUserId]);
+  }, []);
 
   // 2) 선택된 컬렉션의 메모리 목록 가져오기
   useEffect(() => {
-    if (!selectedCollectionId) return;
-    fetch(`/atelier/imtim/collections/${selectedCollectionId}/memories`)
+    fetch(`/atelier/video/collections/${selectedCollectionId}/memories`)
       .then((res) => {
         if (!res.ok) throw new Error("메모리 조회 실패");
         return res.json();
@@ -49,11 +49,11 @@ export default function ImageToVideoMain({ currentUserId }) {
       });
   }, [selectedCollectionId]);
 
-  // 3) 현재 선택된 메모리 객체
+  // 선택된 메모리 객체
   const selectedMemory =
     selectedMemoryId && memories.length > 0
       ? memories.find(
-          (m) => m.memoryid.toString() === selectedMemoryId.toString()
+          (m) => m.memoryid?.toString() === selectedMemoryId.toString()
         )
       : null;
 
@@ -75,8 +75,13 @@ export default function ImageToVideoMain({ currentUserId }) {
       <div className={styles.centerPanel}>
         <SettingPanel
           selectedMemory={selectedMemory}
-          currentUserId={currentUserId}
-          onGenerate={(videoUrl) => setResult({ status: "success", videoUrl })}
+          onGenerate={(dto) =>
+            setResult({
+              status: "success",
+              resultDto: dto,
+              videoUrl: dto.getVideoUrl?.() ?? dto.videoUrl,
+            })
+          }
         />
       </div>
 
@@ -86,6 +91,7 @@ export default function ImageToVideoMain({ currentUserId }) {
           result={result}
           originalMemoryId={selectedMemoryId}
           originalMemoryTitle={selectedMemory?.title}
+          selectedCollectionId={selectedCollectionId}
         />
       </div>
     </div>

@@ -15,12 +15,16 @@ function WorkResultPanel({
 
   // 새 메모리로 저장
   const handleSaveAsNewMemory = async () => {
+    console.log("🛠️ Saving new memory:", {
+      collectionId: selectedCollectionId,
+      resultDto: result.resultDto,
+    });
     if (!result?.resultDto) {
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
     try {
-      const response = await fetch(`/atelier/imtim/${selectedCollectionId}`, {
+      const response = await fetch(`/atelier/video/${selectedCollectionId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(result.resultDto),
@@ -41,7 +45,7 @@ function WorkResultPanel({
       return;
     }
     try {
-      const response = await fetch(`/atelier/imtim/save/${originalMemoryId}`, {
+      const response = await fetch(`/atelier/video/save/${originalMemoryId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(result.resultDto),
