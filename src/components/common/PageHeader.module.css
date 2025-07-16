@@ -1,0 +1,21 @@
+.pageHeader {
+  display: flex;
+  align-items: center;
+  font-size: 25px;
+  font-weight: bold;
+  color: #4a4a4a;
+  padding: 1px 30px 30px 30px;
+}
+
+.goBackButton {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #4a4a4a;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.pageTitle {
+  font-weight: 500;
+}

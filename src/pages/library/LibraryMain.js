@@ -7,6 +7,7 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
+import PageHeader from "../../components/common/PageHeader";
 
 function LibraryMain() {
   // 페이지 이동용
@@ -133,9 +134,12 @@ function LibraryMain() {
     navigate(`detail/${collectionId}`);
   };
 
+  //TODO: 페이지별로 PageHeader 넣기
   return (
     <>
       {/* <h2>hello</h2> */}
+      {/* function PageHeader({ pagename, username }) { */}
+      <PageHeader pagename="Discover" userid={userid} />
       <TagBar
         selectedTag={selectedTag}
         onTagSelect={setSelectedTag}
