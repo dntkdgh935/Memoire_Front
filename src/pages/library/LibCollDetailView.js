@@ -146,6 +146,7 @@ function LibCollDetailView() {
       <MemoryView
         selectedMemory={selectedMemory}
         authorid={collection.authorid}
+        numMemories={memoryList.length}
       />
     </div>
   );
