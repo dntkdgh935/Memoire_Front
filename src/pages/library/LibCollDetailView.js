@@ -32,7 +32,6 @@ function LibCollDetailView() {
   //   }
   // }, [collection]); // collection이 변경될 때마다 호출
 
-  //TODO: 로그인 상태에 따라 다르게 처리 (ex. 좋아요/ 북마크 못하게?)
   //1.  컬렉션 정보 및 내부 메모리 목록 가져오기
   useEffect(() => {
     console.log("안녕!!");

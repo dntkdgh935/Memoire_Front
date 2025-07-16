@@ -15,17 +15,23 @@ function AvatarWName({ user, type }) {
   console.log("username: " + username + ", userid: " + userid);
   // const { userid } = useContext(AuthContext);
   console.log("[AvatarWName]:" + userid);
+
   const handleAvatarClick = () => {
     console.log("heyyy 로그인 유저: " + loginUserId + ", authorid:" + userid);
-    try {
-      if (loginUserId == userid) {
-        console.log("내 아카이브로 이동");
-        navigate(`/archive`); //${userid}`); // 이 URL로 이동
-      } else {
-        navigate(`/library/archive/${userid}`); // 이 URL로 이동
+
+    if (!isLoggedIn) {
+      alert("로그인 후 아카이브 방문 가능합니다.");
+    } else {
+      try {
+        if (loginUserId == userid) {
+          console.log("내 아카이브로 이동");
+          navigate(`/archive`);
+        } else {
+          navigate(`/library/archive/${userid}`); // 이 URL로 이동
+        }
+      } catch (error) {
+        alert("이동 실패!");
       }
-    } catch (error) {
-      alert("이동 실패!");
     }
   };
 

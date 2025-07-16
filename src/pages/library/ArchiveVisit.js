@@ -279,7 +279,6 @@ function ArchiveVisit() {
     }
   };
 
-  // TODO
   const handleCollClick = (collid) => {
     navigate(`/library/detail/${collid}`);
   };
