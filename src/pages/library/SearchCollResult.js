@@ -98,7 +98,7 @@ function SearchCollResult() {
   };
 
   const handleCollClick = (collectionId) => {
-    navigate(`detail/${collectionId}`);
+    navigate(`/library/detail/${collectionId}`);
   };
 
   return (
