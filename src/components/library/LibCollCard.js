@@ -27,6 +27,8 @@ function LibCollCard({
 
   const navigate = useNavigate();
 
+  console.log("collection 주인: ", coll.authorid);
+
   const handleEditClick = () => {
     navigate("/archive/editcoll", { state: coll });
   };

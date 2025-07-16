@@ -17,7 +17,6 @@ function LibCollLabel({ coll, onActionChange }) {
         <AvatarWName
           type="inCollLabel"
           user={{
-            // TODO: 여기에 name이 아니라 authorname을 가진 id를 보내야 함
             username: coll.authorname,
             userid: coll.authorid,
             displayId: `@${coll.authorid}`,

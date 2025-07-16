@@ -7,11 +7,17 @@ import { useParams } from "react-router-dom";
 import LibCollCard from "../../components/library/LibCollCard";
 import MemoryView from "../../components/common/MemoryView";
 import styles from "./LibCollDetailView.module.css"; // ✅
+import { useNavigate } from "react-router-dom";
 
 function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
+  const navigate = useNavigate();
 
   const { isLoggedIn, userid, role } = useContext(AuthContext);
+  //userid가 새로고침 후에도 정상적으로 유지되도록
+  //localStorage 또는 sessionStorage에 userid를 저장하고, 컴포넌트가 로드될 때 이를 읽어와서 사용
+  const storedUserid = localStorage.getItem("userid");
+  const currentUserid = userid || storedUserid;
 
   const [collection, setCollection] = useState(null); // 컬렉션 정보 상태
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
@@ -19,11 +25,12 @@ function LibCollDetailView() {
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //TODO: 로그인 상태에 따라 다르게 처리 (ex. 좋아요/ 북마크 못하게?)
-
-  useEffect(() => {
-    console.log("✅ [변경됨] selectedMemory updated:", selectedMemory);
-  }, [selectedMemory]);
+  // // collection 상태 변경시 재렌더링
+  // useEffect(() => {
+  //   if (collection) {
+  //     console.log("✅ [변경됨] collection 상태 업데이트:", collection);
+  //   }
+  // }, [collection]); // collection이 변경될 때마다 호출
 
   //1.  컬렉션 정보 및 내부 메모리 목록 가져오기
   useEffect(() => {
@@ -32,7 +39,7 @@ function LibCollDetailView() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/library/collection/${id}`
+          `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
         );
         console.log(res.data);
         setCollection(res.data);
@@ -42,12 +49,19 @@ function LibCollDetailView() {
         await fetchMemoryList(res.data.collectionid); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
       } catch (err) {
         console.error("🚨 컬렉션 정보 불러오기 실패", err);
+        console.log("✅로그인 실패한 유저: ", userid);
+        alert("이 컬렉션에 접근할 수 없습니다.");
+        navigate("library/main"); // 이전 페이지로 돌아가기
       } finally {
         setLoading(false);
       }
     };
     fetchCollectionDetail();
-  }, [id]);
+  }, [id, currentUserid]);
+
+  useEffect(() => {
+    console.log("✅ [변경됨] selectedMemory updated:", selectedMemory);
+  }, [selectedMemory]);
 
   // 2. coll 내부의 메모리 리스트 불러오기 함수
   const fetchMemoryList = async (collectionid) => {
@@ -110,7 +124,13 @@ function LibCollDetailView() {
         );
       }
 
-      // UI 상태 변경
+      // // // 2. 서버에서 최신 데이터를 받아와 상태 업데이트
+      // const res = await axios.get(
+      //   `http://localhost:8080/api/library/collection/${collectionId}/${currentUserid}`
+      // );
+      // setCollection(res.data); // 최신 상태로 갱신
+
+      //UI 상태 변경
       setCollection((prev) => {
         if (!prev) return prev;
 

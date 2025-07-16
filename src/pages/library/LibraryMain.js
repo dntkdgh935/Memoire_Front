@@ -7,6 +7,7 @@ import { AuthContext } from "../../AuthProvider";
 import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
+import PageHeader from "../../components/common/PageHeader";
 
 function LibraryMain() {
   // 페이지 이동용
@@ -56,8 +57,6 @@ function LibraryMain() {
       fetchCollections();
     }
   }, [isLoggedIn, userid, selectedTag]);
-
-  //2. TODO: 로그인 상태에 따라 좋아요/ 북마크 버튼 action 바꾸기???
 
   // TagBar: top 5 태그 가져오기
   useEffect(() => {
@@ -131,14 +130,16 @@ function LibraryMain() {
     }
   };
 
-  //TODO: libMain 참고해서 함수 내용 채우기 (Detail View로 이동하도록)
   const handleCollClick = (collectionId) => {
     navigate(`detail/${collectionId}`);
   };
 
+  //TODO: 페이지별로 PageHeader 넣기
   return (
     <>
       {/* <h2>hello</h2> */}
+      {/* function PageHeader({ pagename, username }) { */}
+      <PageHeader pagename="Discover" userid={userid} />
       <TagBar
         selectedTag={selectedTag}
         onTagSelect={setSelectedTag}

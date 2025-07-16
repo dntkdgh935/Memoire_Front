@@ -279,9 +279,8 @@ function ArchiveVisit() {
     }
   };
 
-  // TODO
-  const handleCollClick = (collectionid) => {
-    alert(collectionid);
+  const handleCollClick = (collid) => {
+    navigate(`/library/detail/${collid}`);
   };
 
   return (
