@@ -25,6 +25,13 @@ function LibCollDetailView() {
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // // collection 상태 변경시 재렌더링
+  // useEffect(() => {
+  //   if (collection) {
+  //     console.log("✅ [변경됨] collection 상태 업데이트:", collection);
+  //   }
+  // }, [collection]); // collection이 변경될 때마다 호출
+
   //TODO: 로그인 상태에 따라 다르게 처리 (ex. 좋아요/ 북마크 못하게?)
   //1.  컬렉션 정보 및 내부 메모리 목록 가져오기
   useEffect(() => {
@@ -118,7 +125,13 @@ function LibCollDetailView() {
         );
       }
 
-      // UI 상태 변경
+      // // // 2. 서버에서 최신 데이터를 받아와 상태 업데이트
+      // const res = await axios.get(
+      //   `http://localhost:8080/api/library/collection/${collectionId}/${currentUserid}`
+      // );
+      // setCollection(res.data); // 최신 상태로 갱신
+
+      //UI 상태 변경
       setCollection((prev) => {
         if (!prev) return prev;
 

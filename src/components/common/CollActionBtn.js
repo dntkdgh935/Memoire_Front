@@ -1,9 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
 import styles from "./CollActionBtn.module.css";
 import { FaHeart, FaRegHeart, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import axios from "axios";
 
 function CollActionBtn({ btnType, coll, onActionChange }) {
+  const { isLoggedIn, userid } = useContext(AuthContext);
+  // collection 상태가 변경될 때마다 해당 상태를 추적하여 리렌더링
+  // useEffect(() => {
+  //   if (coll) {
+  //     console.log("✅ [변경됨] collection 상태 업데이트:", coll);
+  //   }
+  // }, [coll]); // collection이 변경될 때마다 호출
+
+  // useEffect(() => {
+  //   // 초기 렌더링 시, 서버에서 최신 collection 데이터 가져오기
+  //   const fetchCollection = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:8080/api/library/collection/${coll.collectionid}/${userid}`
+  //       );
+  //       setCurrentColl(response.data); // 서버에서 받은 최신 데이터를 상태로 설정
+  //     } catch (error) {
+  //       console.error("컬렉션 정보 불러오기 실패", error);
+  //     }
+  //   };
+
+  //   if (coll) {
+  //     fetchCollection(); // collection이 있을 때 서버에서 데이터 가져오기
+  //   }
+  // }, [coll]); // 초기값이 변경될 때마다 새로 데이터를 가져오도록
+
   // 아이콘 스타일을 userlike와 userbookmark 상태에 따라 변경
   const iconStyle = {
     color:

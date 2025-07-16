@@ -5,17 +5,27 @@ import { useNavigate } from "react-router-dom";
 
 function AvatarWName({ user, type }) {
   const navigate = useNavigate();
-  const { isLoggedIn, loginUserId } = useContext(AuthContext);
 
+  // 현재 로그인한 유저
+  const { isLoggedIn, userid: loginUserId } = useContext(AuthContext);
+
+  // 출력할 아바타 유저
   const { username, displayId, profileImageUrl, userid } = user;
+
   console.log("username: " + username + ", userid: " + userid);
   // const { userid } = useContext(AuthContext);
   console.log("[AvatarWName]:" + userid);
-  const handleClick = () => {
-    if (loginUserId == userid) {
-      navigate(`/archive/${userid}`); // 이 URL로 이동
-    } else {
-      navigate(`/library/archive/${userid}`); // 이 URL로 이동
+  const handleAvatarClick = () => {
+    console.log("heyyy 로그인 유저: " + loginUserId + ", authorid:" + userid);
+    try {
+      if (loginUserId == userid) {
+        console.log("내 아카이브로 이동");
+        navigate(`/archive`); //${userid}`); // 이 URL로 이동
+      } else {
+        navigate(`/library/archive/${userid}`); // 이 URL로 이동
+      }
+    } catch (error) {
+      alert("이동 실패!");
     }
   };
 
@@ -23,7 +33,7 @@ function AvatarWName({ user, type }) {
     return (
       <div
         className={styles.inCollLabel}
-        onClick={handleClick}
+        onClick={handleAvatarClick}
         style={{ cursor: "pointer" }}
       >
         <img
@@ -38,7 +48,7 @@ function AvatarWName({ user, type }) {
     return (
       <div
         className={styles.inUserCard}
-        onClick={handleClick}
+        onClick={handleAvatarClick}
         style={{ cursor: "pointer" }}
       >
         <img

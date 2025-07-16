@@ -23,6 +23,8 @@ function LibCollCard({
 }) {
   const { isLoggedIn, userid, role } = useContext(AuthContext);
 
+  console.log("collection 주인: ", coll.authorid);
+
   const handleEditClick = () => {
     alert("수정버튼을 클릭했습니다");
   };
