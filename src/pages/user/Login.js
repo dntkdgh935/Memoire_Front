@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import apiClient from "../../utils/axios";
 import { AuthContext } from "../../AuthProvider";
 import styles from "./Login.module.css";
@@ -11,13 +11,24 @@ function Login({ onLoginSuccess }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 진행 중 상태
   const [autoLogin, setAutoLogin] = useState(false); // 체크박스 상태로 변경
   const [isSocialLoginProcessing, setIsSocialLoginProcessing] = useState(false); // 소셜 로그인 진행 중 상태
+  const location = useLocation();
 
   const { updateTokens } = useContext(AuthContext);
 
   useEffect(() => {
+    // FindId 페이지에서 전달받은 아이디가 있는지 확인하고, 있다면 loginId 상태에 설정
+    if (location.state && location.state.foundId) {
+      const foundId = location.state.foundId;
+      console.log("전달받은 아이디:", foundId);
+      setLoginId(foundId); // 전달받은 아이디로 loginId 상태를 업데이트
+      // 전달받은 아이디는 한 번 사용 후 state를 초기화하여 URL에 남지 않도록 할 수 있습니다.
+      // navigate(location.pathname, { replace: true, state: {} });
+    }
+
+    // 기존 자동 로그인 처리 로직
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) navigate("/");
-  }, [navigate]);
+  }, [navigate, location.state?.foundId]); // location.state 대신 location.state?.foundId를 의존성 배열에 추가
 
   const base64DecodeUnicode = (base64Url) => {
     try {
@@ -43,6 +54,12 @@ function Login({ onLoginSuccess }) {
 
   const handleSignUp = () => {
     navigate("/user/signUp");
+  };
+  const handleFindId = () => {
+    navigate("/user/findId");
+  };
+  const handleFindPWD = () => {
+    navigate("/user/findPWD");
   };
 
   const handleLogin = async () => {
@@ -87,7 +104,7 @@ function Login({ onLoginSuccess }) {
 
       if (authorizationUrl) {
         // ✅ authorizationUrl이 이제 'http://localhost:8080/oauth2/authorization/naver' 와 같은
-        //    절대 경로이므로, 브라우저가 올바르게 리다이렉션합니다.
+        //    절대 경로이므로, 브라우저가 올바르게 리다이렉션합니다.
         console.log(`Redirecting to: ${authorizationUrl}`);
         window.location.href = authorizationUrl;
       } else {
@@ -117,7 +134,7 @@ function Login({ onLoginSuccess }) {
             <input
               className={styles.input}
               type="text"
-              value={loginId}
+              value={loginId} // loginId 상태와 바인딩
               onChange={(e) => setLoginId(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="아이디"
@@ -189,15 +206,27 @@ function Login({ onLoginSuccess }) {
           </button>
         </div>
         <div className={styles.additionalText}>
-          아이디 또는 비밀번호를 잊으셨나요?
-        </div>
-        <div className={styles.signUpLink}>
           <span
-            onClick={handleSignUp}
+            onClick={handleFindId}
             role="button"
             tabIndex={0}
-            onKeyDown={handleKeyDown}
+            className={styles.findGroup}
           >
+            아이디
+          </span>{" "}
+          또는{" "}
+          <span
+            onClick={handleFindPWD}
+            role="button"
+            tabIndex={0}
+            className={styles.findGroup}
+          >
+            비밀번호
+          </span>
+          를 잊으셨나요?
+        </div>
+        <div className={styles.signUpLink}>
+          <span onClick={handleSignUp} role="button" tabIndex={0}>
             회원가입
           </span>
         </div>
