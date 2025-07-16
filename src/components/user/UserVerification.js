@@ -5,7 +5,6 @@ import apiClient from "../../utils/axios";
 import styles from "./UserVerification.module.css"; // CSS 모듈 임포트
 
 function UserVerification({ phone, setPhone, onVerificationComplete }) {
-  // const [verificationCode, setVerificationCode] = useState(""); // ✅ 이 상태는 더 이상 사용하지 않음
   const [displayedCode, setDisplayedCode] = useState(""); // ✅ 발급받은 인증번호를 저장할 새로운 상태
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
