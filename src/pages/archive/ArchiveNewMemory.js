@@ -58,7 +58,14 @@ function ArchiveNewMemory() {
     formData.append("collectionTitle", collection.collectionTitle);
     formData.append("visibility", collection.visibility);
     formData.append("color", collection.color);
-    formData.append("memoryType", tab);
+    formData.append(
+      "memoryType",
+      tab === "text"
+        ? "text"
+        : file.type.startsWith("video/")
+          ? "video"
+          : "image"
+    );
     formData.append("title", title);
     if (tab === "text") {
       formData.append("content", content);
