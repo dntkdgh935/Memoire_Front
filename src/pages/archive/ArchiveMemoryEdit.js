@@ -1,13 +1,12 @@
-// src/components/ArchiveNewMemory.js
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
-import styles from "./ArchiveNewMemory.module.css";
+import styles from "./ArchiveMemoryEdit.module.css";
 
-function ArchiveNewMemory() {
+function ArchiveMemoryEdit() {
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { state: collection } = useLocation();
+  const { state: memory } = useLocation();
 
   const [tab, setTab] = useState("text");
   const [title, setTitle] = useState("");
@@ -17,24 +16,18 @@ function ArchiveNewMemory() {
   useEffect(() => {
     if (isLoggedIn === false) {
       alert("로그인을 하세요!");
-      setTimeout(() => navigate("/"), 100);
+      navigate("/");
       return;
     }
-    if (userid && collection?.authorid && userid !== collection.authorid) {
-      alert("문제가 발생했습니다!");
-      setTimeout(() => navigate("/archive"), 100);
-      return;
-    }
-    if (!collection) {
+    if (!memory) {
       alert("잘못된 접근입니다");
-      setTimeout(() => navigate("/archive"), 100);
+      navigate("/archive");
       return;
     }
-  }, [isLoggedIn, userid, collection, navigate]);
-
-  if (!collection) {
-    return <div>잘못된 접근입니다</div>;
-  }
+    setTab(memory.memoryType === "text" ? "text" : "media");
+    setTitle(memory.title);
+    setContent(memory.content);
+  }, [isLoggedIn, userid, memory, navigate]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -54,10 +47,7 @@ function ArchiveNewMemory() {
       return;
     }
     const formData = new FormData();
-    formData.append("authorid", collection.authorid);
-    formData.append("collectionTitle", collection.collectionTitle);
-    formData.append("visibility", collection.visibility);
-    formData.append("color", collection.color);
+    formData.append("memoryid", memory.memoryid);
     formData.append(
       "memoryType",
       tab === "text"
@@ -66,6 +56,7 @@ function ArchiveNewMemory() {
           ? "video"
           : "image"
     );
+    formData.append("collectionid", memory.collectionid);
     formData.append("title", title);
     if (tab === "text") {
       formData.append("content", content);
@@ -74,36 +65,22 @@ function ArchiveNewMemory() {
         formData.append("file", file);
       }
     }
-    if (collection.collectionid) {
-      formData.append("collectionid", collection.collectionid);
-      try {
-        await secureApiRequest("/archive/newMemory", {
-          method: "POST",
-          body: formData,
-        });
+    formData.append("memoryOrder", memory.memoryOrder);
+    formData.append("previousFileType", memory.memoryType);
+    formData.append("previousFileName", memory.filename);
+    try {
+      await secureApiRequest("/archive/editMemory", {
+        method: "POST",
+        body: formData,
+      });
 
-        alert("업로드 성공");
-        navigate("/archive");
-      } catch (e) {
-        console.error("컬렉션 업로드 실패 ", e);
-        alert("업로드 중 오류 발생");
-      }
+      alert("업로드 성공");
       navigate("/archive");
-    } else {
-      try {
-        await secureApiRequest("/archive/newColl", {
-          method: "POST",
-          body: formData,
-        });
-
-        alert("업로드 성공");
-        navigate("/archive");
-      } catch (e) {
-        console.error("컬렉션 업로드 실패 ", e);
-        alert("업로드 중 오류 발생");
-      }
-      navigate("/archive");
+    } catch (e) {
+      console.error("컬렉션 업로드 실패 ", e);
+      alert("업로드 중 오류 발생");
     }
+    navigate("/archive");
   };
 
   return (
@@ -186,16 +163,6 @@ function ArchiveNewMemory() {
             </div>
           )}
         </div>
-        {collection.visibility === "1" && (
-          <div className={styles.visibilityBtns}>공유범위: 전체공개</div>
-        )}
-        {collection.visibility === "2" && (
-          <div className={styles.visibilityBtns}>공유범위: 팔로워</div>
-        )}
-        {collection.visibility === "3" && (
-          <div className={styles.visibilityBtns}>공유범위: 비공개</div>
-        )}
-
         <button type="submit" className={styles.uploadBtn}>
           업로드
         </button>
@@ -204,4 +171,4 @@ function ArchiveNewMemory() {
   );
 }
 
-export default ArchiveNewMemory;
+export default ArchiveMemoryEdit;

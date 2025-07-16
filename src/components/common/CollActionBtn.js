@@ -28,7 +28,8 @@ function CollActionBtn({ btnType, coll, onActionChange }) {
         ? FaBookmark // userbookmark가 true이면 채워진 북마크
         : FaRegBookmark; // userbookmark가 false이면 빈 북마크
 
-  const handleBtnClick = () => {
+  const handleBtnClick = (e) => {
+    e.stopPropagation();
     const actionType = btnType === "like" ? "userlike" : "userbookmark"; // 클릭된 버튼에 따른 액션 설정
     // 부모에게 상태 변경을 요청 (API 요청은 부모에서 처리)
     onActionChange(coll.collectionid, actionType);

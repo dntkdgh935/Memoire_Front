@@ -6,6 +6,7 @@ import styles from "./LibCollCard.module.css";
 import MemoryList from "../../components/common/MemoryList";
 import CollActionBtn from "../../components/common/CollActionBtn";
 import AvatarWName from "../common/AvatarWName";
+import { useNavigate } from "react-router-dom";
 
 /*<LibCollCard
         coll={collection}
@@ -21,14 +22,35 @@ function LibCollCard({
   onActionChange,
   selectedMemoryId,
 }) {
-  const { isLoggedIn, userid, role } = useContext(AuthContext);
+  const { isLoggedIn, userid, role, secureApiRequest } =
+    useContext(AuthContext);
+
+  const navigate = useNavigate();
 
   const handleEditClick = () => {
-    alert("수정버튼을 클릭했습니다");
+    navigate("/archive/editcoll", { state: coll });
   };
 
-  const handleDeleteClick = () => {
-    alert("삭제버튼을 클릭했습니다");
+  const handleDeleteClick = async () => {
+    if (window.confirm("정말 해당 컬렉션을 삭제하시겠습니까?")) {
+      try {
+        await secureApiRequest(
+          `/archive/collection/${coll.collectionid}?userid=${coll.authorid}`,
+          {
+            method: "DELETE",
+          }
+        );
+        alert("컬렉션 삭제 완료");
+        navigate("/archive");
+      } catch (error) {
+        console.error("컬렉션 삭제 실패", error);
+        alert("컬렉션 삭제에 실패했습니다");
+      }
+    }
+  };
+
+  const handleAddMemoryClick = () => {
+    navigate("/archive/newmem", { state: coll });
   };
 
   return (
@@ -87,6 +109,11 @@ function LibCollCard({
           onMemoryClick={onMemoryClick}
           selectedMemoryId={selectedMemoryId}
         />
+        {isLoggedIn && (role === "ADMIN" || userid === coll.authorid) && (
+          <div className={styles.memoryItem} onClick={handleAddMemoryClick}>
+            +
+          </div>
+        )}
       </div>
     </div>
   );

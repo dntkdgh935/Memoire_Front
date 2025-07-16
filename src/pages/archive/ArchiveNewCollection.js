@@ -27,7 +27,7 @@ function ArchiveNewCollection() {
       authorid: userid, //AuthProvider 에서 가져온 userid
       color: "#000000",
     }));
-  }, [isLoggedIn, userid]);
+  }, [isLoggedIn, userid, navigate]);
 
   if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
     return <div>로딩중...</div>;

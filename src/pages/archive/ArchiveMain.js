@@ -13,7 +13,6 @@ function ArchiveMain() {
   const { isLoggedIn, userid } = useContext(AuthContext);
 
   const [collections, setCollections] = useState([]);
-  const [bookmarks, setBookmarks] = useState([]);
   const [activeTab, setActiveTab] = useState("myColl");
 
   const navigate = useNavigate();
@@ -37,20 +36,6 @@ function ArchiveMain() {
           setCollections(collectionsInfo.data);
         } catch (error) {
           console.error("Error fetching user collections:", error);
-        }
-        try {
-          const bookmarksInfo = await apiClient.get(
-            "/archive/bookmarkCollections",
-            {
-              params: {
-                userid: userid,
-              },
-            }
-          );
-          console.log(bookmarksInfo.data);
-          setBookmarks(bookmarksInfo.data);
-        } catch (error) {
-          console.error("Error fetching user bookmarks:", error);
         }
       };
 
@@ -89,47 +74,51 @@ function ArchiveMain() {
         }
       );
       console.log(bookmarksInfo.data);
-      setBookmarks(bookmarksInfo.data);
+      setCollections(bookmarksInfo.data);
     } catch (error) {
       console.error("Error fetching user bookmarks:", error);
     }
   };
 
+  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
   const handleActionChange = async (collectionId, actionType) => {
-    const targetList = activeTab === "myColl" ? collections : bookmarks;
-    const setTargetList =
-      activeTab === "myColl" ? setCollections : setBookmarks;
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      const isLiked =
+        actionType === "userlike"
+          ? !collections.find((coll) => coll.collectionid === collectionId)
+              .userlike
+          : undefined;
+      const isBookmarked =
+        actionType === "userbookmark"
+          ? !collections.find((coll) => coll.collectionid === collectionId)
+              .userbookmark
+          : undefined;
 
-    const targetItem = targetList.find(
-      (coll) => coll.collectionid === collectionId
-    );
-    if (!targetItem) return;
-
-    const isLiked =
-      actionType === "userlike" ? !targetItem.userlike : undefined;
-    const isBookmarked =
-      actionType === "userbookmark" ? !targetItem.userbookmark : undefined;
-
-    try {
-      if (actionType === "userlike") {
-        await apiClient.post(`/api/library/togglelike`, null, {
-          params: { collectionId, isLiked },
-        });
-      } else if (actionType === "userbookmark") {
-        await apiClient.post(`/api/library/togglebm`, null, {
-          params: { collectionId, isBookmarked },
-        });
+      try {
+        if (actionType === "userlike") {
+          await apiClient.post("/api/library/togglelike", null, {
+            params: { userid, collectionId, isLiked },
+          });
+        } else if (actionType === "userbookmark") {
+          await apiClient.post("/api/library/togglebm", null, {
+            params: { userid, collectionId, isBookmarked },
+          });
+        }
+      } catch (error) {
+        console.error("Error performing action:", error);
       }
 
-      // 상태 업데이트
-      setTargetList((prevState) =>
+      // UI 상태 변경
+      setCollections((prevState) =>
         prevState.map((coll) =>
           coll.collectionid === collectionId
             ? {
                 ...coll,
-                [actionType]: !coll[actionType],
+                [actionType]: !coll[actionType], // 상태 토글
+                // 좋아요/북마크 카운트 업데이트
                 [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-                  coll[actionType]
+                  coll[actionType] === true
                     ? coll[
                         actionType === "userlike"
                           ? "likeCount"
@@ -144,13 +133,13 @@ function ArchiveMain() {
             : coll
         )
       );
-    } catch (error) {
-      console.error("상태 변경 중 오류 발생:", error);
+    } else {
+      alert("로그인 후 사용 가능합니다.");
     }
   };
 
-  const handleCollClick = (collectionid) => {
-    alert(collectionid);
+  const handleCollClick = (collectionId) => {
+    navigate(`/library/detail/${collectionId}`);
   };
 
   const handleNewCollection = () => {
@@ -182,7 +171,7 @@ function ArchiveMain() {
           </button>
         </div>
         <CollGrid
-          colls={activeTab == "myColl" ? collections : bookmarks}
+          colls={collections}
           onActionChange={handleActionChange}
           onCollClick={handleCollClick}
         />
