@@ -1,17 +1,22 @@
-import Reac, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
 import styles from "./AvatarWName.module.css";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../AuthProvider";
 
 function AvatarWName({ user, type }) {
-  const navigate = useNavigate(); // 이 줄이 반드시 필요!
+  const navigate = useNavigate();
+  const { isLoggedIn, loginUserId } = useContext(AuthContext);
 
   const { username, displayId, profileImageUrl, userid } = user;
   console.log("username: " + username + ", userid: " + userid);
   // const { userid } = useContext(AuthContext);
   console.log("[AvatarWName]:" + userid);
   const handleClick = () => {
-    navigate(`/library/archive/${userid}`); // 이 URL로 이동
+    if (loginUserId == userid) {
+      navigate(`/archive/${userid}`); // 이 URL로 이동
+    } else {
+      navigate(`/library/archive/${userid}`); // 이 URL로 이동
+    }
   };
 
   if (type === "inCollLabel") {
