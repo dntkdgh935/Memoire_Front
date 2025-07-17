@@ -1,14 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./SettingPanel.module.css";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
+  const [title, setTitle] = useState(selectedMemory?.title || "");
   const [stylePrompt, setStylePrompt] = useState("");
   const [extraPrompt, setExtraPrompt] = useState("");
+
+  useEffect(() => {
+    setTitle(selectedMemory?.title || "");
+  }, [selectedMemory]);
 
   const handleGenerate = () => {
     if (!selectedMemory || !stylePrompt) return;
 
     const payload = {
+      title,
       imageUrl: selectedMemory.imageUrl,
       stylePrompt,
       extraPrompt,
@@ -39,7 +45,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
       <div className={styles.field}>
         <label>원본 이미지</label>
         <img
-          src={selectedMemory.imageUrl}
+          src={`http://localhost:8080/upload_files/memory_img/${selectedMemory.filename}`}
           alt={selectedMemory.title}
           className={styles.imagePreview}
         />
@@ -50,8 +56,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         <label>제목</label>
         <input
           type="text"
-          value={selectedMemory.title}
-          readOnly
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           className={styles.input}
         />
       </div>

@@ -4,6 +4,7 @@ import SettingPanel from "../../components/atelier/ImageToVideo/SettingPanel";
 import WorkResultPanel from "../../components/atelier/ImageToVideo/WorkResultPanel";
 import styles from "./ImageToVideoMain.module.css";
 import { AuthContext } from "../../AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function ImageToVideoMain() {
   const [collections, setCollections] = useState([]);
@@ -11,7 +12,17 @@ export default function ImageToVideoMain() {
   const [memories, setMemories] = useState([]);
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [result, setResult] = useState(null);
-  const { userid } = useContext(AuthContext);
+  const { isLoggedIn, userid } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+  }, [isLoggedIn, navigate]);
 
   // 컬렉션 목록 조회
   useEffect(() => {

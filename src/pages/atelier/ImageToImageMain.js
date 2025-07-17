@@ -4,6 +4,7 @@ import SettingPanel from "../../components/atelier/ImageToImage/SettingPanel";
 import WorkResultPanel from "../../components/atelier/ImageToImage/WorkResultPanel";
 import styles from "./ImageToImageMain.module.css";
 import { AuthContext } from "../../AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 export default function ImageToImageMain() {
   const [collections, setCollections] = useState([]);
@@ -11,7 +12,7 @@ export default function ImageToImageMain() {
   const [memories, setMemories] = useState([]);
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [result, setResult] = useState(null);
-  const { userid } = useContext(AuthContext);
+  const { isLoggedIn, userid } = useContext(AuthContext);
 
   // 선택된 메모리 객체
   const selectedMemory =
@@ -20,6 +21,16 @@ export default function ImageToImageMain() {
           (m) => m.memoryid?.toString() === selectedMemoryId.toString()
         )
       : null;
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+  }, [isLoggedIn, navigate]);
 
   // 컬렉션 목록 조회
   useEffect(() => {
