@@ -12,7 +12,7 @@ import { useResetRecoilState } from "recoil";
 
 function ArchiveVisit() {
   const { userid: ownerid } = useParams();
-  const { userid: myid } = useContext(AuthContext);
+  const { userid: myid, secureApiRequest } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // 방문한 아카이브 소유자 정보
@@ -26,7 +26,7 @@ function ArchiveVisit() {
   const [collections, setCollections] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
 
-  // 해당 아카이브 소유자에 대한 팔로우 상태 가져옴
+  // 로그인 유저와 해당 아카이브 소유자에 대한 팔로우 상태 가져옴
   useEffect(() => {
     if (!myid || !ownerid) return; // ⭐ 유효한 경우만 진행
     const fetchRelStatus = async () => {
@@ -36,15 +36,8 @@ function ArchiveVisit() {
         const res = await apiClient.get(`api/library/getRelationshipStatus`, {
           params: { userid: myid, targetid: ownerid },
         });
-
         setRelStatus(String(res.data));
         // 상태에 따라 relStatus, relBtnMsg 설정
-
-        console.log(
-          "^^^팔로우 상태 확인 성공!~~:",
-          relStatus,
-          typeof relStatus
-        );
       } catch (e) {
         console.error("팔로우 상태 확인 실패", e);
       }
@@ -240,14 +233,15 @@ function ArchiveVisit() {
     const isBookmarked =
       actionType === "userbookmark" ? !targetItem.userbookmark : undefined;
 
+    //TODO: secureApiReuqest 로 추후 변경(현재 변경시 에러남)
     try {
       if (actionType === "userlike") {
         await apiClient.post(`/api/library/togglelike`, null, {
-          params: { collectionId, isLiked },
+          params: { userid: myid, collectionId, isLiked },
         });
       } else if (actionType === "userbookmark") {
         await apiClient.post(`/api/library/togglebm`, null, {
-          params: { collectionId, isBookmarked },
+          params: { userid: myid, collectionId, isBookmarked },
         });
       }
 

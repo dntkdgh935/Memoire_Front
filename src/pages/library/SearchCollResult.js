@@ -23,9 +23,10 @@ function SearchCollResult() {
     const fetchSearchedColls = async () => {
       try {
         setLoading(true);
-        // API 요청 (검색어를 기반으로)
-        const response = await apiClient.get(
-          `/api/library/search/collection?query=${searchQuery}&userid=${userid}`
+
+        const response = await secureApiRequest(
+          `/api/library/search/collection?query=${searchQuery}&userid=${userid}`,
+          { method: "GET" }
         );
         setSearchedColls(response.data); // 검색 결과 저장
       } catch (error) {
@@ -58,13 +59,15 @@ function SearchCollResult() {
           : undefined;
 
       if (actionType === "userlike") {
-        await axios.post(
-          `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
+        await secureApiRequest(
+          `/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`,
+          { method: "POST" }
         );
       }
       if (actionType === "userbookmark") {
-        await axios.post(
-          `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+        await secureApiRequest(
+          `/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
+          { method: "POST" }
         );
       }
 
