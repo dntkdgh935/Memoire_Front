@@ -79,7 +79,13 @@ export default function ImageToImageMain() {
       <div className={styles.centerPanel}>
         <SettingPanel
           selectedMemory={selectedMemory}
-          onGenerate={(imageUrl) => setResult({ status: "success", imageUrl })}
+          onGenerate={(dto) =>
+            setResult({
+              status: "success",
+              resultDto: dto,
+              imageUrl: dto.imageUrl,
+            })
+          }
         />
       </div>
 
