@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import styles from "./SettingPanel.module.css";
 
-export default function SettingPanel({
-  selectedMemory,
-  onGenerate,
-  currentUserId,
-}) {
+export default function SettingPanel({ selectedMemory, onGenerate }) {
   const [stylePrompt, setStylePrompt] = useState("");
   const [extraPrompt, setExtraPrompt] = useState("");
 
@@ -16,11 +12,6 @@ export default function SettingPanel({
       imageUrl: selectedMemory.imageUrl,
       stylePrompt,
       extraPrompt,
-      userId: currentUserId,
-      title: selectedMemory.title,
-      content: selectedMemory.content,
-      filename: selectedMemory.filename,
-      filepath: selectedMemory.filepath,
     };
 
     fetch("/atelier/imtim/generate", {
@@ -32,7 +23,7 @@ export default function SettingPanel({
         if (!res.ok) throw new Error("이미지 변환 실패");
         return res.json();
       })
-      .then((data) => onGenerate(data.imageUrl))
+      .then((dto) => onGenerate(dto))
       .catch((err) => console.error("변환 요청 오류:", err));
   };
 
