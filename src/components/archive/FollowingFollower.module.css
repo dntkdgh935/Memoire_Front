@@ -68,3 +68,18 @@
   font-size: 13px;
   color: #4f4f4f;
 }
+
+.messagebtn {
+  margin-left: auto;
+  background-color: #e1e1e1;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.messagebtn:hover {
+  background-color: #cfcfcf;
+}

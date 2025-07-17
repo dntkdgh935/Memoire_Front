@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./ArchiveMain.module.css";
 
 function ArchiveMain() {
-  const { isLoggedIn, userid } = useContext(AuthContext);
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
   const [collections, setCollections] = useState([]);
   const [activeTab, setActiveTab] = useState("myColl");
@@ -27,11 +27,12 @@ function ArchiveMain() {
     if (isLoggedIn && userid) {
       const fetchStuff = async () => {
         try {
-          const collectionsInfo = await apiClient.get("/archive/collections", {
-            params: {
-              userid: userid,
-            },
-          });
+          const collectionsInfo = await secureApiRequest(
+            `/archive/collections?userid=${userid}`,
+            {
+              method: "GET",
+            }
+          );
           console.log(collectionsInfo.data);
           setCollections(collectionsInfo.data);
         } catch (error) {
@@ -50,11 +51,12 @@ function ArchiveMain() {
   const handleMyCollClick = async () => {
     setActiveTab("myColl");
     try {
-      const collectionsInfo = await apiClient.get("/archive/collections", {
-        params: {
-          userid: userid,
-        },
-      });
+      const collectionsInfo = await secureApiRequest(
+        `/archive/collections?userid=${userid}`,
+        {
+          method: "GET",
+        }
+      );
       console.log(collectionsInfo.data);
       setCollections(collectionsInfo.data);
     } catch (error) {
@@ -65,12 +67,10 @@ function ArchiveMain() {
   const handleBookmarkCollClick = async () => {
     setActiveTab("bookmarkColl");
     try {
-      const bookmarksInfo = await apiClient.get(
-        "/archive/bookmarkCollections",
+      const bookmarksInfo = await secureApiRequest(
+        `/archive/bookmarkCollections?userid=${userid}`,
         {
-          params: {
-            userid: userid,
-          },
+          method: "GET",
         }
       );
       console.log(bookmarksInfo.data);
@@ -96,13 +96,20 @@ function ArchiveMain() {
           : undefined;
 
       try {
+        const formData = new FormData();
+        formData.append("userid", userid);
+        formData.append("collectionId", collectionId);
         if (actionType === "userlike") {
-          await apiClient.post("/api/library/togglelike", null, {
-            params: { userid, collectionId, isLiked },
+          formData.append("isLiked", isLiked);
+          await secureApiRequest("/api/library/togglelike", {
+            method: "POST",
+            body: formData,
           });
         } else if (actionType === "userbookmark") {
-          await apiClient.post("/api/library/togglebm", null, {
-            params: { userid, collectionId, isBookmarked },
+          formData.append("isBookmarked", isBookmarked);
+          await secureApiRequest("/api/library/togglebm", {
+            method: "POST",
+            body: formData,
           });
         }
       } catch (error) {

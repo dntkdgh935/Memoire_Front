@@ -43,24 +43,6 @@ function ArchiveNewCollection() {
     }
 
     navigate("/archive/newmem", { state: collection });
-    // 여기말고 메모리 생성까지 완료해야 디비에 데이터를 저장함
-    // const data = new FormData();
-    // data.append("authorid", collection.authorid);
-    // data.append("collectionTitle", collection.collectionTitle);
-    // data.append("visibility", collection.visibility);
-    // data.append("color", collection.color);
-
-    // try {
-    //   await secureApiRequest("/archive/newColl", {
-    //     method: "POST",
-    //     body: data,
-    //   });
-    //   alert("새 컬렉션 등록 완료");
-    //   navigate("/archive");
-    // } catch (error) {
-    //   console.error("새 컬렉션 등록 실패", error);
-    //   alert("새 컬렉션 등록에 실패했습니다");
-    // }
   };
 
   const handleChange = (e) => {
