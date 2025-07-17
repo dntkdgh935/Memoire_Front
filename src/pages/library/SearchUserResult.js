@@ -23,8 +23,10 @@ function SearchUserResult() {
       try {
         setLoading(true);
         // API 요청 (검색어를 기반으로)
-        const response = await apiClient.get(
-          `/api/user/search?query=${searchQuery}&userid=${userid}`
+        //TODO: 수정
+        const response = await secureApiRequest(
+          `/api/user/search?query=${searchQuery}&userid=${userid}`,
+          { method: "GET" }
         );
         setSearchedUsers(response.data); // 검색 결과 저장
       } catch (error) {
