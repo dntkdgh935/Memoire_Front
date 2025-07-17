@@ -17,16 +17,17 @@ import SocialSignUp from "../pages/user/SocialSignUp";
 import LibraryRouter from "./LibraryRouter";
 import ArchiveRouter from "./ArchiveRouter";
 import UserRouter from "./UserRouter";
+import ChatRouter from "./ChatRouter";
 
 function AppRouter() {
   return (
     <Routes>
-
       <Route path="/" element={<Navigate to="/library" />} />
 
       <Route path="/library/*" element={<LibraryRouter />} />
       <Route path="/archive/*" element={<ArchiveRouter />} />
       <Route path="/user/*" element={<UserRouter />} />
+      <Route path="/chat/*" element={<ChatRouter />} />
       <Route
         path="/oauth2/callback/success"
         element={<OAuth2CallbackSuccess />}

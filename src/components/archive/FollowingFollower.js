@@ -2,13 +2,16 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
 import styles from "./FollowingFollower.module.css";
+import { useNavigate } from "react-router-dom";
 
 function FollowingFollower() {
-  const { userid } = useContext(AuthContext);
+  const { userid, secureApiRequest } = useContext(AuthContext);
 
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [activeTab, setActiveTab] = useState("following");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!userid) return;
@@ -35,6 +38,31 @@ function FollowingFollower() {
 
     fetchStuff();
   }, [userid]);
+
+  const handleMessageClick = async (otherUserId) => {
+    try {
+      const formData = new FormData();
+      formData.append("userid", userid);
+      formData.append("otherUserid", otherUserId);
+      const chatroomInfo = await secureApiRequest(`/chat/check`, {
+        method: "POST",
+        body: formData,
+      });
+      console.log(chatroomInfo.data);
+      if (chatroomInfo.data === null || chatroomInfo.data === "") {
+        const newChatroomInfo = await secureApiRequest(`/chat/new`, {
+          method: "POST",
+          body: formData,
+        });
+        console.log(newChatroomInfo.data);
+        navigate(`/chat/room/${chatroomInfo.data}`);
+      } else {
+        navigate(`/chat/room/${chatroomInfo.data}`);
+      }
+    } catch (err) {
+      console.error("메시지 전송 페이지로 이동 실패:", err);
+    }
+  };
 
   return (
     <div className={styles.followcard}>
@@ -73,6 +101,12 @@ function FollowingFollower() {
                 <div className={styles.username}>{user.nickname}</div>
                 <div className={styles.userid}>@{user.loginId}</div>
               </div>
+              <button
+                className={styles.messagebtn}
+                onClick={() => handleMessageClick(user.userId)}
+              >
+                메시지
+              </button>
             </div>
           ))
         )}

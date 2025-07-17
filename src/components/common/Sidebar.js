@@ -8,6 +8,8 @@ import archiveAct from "../../assets/images/archive_act.svg";
 import archiveDe from "../../assets/images/archive_de.svg";
 import atelierAct from "../../assets/images/atelier_act.svg";
 import atelierDe from "../../assets/images/atelier_de.svg";
+import chatAct from "../../assets/images/chat_act.png";
+import chatDe from "../../assets/images/chat_de.jpg";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -41,6 +43,18 @@ function Sidebar() {
         <img
           src={isActive("/atelier") ? atelierAct : atelierDe}
           alt="Atelier"
+        />
+      </div>
+
+      {/* TODO: 채팅 아이콘 수정 */}
+      <div
+        className={`${styles.menuWrapper} ${isActive("/chat") ? styles.active : ""}`}
+        onClick={() => navigate("/chat")}
+      >
+        <img
+          src={isActive("/chat") ? chatAct : chatDe}
+          alt="Chat"
+          style={{ width: "40px", height: "40px" }}
         />
       </div>
     </div>
