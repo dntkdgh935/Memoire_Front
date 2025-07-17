@@ -15,7 +15,7 @@ function WorkResultPanel({
 
   // 새 메모리로 저장
   const handleSaveAsNewMemory = async () => {
-    console.log("🛠️ Saving new memory:", {
+    console.log("Saving new memory:", {
       collectionId: selectedCollectionId,
       resultDto: result.resultDto,
     });

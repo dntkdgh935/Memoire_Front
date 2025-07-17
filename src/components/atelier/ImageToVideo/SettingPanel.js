@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./SettingPanel.module.css";
 
-export default function SettingPanel({
-  selectedMemory,
-  currentUserId,
-  onGenerate,
-}) {
+export default function SettingPanel({ selectedMemory, onGenerate }) {
+  const [title, setTitle] = useState(selectedMemory?.title || "");
+
   // TTS 설정
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [ttsScript, setTtsScript] = useState("");
@@ -16,16 +14,15 @@ export default function SettingPanel({
   const [ttsError, setTtsError] = useState(null);
   const [ttsGenerated, setTtsGenerated] = useState(false);
 
-  // tts 미리듣기
-  const [ttsPreviewUrl, setTtsPreviewUrl] = useState("");
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState(null);
-
   // 비디오 설정
   const [videoPrompt, setVideoPrompt] = useState("");
   const [extraPrompt, setExtraPrompt] = useState("");
   const [videoLoading, setVideoLoading] = useState(false);
   const [videoError, setVideoError] = useState(null);
+
+  useEffect(() => {
+    setTitle(selectedMemory?.title || "");
+  }, [selectedMemory]);
 
   if (!selectedMemory) {
     return <p className={styles.placeholder}>왼쪽에서 메모리를 선택해주세요</p>;
@@ -53,31 +50,12 @@ export default function SettingPanel({
     }
   };
 
-  const handlePreviewTts = async () => {
-    setPreviewLoading(true);
-    setPreviewError(null);
-    try {
-      const payload = { script: ttsScript, ttsStyle, tone: ttsTone };
-      const res = await fetch("/atelier/video/preview-tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error((await res.text()) || "미리듣기 실패");
-      const url = await res.text();
-      setTtsPreviewUrl(url);
-    } catch (e) {
-      setPreviewError(e.message);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
   const handleGenerateVideo = async () => {
     setVideoLoading(true);
     setVideoError(null);
     try {
       const payload = {
+        title,
         imageUrl: selectedMemory.imageUrl,
         videoPrompt,
         extraPrompt,
@@ -105,15 +83,15 @@ export default function SettingPanel({
         <label>제목</label>
         <input
           type="text"
-          value={selectedMemory.title}
-          readOnly
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           className={styles.input}
         />
       </div>
       <div className={styles.field}>
         <label>원본 이미지</label>
         <img
-          src={selectedMemory.imageUrl}
+          src={`http://localhost:8080/upload_files/memory_img/${selectedMemory.filename}`}
           alt="원본"
           className={styles.imagePreview}
         />
@@ -197,21 +175,19 @@ export default function SettingPanel({
             {ttsGenerated && (
               <button
                 className={styles.secondaryBtn}
-                onClick={handlePreviewTts}
-                disabled={previewLoading}
+                onClick={handleGenerateTts}
+                disabled={ttsLoading || !ttsScript}
               >
-                {previewLoading ? "미리듣기 중..." : "미리듣기"}
+                {ttsLoading ? "미리듣기 중..." : "미리듣기"}
               </button>
             )}
           </div>
 
           {/* 오디오 플레이어 */}
-          {ttsPreviewUrl && (
+          {ttsUrl && (
             <div className={styles.field}>
-              <audio controls src={ttsPreviewUrl} />
-              {previewError && (
-                <p className={styles.errorText}>{previewError}</p>
-              )}
+              <audio controls src={ttsUrl} />
+              {ttsError && <p className={styles.errorText}>{ttsError}</p>}
             </div>
           )}
         </>
