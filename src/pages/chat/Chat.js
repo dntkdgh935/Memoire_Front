@@ -86,27 +86,26 @@ function Chat() {
   }, [messages]);
 
   return (
-
-    <PageHeader pagename={`Chatroom`} />
-    <div style={{ maxWidth: 600, margin: "0 auto" }}>
-      <h3>채팅방: {chatroomid}</h3>
-      <div
-        style={{
-          border: "1px solid #ccc",
-          height: "400px",
-          overflowY: "auto",
-          padding: "10px",
-        }}
-      >
-        {messages.map((msg) => (
-          <div
-            key={msg.chatId}
-            style={{
-              textAlign: msg.userid === userid ? "right" : "left",
-              margin: "5px 0",
-            }}
-          >
-
+    <>
+      <PageHeader pagename={`Chatroom`} />
+      <div style={{ maxWidth: 600, margin: "0 auto" }}>
+        <h3>채팅방: {chatroomid}</h3>
+        <div
+          style={{
+            border: "1px solid #ccc",
+            height: "400px",
+            overflowY: "auto",
+            padding: "10px",
+          }}
+        >
+          {messages.map((msg) => (
+            <div
+              key={msg.chatId}
+              style={{
+                textAlign: msg.userid === userid ? "right" : "left",
+                margin: "5px 0",
+              }}
+            >
               <div
                 style={{
                   display: "inline-block",
