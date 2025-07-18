@@ -3,6 +3,7 @@ import MemoryList from "../../components/atelier/common/MemoryList";
 import SettingPanel from "../../components/atelier/TextToImage/SettingPanel";
 import WorkResultPanel from "../../components/atelier/TextToImage/WorkResultPanel";
 import styles from "./TextToTextMain.module.css"; // 기존 모듈 재활용
+import PageHeader from "../../components/common/PageHeader";
 
 function TextToImageMain() {
   const [collections, setCollections] = useState([]);
@@ -13,7 +14,9 @@ function TextToImageMain() {
 
   const selectedMemory =
     selectedMemoryId && memories.length > 0
-      ? memories.find((m) => m.memoryid?.toString() === selectedMemoryId?.toString())
+      ? memories.find(
+          (m) => m.memoryid?.toString() === selectedMemoryId?.toString()
+        )
       : null;
 
   // 컬렉션 목록 가져오기
@@ -58,29 +61,35 @@ function TextToImageMain() {
   }, [selectedCollectionId]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.leftPanel}>
-        <MemoryList
-          collections={collections}
-          memories={memories}
-          selectedCollectionId={selectedCollectionId}
-          selectedMemoryId={selectedMemoryId}
-          onSelectCollection={setSelectedCollectionId}
-          onSelectMemory={setSelectedMemoryId}
-        />
-      </div>
+    <>
+      <PageHeader pagename={`Atelier`} />
+      <div className={styles.container}>
+        <div className={styles.leftPanel}>
+          <MemoryList
+            collections={collections}
+            memories={memories}
+            selectedCollectionId={selectedCollectionId}
+            selectedMemoryId={selectedMemoryId}
+            onSelectCollection={setSelectedCollectionId}
+            onSelectMemory={setSelectedMemoryId}
+          />
+        </div>
 
-      <div className={styles.centerPanel}>
-        <SettingPanel
-          selectedMemory={selectedMemory}
-          onGenerate={setResult}
-        />
-      </div>
+        <div className={styles.centerPanel}>
+          <SettingPanel
+            selectedMemory={selectedMemory}
+            onGenerate={setResult}
+          />
+        </div>
 
-      <div className={styles.rightPanel}>
-        <WorkResultPanel result={result} originalMemoryId={selectedMemoryId} />
+        <div className={styles.rightPanel}>
+          <WorkResultPanel
+            result={result}
+            originalMemoryId={selectedMemoryId}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

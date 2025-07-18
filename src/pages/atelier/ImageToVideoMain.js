@@ -5,6 +5,7 @@ import WorkResultPanel from "../../components/atelier/ImageToVideo/WorkResultPan
 import styles from "./ImageToVideoMain.module.css";
 import { AuthContext } from "../../AuthProvider";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function ImageToVideoMain() {
   const [collections, setCollections] = useState([]);
@@ -69,42 +70,46 @@ export default function ImageToVideoMain() {
       : null;
 
   return (
-    <div className={styles.container}>
-      {/* 좌측 패널: 컬렉션 & 메모리 리스트 */}
-      <div className={styles.leftPanel}>
-        <MemoryList
-          collections={collections}
-          memories={memories}
-          selectedCollectionId={selectedCollectionId}
-          selectedMemoryId={selectedMemoryId}
-          onSelectCollection={setSelectedCollectionId}
-          onSelectMemory={setSelectedMemoryId}
-        />
-      </div>
+    <>
+      <PageHeader pagename={`Atelier`} />
 
-      {/* 중앙 패널: TTS → 비디오 설정 */}
-      <div className={styles.centerPanel}>
-        <SettingPanel
-          selectedMemory={selectedMemory}
-          onGenerate={(dto) =>
-            setResult({
-              status: "success",
-              resultDto: dto,
-              videoUrl: dto.getVideoUrl?.() ?? dto.videoUrl,
-            })
-          }
-        />
-      </div>
+      <div className={styles.container}>
+        {/* 좌측 패널: 컬렉션 & 메모리 리스트 */}
+        <div className={styles.leftPanel}>
+          <MemoryList
+            collections={collections}
+            memories={memories}
+            selectedCollectionId={selectedCollectionId}
+            selectedMemoryId={selectedMemoryId}
+            onSelectCollection={setSelectedCollectionId}
+            onSelectMemory={setSelectedMemoryId}
+          />
+        </div>
 
-      {/* 우측 패널: 생성 결과 (로딩·에러·영상) */}
-      <div className={styles.rightPanel}>
-        <WorkResultPanel
-          result={result}
-          originalMemoryId={selectedMemoryId}
-          originalMemoryTitle={selectedMemory?.title}
-          selectedCollectionId={selectedCollectionId}
-        />
+        {/* 중앙 패널: TTS → 비디오 설정 */}
+        <div className={styles.centerPanel}>
+          <SettingPanel
+            selectedMemory={selectedMemory}
+            onGenerate={(dto) =>
+              setResult({
+                status: "success",
+                resultDto: dto,
+                videoUrl: dto.getVideoUrl?.() ?? dto.videoUrl,
+              })
+            }
+          />
+        </div>
+
+        {/* 우측 패널: 생성 결과 (로딩·에러·영상) */}
+        <div className={styles.rightPanel}>
+          <WorkResultPanel
+            result={result}
+            originalMemoryId={selectedMemoryId}
+            originalMemoryTitle={selectedMemory?.title}
+            selectedCollectionId={selectedCollectionId}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
