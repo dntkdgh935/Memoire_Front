@@ -47,6 +47,13 @@ function ArchiveVisit() {
     fetchRelStatus();
   }, [ownerid, myid]); //[ownerid, myid]);
 
+  // 차단 관계가 있으면 방문 불가
+  useEffect(() => {
+    if (relStatus === "2") {
+      navigate(-1);
+    }
+  }, [relStatus]);
+
   useEffect(() => {
     const fetchOwnerNickname = async () => {
       try {
@@ -85,18 +92,29 @@ function ArchiveVisit() {
   //아카이브 소유자의 컬렉션 목록 가져옴
   useEffect(() => {
     console.log("owner id: " + ownerid);
+    console.log("login user id: " + myid);
     if (ownerid) {
       const fetchStuff = async () => {
         try {
-          const collectionsInfo = await apiClient.get("/archive/collections", {
-            params: {
-              userid: ownerid,
-            },
-          });
+          const collectionsInfo = await apiClient.get(
+            "api/library/archiveVisit",
+            {
+              params: {
+                userid: myid,
+                ownerid: ownerid,
+              },
+            }
+          );
           console.log(collectionsInfo.data);
           setCollections(collectionsInfo.data);
         } catch (error) {
-          console.error("Error fetching user collections: ", error);
+          if (error.response && error.response.status === 403) {
+            // 차단된 경우 사용자에게 알림
+            console.warn("접근이 차단된 사용자입니다.");
+            alert("사용자가 존재하지 않습니다.");
+          } else {
+            console.error("Error fetching user collections: ", error);
+          }
         }
         try {
           const bookmarksInfo = await apiClient.get(
@@ -115,7 +133,7 @@ function ArchiveVisit() {
       };
       fetchStuff();
     }
-  }, [ownerid, navigate]);
+  }, [ownerid, myid]);
 
   //  if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
   //    return <div>로딩중...</div>;
