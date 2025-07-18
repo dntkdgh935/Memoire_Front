@@ -9,9 +9,11 @@ import VisitProfileCard from "../../components/library/VisitProfileCard";
 import CollGrid from "../../components/common/CollGrid";
 import { useNavigate } from "react-router-dom";
 import { useResetRecoilState } from "recoil";
+import PageHeader from "../../components/common/PageHeader";
 
 function ArchiveVisit() {
   const { userid: ownerid } = useParams();
+  const [ownerNickname, setOwnerNickname] = useState("정보없음");
   const { userid: myid, secureApiRequest } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -44,6 +46,20 @@ function ArchiveVisit() {
     };
     fetchRelStatus();
   }, [ownerid, myid]); //[ownerid, myid]);
+
+  useEffect(() => {
+    const fetchOwnerNickname = async () => {
+      try {
+        const userInfo = await apiClient.get("/archive/userinfo", {
+          params: { userid: ownerid },
+        });
+        setOwnerNickname(userInfo.data.nickname);
+      } catch (error) {
+        console.error("닉네임 가져오기 실패");
+      }
+    };
+    fetchOwnerNickname();
+  }, [ownerid]);
 
   //relStatus바뀔 때 메세지 바꿈
   useEffect(() => {
@@ -278,38 +294,41 @@ function ArchiveVisit() {
   };
 
   return (
-    <div className={styles.profileContainer}>
-      <div className={styles.sidebar}>
-        <VisitProfileCard
-          ownerid={ownerid}
-          relStatus={relStatus}
-          relBtnMsg={relBtnMsg}
-          onFollowBtnClick={handleToggleFollow}
-          onBlockClick={handleBlockClick}
-        />
-      </div>
-      <div className={styles.content}>
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
-            onClick={handleMyCollClick}
-          >
-            유저의 컬렉션
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
-            onClick={handleBookmarkCollClick}
-          >
-            유저가 북마크한 컬렉션
-          </button>
+    <>
+      <PageHeader pagename={`${ownerNickname}님의 아카이브`} />
+      <div className={styles.profileContainer}>
+        <div className={styles.sidebar}>
+          <VisitProfileCard
+            ownerid={ownerid}
+            relStatus={relStatus}
+            relBtnMsg={relBtnMsg}
+            onFollowBtnClick={handleToggleFollow}
+            onBlockClick={handleBlockClick}
+          />
         </div>
-        <CollGrid
-          colls={activeTab == "myColl" ? collections : bookmarks}
-          onActionChange={handleActionChange}
-          onCollClick={handleCollClick}
-        />
+        <div className={styles.content}>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
+              onClick={handleMyCollClick}
+            >
+              유저의 컬렉션
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
+              onClick={handleBookmarkCollClick}
+            >
+              유저가 북마크한 컬렉션
+            </button>
+          </div>
+          <CollGrid
+            colls={activeTab == "myColl" ? collections : bookmarks}
+            onActionChange={handleActionChange}
+            onCollClick={handleCollClick}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

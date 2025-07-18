@@ -4,6 +4,7 @@ import apiClient from "../../utils/axios";
 import ProfileCard from "../../components/archive/ProfileCard";
 import FollowingFollower from "../../components/archive/FollowingFollower";
 import CollGrid from "../../components/common/CollGrid";
+import PageHeader from "../../components/common/PageHeader";
 
 import { useNavigate } from "react-router-dom";
 
@@ -154,36 +155,39 @@ function ArchiveMain() {
   };
 
   return (
-    <div className={styles.profileContainer}>
-      <div className={styles.sidebar}>
-        <ProfileCard />
-        <FollowingFollower />
-      </div>
-      <div className={styles.content}>
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
-            onClick={handleMyCollClick}
-          >
-            내 컬렉션
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
-            onClick={handleBookmarkCollClick}
-          >
-            북마크한 컬렉션
-          </button>
-          <button className={styles.button} onClick={handleNewCollection}>
-            새 컬렉션
-          </button>
+    <>
+      <PageHeader pagename={`내 아카이브`} />
+      <div className={styles.profileContainer}>
+        <div className={styles.sidebar}>
+          <ProfileCard />
+          <FollowingFollower />
         </div>
-        <CollGrid
-          colls={collections}
-          onActionChange={handleActionChange}
-          onCollClick={handleCollClick}
-        />
+        <div className={styles.content}>
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
+              onClick={handleMyCollClick}
+            >
+              내 컬렉션
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
+              onClick={handleBookmarkCollClick}
+            >
+              북마크한 컬렉션
+            </button>
+            <button className={styles.button} onClick={handleNewCollection}>
+              새 컬렉션
+            </button>
+          </div>
+          <CollGrid
+            colls={collections}
+            onActionChange={handleActionChange}
+            onCollClick={handleCollClick}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

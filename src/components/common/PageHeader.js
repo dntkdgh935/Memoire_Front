@@ -10,6 +10,7 @@ function PageHeader({ pagename, username }) {
 
   // 현재 경로에 따라 헤더 변경
   const isInMain = location.pathname.endsWith("/library");
+  const isInArchive = location.pathname.endsWith("library/");
 
   // 뒤로 가기 버튼 클릭 시 동작
   const handleGoBack = () => {

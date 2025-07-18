@@ -8,6 +8,7 @@ import LibCollCard from "../../components/library/LibCollCard";
 import MemoryView from "../../components/common/MemoryView";
 import styles from "./LibCollDetailView.module.css"; // ✅
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader";
 
 function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
@@ -155,20 +156,23 @@ function LibCollDetailView() {
   };
 
   return (
-    <div className={styles.detailContainer}>
-      <LibCollCard
-        coll={collection}
-        memoryList={memoryList}
-        onMemoryClick={handleMemoryClick}
-        onActionChange={handleActionChange}
-        selectedMemoryId={selectedMemoryId}
-      />
-      <MemoryView
-        selectedMemory={selectedMemory}
-        authorid={collection.authorid}
-        numMemories={memoryList.length}
-      />
-    </div>
+    <>
+      <PageHeader pagename={`컬렉션 상세보기`} />
+      <div className={styles.detailContainer}>
+        <LibCollCard
+          coll={collection}
+          memoryList={memoryList}
+          onMemoryClick={handleMemoryClick}
+          onActionChange={handleActionChange}
+          selectedMemoryId={selectedMemoryId}
+        />
+        <MemoryView
+          selectedMemory={selectedMemory}
+          authorid={collection.authorid}
+          numMemories={memoryList.length}
+        />
+      </div>
+    </>
   );
 }
 

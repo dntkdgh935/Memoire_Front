@@ -5,6 +5,7 @@ import WorkResultPanel from "../../components/atelier/ImageToImage/WorkResultPan
 import styles from "./ImageToImageMain.module.css";
 import { AuthContext } from "../../AuthProvider";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function ImageToImageMain() {
   const [collections, setCollections] = useState([]);
@@ -73,42 +74,45 @@ export default function ImageToImageMain() {
   }, [selectedCollectionId]);
 
   return (
-    <div className={styles.container}>
-      {/* 좌측: 컬렉션 / 메모리 리스트 */}
-      <div className={styles.leftPanel}>
-        <MemoryList
-          collections={collections}
-          memories={memories}
-          selectedCollectionId={selectedCollectionId}
-          selectedMemoryId={selectedMemoryId}
-          onSelectCollection={setSelectedCollectionId}
-          onSelectMemory={setSelectedMemoryId}
-        />
-      </div>
+    <>
+      <PageHeader pagename={`Atelier`} />
+      <div className={styles.container}>
+        {/* 좌측: 컬렉션 / 메모리 리스트 */}
+        <div className={styles.leftPanel}>
+          <MemoryList
+            collections={collections}
+            memories={memories}
+            selectedCollectionId={selectedCollectionId}
+            selectedMemoryId={selectedMemoryId}
+            onSelectCollection={setSelectedCollectionId}
+            onSelectMemory={setSelectedMemoryId}
+          />
+        </div>
 
-      {/* 중앙: 설정 패널 (원본 이미지, 스타일, 프롬프트) */}
-      <div className={styles.centerPanel}>
-        <SettingPanel
-          selectedMemory={selectedMemory}
-          onGenerate={(dto) =>
-            setResult({
-              status: "success",
-              resultDto: dto,
-              imageUrl: dto.imageUrl,
-            })
-          }
-        />
-      </div>
+        {/* 중앙: 설정 패널 (원본 이미지, 스타일, 프롬프트) */}
+        <div className={styles.centerPanel}>
+          <SettingPanel
+            selectedMemory={selectedMemory}
+            onGenerate={(dto) =>
+              setResult({
+                status: "success",
+                resultDto: dto,
+                imageUrl: dto.imageUrl,
+              })
+            }
+          />
+        </div>
 
-      {/* 우측: 결과 패널 (로딩, 에러, 성공) */}
-      <div className={styles.rightPanel}>
-        <WorkResultPanel
-          result={result}
-          originalMemoryId={selectedMemoryId}
-          selectedCollectionId={selectedCollectionId}
-          originalMemoryTitle={selectedMemory?.title}
-        />
+        {/* 우측: 결과 패널 (로딩, 에러, 성공) */}
+        <div className={styles.rightPanel}>
+          <WorkResultPanel
+            result={result}
+            originalMemoryId={selectedMemoryId}
+            selectedCollectionId={selectedCollectionId}
+            originalMemoryTitle={selectedMemory?.title}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
