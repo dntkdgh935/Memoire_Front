@@ -12,23 +12,32 @@ function Chat() {
   const bottomRef = useRef(null);
 
   useEffect(() => {
+    if (!userid || userid === "") return;
     const pathParts = location.pathname.split("/");
-    const roomIdFromPath = pathParts[pathParts.length - 1]; // e.g., "/chat/room123" → "room123"
+    const roomIdFromPath = pathParts[pathParts.length - 1];
     setChatroomid(roomIdFromPath);
-  }, [location]);
-
-  useEffect(() => {
+    if (!chatroomid || chatroomid === "") return;
     const socketUrl = `ws://localhost:8080/chat/${chatroomid}?userid=${userid}`;
     socketRef.current = new WebSocket(socketUrl);
 
     socketRef.current.onopen = () => {
-      console.log("✅ WebSocket connected");
+      const accessToken = localStorage.getItem("accessToken");
+
+      socketRef.current.send(
+        JSON.stringify({
+          type: "AUTH",
+          accessToken: accessToken,
+        })
+      );
     };
 
     socketRef.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (Array.isArray(data)) {
+        if (data.type === "AUTH_SUCCESS") {
+          console.log("WebSocket 인증 성공");
+          console.log("WebSocket 연결됨");
+        } else if (Array.isArray(data)) {
           // 기존 채팅 내역 전체
           setMessages(data);
         } else {
@@ -41,22 +50,28 @@ function Chat() {
     };
 
     socketRef.current.onclose = () => {
-      console.log("❌ WebSocket disconnected");
+      console.log("WS Disconnected");
     };
 
     socketRef.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
+      console.error("WS error:", error);
     };
 
     return () => {
       socketRef.current?.close();
     };
-  }, [chatroomid, userid]);
+  }, [chatroomid, userid, location]);
 
-  // ✅ 메시지 전송
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (
+      !input.trim() ||
+      !socketRef.current ||
+      socketRef.current.readyState !== WebSocket.OPEN
+    ) {
+      return;
+    }
     const message = {
+      type: "CHAT",
       chatroomid: chatroomid,
       userid: userid,
       messageContent: input,
@@ -65,7 +80,6 @@ function Chat() {
     setInput("");
   };
 
-  // ✅ 메시지 자동 스크롤
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -81,9 +95,9 @@ function Chat() {
           padding: "10px",
         }}
       >
-        {messages.map((msg, i) => (
+        {messages.map((msg) => (
           <div
-            key={i}
+            key={msg.chatId}
             style={{
               textAlign: msg.userid === userid ? "right" : "left",
               margin: "5px 0",

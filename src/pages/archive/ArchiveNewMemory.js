@@ -66,11 +66,27 @@ function ArchiveNewMemory() {
           ? "video"
           : "image"
     );
+    const byteLength = new Blob([title]).size;
+    if (byteLength > 100) {
+      alert("제목이 너무 깁니다");
+      return;
+    }
     formData.append("title", title);
     if (tab === "text") {
+      const byteLength = new Blob([content]).size;
+      if (byteLength > 10000) {
+        alert("내용이 너무 깁니다");
+        return;
+      }
       formData.append("content", content);
     } else {
       if (file) {
+        if (file.size > 200 * 1024 * 1024) {
+          alert(
+            "파일 크기가 너무 큽니다. 200MB 이하의 파일만 업로드할 수 있습니다."
+          );
+          return;
+        }
         formData.append("file", file);
       }
     }
@@ -104,6 +120,30 @@ function ArchiveNewMemory() {
       }
       navigate("/archive");
     }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length === 0) return;
+
+    const droppedFile = droppedFiles[0];
+
+    const MAX_FILE_SIZE = 200 * 1024 * 1024;
+    if (droppedFile.size > MAX_FILE_SIZE) {
+      alert("파일 크기가 너무 큽니다. 200MB 이하만 업로드 가능합니다.");
+      return;
+    }
+
+    if (
+      !droppedFile.type.startsWith("image/") &&
+      !droppedFile.type.startsWith("video/")
+    ) {
+      alert("이미지 또는 영상 파일만 업로드 가능합니다.");
+      return;
+    }
+
+    setFile(droppedFile);
   };
 
   return (
@@ -150,6 +190,8 @@ function ArchiveNewMemory() {
             <div
               className={styles.fileDropZone}
               style={{ display: tab === "media" ? "block" : "none" }}
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
             >
               <input
                 type="file"
