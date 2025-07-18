@@ -4,7 +4,7 @@ import apiClient from "../../utils/axios";
 import styles from "./ProfileCard.module.css";
 
 function ProfileCard() {
-  const { userid } = useContext(AuthContext);
+  const { userid, secureApiRequest } = useContext(AuthContext);
 
   const [user, setUser] = useState({
     loginId: "",
@@ -35,9 +35,12 @@ function ProfileCard() {
 
     const fetchStuff = async () => {
       try {
-        const userInfo = await apiClient.get("/archive/userinfo", {
-          params: { userid: userid },
-        });
+        const userInfo = await secureApiRequest(
+          `/archive/userinfo?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
         console.log(userInfo.data);
 
         setUser({
@@ -48,19 +51,34 @@ function ProfileCard() {
 
         setStatusMessage(userInfo.data.statusMessage || "");
 
-        const collectionNum = await apiClient.get(`/archive/numCollections`, {
-          params: { userid: userid },
-        });
+        const collectionNum = await secureApiRequest(
+          `/archive/numCollections?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
 
-        const memoriesNum = await apiClient.get(`/archive/numMemory`, {
-          params: { userid: userid },
-        });
-        const followingNum = await apiClient.get(`/archive/numFollowing`, {
-          params: { userid: userid },
-        });
-        const followerNum = await apiClient.get(`/archive/numFollowers`, {
-          params: { userid: userid },
-        });
+        const memoriesNum = await secureApiRequest(
+          `/archive/numMemory?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
+
+        const followingNum = await secureApiRequest(
+          `/archive/numFollowing?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
+
+        const followerNum = await secureApiRequest(
+          `/archive/numFollowers?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
+
         console.log(collectionNum.data);
         console.log(memoriesNum.data);
         console.log(followingNum.data);
@@ -81,10 +99,6 @@ function ProfileCard() {
 
   const handleEditProfile = () => {
     alert("프로필 수정 기능이 실행됩니다!");
-  };
-
-  const handleStatClick = (statType, value) => {
-    alert(`${statType}: ${value}개`);
   };
 
   const handleStatusClick = () => {
@@ -136,10 +150,10 @@ function ProfileCard() {
 
   return (
     <div
-      className={`${styles["profile-card"]} ${isVisible ? styles.visible : ""}`}
+      className={`${styles["profilecard"]} ${isVisible ? styles.visible : ""}`}
     >
-      <div className={styles["profile-header"]}>
-        <div className={styles["profile-avatar"]}>
+      <div className={styles["profileheader"]}>
+        <div className={styles["profileavatar"]}>
           <img
             src={
               user.profileImage
@@ -147,26 +161,26 @@ function ProfileCard() {
                 : "https://static.mothership.sg/1/2021/07/cat.jpg"
             }
             alt="Profile"
-            className={`${styles["avatar-img"]} ${avatarClicked ? styles["avatar-clicked"] : ""}`}
+            className={`${styles.avatarimg} ${avatarClicked ? styles.avatarclicked : ""}`}
             onClick={handleAvatarClick}
           />
         </div>
-        <div className={styles["profile-info"]}>
-          <h2 className={styles["username"]}>
-            {user.nickname ? user.nickname : userid}
+        <div className={styles.profileinfo}>
+          <h2 className={styles.username}>
+            {user.nickname || "닉네임이 없습니다"}
           </h2>
-          <p className={styles["handle"]}>@{user.loginId}</p>
+          <p className={styles.handle}>@{user.loginId || "소셜로그인"}</p>
         </div>
       </div>
 
-      <div className={styles["status-bubble"]}>
+      <div className={styles.statusbubble}>
         {isEditingStatus ? (
           <>
             <textarea
               value={editStatusMessage}
               onChange={(e) => setEditStatusMessage(e.target.value)}
               rows={3}
-              className={styles["status-textarea"]}
+              className={styles.statustextarea}
               autoFocus
               onKeyDown={handleStatusKeyDown}
             />
@@ -178,41 +192,26 @@ function ProfileCard() {
         )}
       </div>
 
-      <div className={styles["stats-container"]}>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("컬렉션 수", stats.collections)}
-        >
-          <span className={styles["stat-number"]}>{stats.collections}</span>
-          <span className={styles["stat-label"]}>컬렉션 수</span>
+      <div className={styles.statscontainer}>
+        <div className={styles.statitem}>
+          <span className={styles.statnumber}>{stats.collections}</span>
+          <span className={styles.statlabel}>컬렉션 수</span>
         </div>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("메모리 수", stats.memories)}
-        >
-          <span className={styles["stat-number"]}>{stats.memories}</span>
-          <span className={styles["stat-label"]}>메모리 수</span>
+        <div className={styles.statitem}>
+          <span className={styles.statnumber}>{stats.memories}</span>
+          <span className={styles.statlabel}>메모리 수</span>
         </div>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("팔로잉", stats.following)}
-        >
-          <span className={styles["stat-number"]}>{stats.following}</span>
-          <span className={styles["stat-label"]}>팔로잉</span>
+        <div className={styles.statitem}>
+          <span className={styles.statnumber}>{stats.following}</span>
+          <span className={styles.statlabel}>팔로잉</span>
         </div>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("팔로워", stats.followers)}
-        >
-          <span className={styles["stat-number"]}>{stats.followers}</span>
-          <span className={styles["stat-label"]}>팔로워</span>
+        <div className={styles.statitem}>
+          <span className={styles.statnumber}>{stats.followers}</span>
+          <span className={styles.statlabel}>팔로워</span>
         </div>
       </div>
 
-      <button
-        className={styles["edit-profile-btn"]}
-        onClick={handleEditProfile}
-      >
+      <button className={styles.editprofilebtn} onClick={handleEditProfile}>
         프로필 수정
       </button>
     </div>
