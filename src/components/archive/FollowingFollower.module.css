@@ -83,3 +83,16 @@
 .messagebtn:hover {
   background-color: #cfcfcf;
 }
+
+.userCheckbox {
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  accent-color: #999;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.userCheckbox:hover {
+  transform: scale(1.1);
+}

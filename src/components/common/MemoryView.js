@@ -34,9 +34,12 @@ function MemoryView({ selectedMemory, authorid, numMemories }) {
       return;
     }
     try {
-      await secureApiRequest(`/archive/memory/${selectedMemory.memoryid}`, {
-        method: "DELETE",
-      });
+      await secureApiRequest(
+        `/archive/memory/${selectedMemory.memoryid}?userid=${userid}`,
+        {
+          method: "DELETE",
+        }
+      );
       alert("메모리 삭제 완료");
       navigate("/archive");
     } catch (error) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
 import styles from "./FollowingFollower.module.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function FollowingFollower() {
   const { userid, secureApiRequest } = useContext(AuthContext);
@@ -10,11 +10,13 @@ function FollowingFollower() {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [activeTab, setActiveTab] = useState("following");
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!userid) return;
+    if (!userid || userid === "") return;
 
     const fetchStuff = async () => {
       try {
@@ -42,8 +44,8 @@ function FollowingFollower() {
   const handleMessageClick = async (otherUserId) => {
     try {
       const formData = new FormData();
-      formData.append("userid", userid);
-      formData.append("otherUserid", otherUserId);
+      formData.append("users", userid);
+      formData.append("users", otherUserId);
       const chatroomInfo = await secureApiRequest(`/chat/check`, {
         method: "POST",
         body: formData,
@@ -55,13 +57,42 @@ function FollowingFollower() {
           body: formData,
         });
         console.log(newChatroomInfo.data);
-        navigate(`/chat/room/${chatroomInfo.data}`);
+        navigate(`/chat/room/${newChatroomInfo.data}`);
       } else {
         navigate(`/chat/room/${chatroomInfo.data}`);
       }
     } catch (err) {
       console.error("메시지 전송 페이지로 이동 실패:", err);
     }
+  };
+
+  const handleGroupMessageClick = async () => {
+    alert("그룹채팅방에 초대할 상대: " + selectedUsers);
+    if (selectedUsers.length === 0) {
+      alert("채팅방에 초대할 상대를 고르세요.");
+    } else if (selectedUsers.length === 1) {
+      handleMessageClick(selectedUsers[0]);
+    } else {
+      const formData = new FormData();
+      formData.append("users", userid);
+      selectedUsers.forEach((id) => {
+        formData.append("users", id);
+      });
+      const newChatroomInfo = await secureApiRequest(`/chat/new`, {
+        method: "POST",
+        body: formData,
+      });
+      console.log(newChatroomInfo.data);
+      navigate(`/chat/room/${newChatroomInfo.data}`);
+    }
+  };
+
+  const toggleUserSelection = (userId) => {
+    setSelectedUsers((prevSelected) =>
+      prevSelected.includes(userId)
+        ? prevSelected.filter((id) => id !== userId)
+        : [...prevSelected, userId]
+    );
   };
 
   return (
@@ -87,7 +118,7 @@ function FollowingFollower() {
         ) : (
           (activeTab === "following" ? following : followers).map((user) => (
             // TODO: 클릭 시 해당 유저의 프로필 페이지로 이동함
-            <div key={user.loginId} className={styles.followuseritem}>
+            <div key={user.userId} className={styles.followuseritem}>
               <img
                 src={
                   user.profileImagePath
@@ -101,14 +132,31 @@ function FollowingFollower() {
                 <div className={styles.username}>{user.nickname}</div>
                 <div className={styles.userid}>@{user.loginId}</div>
               </div>
-              <button
-                className={styles.messagebtn}
-                onClick={() => handleMessageClick(user.userId)}
-              >
-                메시지
-              </button>
+              {location.pathname === "/chat/new" ? (
+                <input
+                  type="checkbox"
+                  className={styles.userCheckbox}
+                  checked={selectedUsers.includes(user.userId)}
+                  onChange={() => toggleUserSelection(user.userId)}
+                />
+              ) : (
+                <button
+                  className={styles.messagebtn}
+                  onClick={() => handleMessageClick(user.userId)}
+                >
+                  메시지
+                </button>
+              )}
             </div>
           ))
+        )}
+        {location.pathname === "/chat/new" && (
+          <button
+            className={styles.messagebtn}
+            onClick={handleGroupMessageClick}
+          >
+            채팅방 초대하기: {selectedUsers.length}명
+          </button>
         )}
       </div>
     </div>

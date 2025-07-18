@@ -11,6 +11,7 @@ const ChatRoomMain = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!userid || userid === "") return;
     const fetchStuff = async () => {
       try {
         const chatroomsInfo = await secureApiRequest(
