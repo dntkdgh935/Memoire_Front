@@ -1,4 +1,5 @@
-/* src/components/user/CheckPwd.module.css */
+/* src/components/CheckPwd.module.css (수정된 코드) */
+
 .input {
   width: 100%;
   padding: 12px 15px;
@@ -21,58 +22,76 @@
 
 .inputGroup {
   position: relative;
+  /* margin-bottom은 상위 컴포넌트에서 제어하는 것이 더 유연할 수 있습니다. */
+  /* 여기서는 원래 코드에 있었으므로 유지합니다. */
+  margin-bottom: 20px; /* 인풋 그룹 간 간격 조정 */
 }
 
 /* 메시지 래퍼 스타일 */
 .messageWrapper {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 1px;
+  /* position: absolute; 제거하여 요소 흐름에 맞게 위치하도록 함 */
+  /* 메시지가 input 바로 아래에 오도록 `margin-top` 대신 `padding-top` 등을 활용하거나,
+       상위 `inputGroup`에 `padding-bottom`을 주어 공간 확보 */
+  margin-top: 5px; /* input과의 간격 */
   text-align: left;
+  min-height: 15px; /* 메시지가 표시될 공간 미리 확보 */
 }
 
 /* 비밀번호 불일치 메시지 스타일 */
 .errorMessage {
-  color: #d9534f;
-  font-size: 11px;
+  color: #d9534f; /* 빨간색 */
+  font-size: 12px; /* 폰트 크기 약간 키움 */
   margin: 0;
   padding-left: 3px;
+  font-weight: 500;
 }
 
 /* 비밀번호 강도 메시지 스타일 */
-.strength-weak {
-  color: #d9534f;
-  font-size: 11px;
+/* ✅ 새로 추가된 '아주 약함' (zxcvbn score 0) */
+.strength-veryWeak {
+  color: #cb2431; /* 더 강한 빨간색 (위험) */
+  font-size: 12px;
   margin: 0;
   padding-left: 3px;
+  font-weight: 500;
+}
+
+.strength-weak {
+  color: #d9534f; /* 빨간색 */
+  font-size: 12px;
+  margin: 0;
+  padding-left: 3px;
+  font-weight: 500;
 }
 
 .strength-medium {
-  color: #f0ad4e;
-  font-size: 11px;
+  color: #f0ad4e; /* 주황색 */
+  font-size: 12px;
   margin: 0;
   padding-left: 3px;
+  font-weight: 500;
 }
 
 .strength-strong {
-  color: #ffcc00;
-  font-size: 11px;
+  color: #5bc0de; /* 파란색 (이전의 #ffcc00 '노란색'보다 더 강함에 적합) */
+  font-size: 12px;
   margin: 0;
   padding-left: 3px;
+  font-weight: 500;
 }
 
 .strength-veryStrong {
-  color: #5cb85c;
-  font-size: 11px;
+  color: #5cb85c; /* 초록색 */
+  font-size: 12px;
   margin: 0;
   padding-left: 3px;
+  font-weight: 500;
 }
 
 /* 메시지 공통 클래스 */
 .messageSpace {
   margin: 0;
   padding-left: 3px;
-  font-size: 11px;
+  font-size: 12px; /* 공통 폰트 크기 적용 */
   text-align: left;
 }

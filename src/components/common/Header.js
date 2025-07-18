@@ -39,7 +39,12 @@ function Header() {
   };
   // 유저 아이콘 클릭 시 로그인 페이지로 이동
   const handleUserIconClick = () => {
-    navigate("/user/login");
+    if (isLoggedIn) {
+      navigate("/user/myinfo");
+    } else {
+      // 로그아웃 상태이면 로그인 페이지로 이동
+      navigate("/user/login");
+    }
   };
 
   const handleAuthButtonClick = () => {
