@@ -22,7 +22,7 @@ function ArchiveVisit() {
   const [relBtnMsg, setRelBtnMsg] = useState(""); // 버튼에 나타날 텍스트
 
   // 아카이브 소유자 컬렉션 유형 선택 탭
-  const [activeTab, setActiveTab] = useState("유저 제작 컬렉션");
+  const [activeTab, setActiveTab] = useState("myColl");
 
   //아카이브 소유자 컬렉션 목록
   const [collections, setCollections] = useState([]);

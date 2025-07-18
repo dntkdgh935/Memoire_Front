@@ -20,16 +20,22 @@ function FollowingFollower() {
 
     const fetchStuff = async () => {
       try {
-        const followerInfo = await apiClient.get("/archive/follower", {
-          params: { userid: userid },
-        });
+        const followerInfo = await secureApiRequest(
+          `/archive/follower?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
         console.log(followerInfo.data);
 
         setFollowers(followerInfo.data);
 
-        const followingInfo = await apiClient.get(`/archive/following`, {
-          params: { userid: userid },
-        });
+        const followingInfo = await secureApiRequest(
+          `/archive/following?userid=${userid}`,
+          {
+            method: "GET",
+          }
+        );
         console.log(followingInfo.data);
 
         setFollowing(followingInfo.data);
@@ -95,6 +101,10 @@ function FollowingFollower() {
     );
   };
 
+  const handleProfileClick = (userid) => {
+    navigate(`/library/archive/${userid}`);
+  };
+
   return (
     <div className={styles.followcard}>
       <div className={styles.followtabs}>
@@ -122,15 +132,26 @@ function FollowingFollower() {
               <img
                 src={
                   user.profileImagePath
-                    ? `http://localhost:8080/upload_files/user_profile/${user.profileImage}`
+                    ? `http://localhost:8080/upload_files/user_profile/${user.profileImagePath}`
                     : "https://static.mothership.sg/1/2021/07/cat.jpg"
                 }
                 alt="Profile"
                 className={styles.followavatar}
+                onClick={() => handleProfileClick(user.userId)}
               />
               <div className={styles.followuserinfo}>
-                <div className={styles.username}>{user.nickname}</div>
-                <div className={styles.userid}>@{user.loginId}</div>
+                <div
+                  className={styles.username}
+                  onClick={() => handleProfileClick(user.userId)}
+                >
+                  {user.nickname || "닉네임이 없습니다"}
+                </div>
+                <div
+                  className={styles.userid}
+                  onClick={() => handleProfileClick(user.userId)}
+                >
+                  @{user.loginId || "소셜로그인"}
+                </div>
               </div>
               {location.pathname === "/chat/new" ? (
                 <input

@@ -98,10 +98,6 @@ function VisitProfileCard({
   //     alert("프로필 수정 기능이 실행됩니다!");
   //   };
 
-  const handleStatClick = (statType, value) => {
-    alert(`${statType}: ${value}개`);
-  };
-
   //   const handleStatusClick = () => {
   //     setEditStatusMessage(statusMessage);
   //     setIsEditingStatus(true);
@@ -132,42 +128,30 @@ function VisitProfileCard({
         </div>
         <div className={styles["profile-info"]}>
           <h2 className={styles["username"]}>
-            {owner.nickname ? owner.nickname : ownerid}
+            {owner.nickname || "닉네임이 없습니다"}
           </h2>
-          <p className={styles["handle"]}>@{owner.loginid}</p>
+          <p className={styles["handle"]}>@{owner.loginid || "소셜로그인"}</p>
         </div>
       </div>
 
       <div className={styles["status-bubble"]}>
-        <p>{statusMessage || "상태메시지를 입력하세요."}</p>
+        <p>{statusMessage || "상태메시지가 없습니다."}</p>
       </div>
 
       <div className={styles["stats-container"]}>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("컬렉션 수", stats.collections)}
-        >
+        <div className={styles["stat-item"]}>
           <span className={styles["stat-number"]}>{stats.collections}</span>
           <span className={styles["stat-label"]}>컬렉션 수</span>
         </div>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("메모리 수", stats.memories)}
-        >
+        <div className={styles["stat-item"]}>
           <span className={styles["stat-number"]}>{stats.memories}</span>
           <span className={styles["stat-label"]}>메모리 수</span>
         </div>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("팔로잉", stats.following)}
-        >
+        <div className={styles["stat-item"]}>
           <span className={styles["stat-number"]}>{stats.following}</span>
           <span className={styles["stat-label"]}>팔로잉</span>
         </div>
-        <div
-          className={styles["stat-item"]}
-          onClick={() => handleStatClick("팔로워", stats.followers)}
-        >
+        <div className={styles["stat-item"]}>
           <span className={styles["stat-number"]}>{stats.followers}</span>
           <span className={styles["stat-label"]}>팔로워</span>
         </div>

@@ -28,9 +28,12 @@ function MemoryView({ selectedMemory, authorid, numMemories }) {
 
   const handleDeleteClick = async () => {
     if (!window.confirm("정말 해당 컬렉션을 삭제하시겠습니까?")) return;
+    if (selectedMemory.memoryOrder === 1) {
+      alert("썸네일은 삭제할 수 없습니다");
+      return;
+    }
     if (numMemories <= 1) {
       alert("오류: 컬렉션엔 최소 1개의 메모리가 존재해야 합니다");
-      navigate("/archive");
       return;
     }
     try {
@@ -45,6 +48,23 @@ function MemoryView({ selectedMemory, authorid, numMemories }) {
     } catch (error) {
       console.error("메모리 삭제 실패", error);
       alert("메모리 삭제에 실패했습니다");
+    }
+  };
+
+  const handleSetThumbnailClick = async () => {
+    if (!window.confirm("해당 메모리를 썸네일로 설정하시겠습니까?")) return;
+
+    try {
+      await secureApiRequest(
+        `/archive/setThumbnail/${selectedMemory.memoryid}`,
+        {
+          method: "GET",
+        }
+      );
+      alert("썸네일 설정 완료");
+      navigate("/archive");
+    } catch (error) {
+      console.error("Error setting thumbnail:", error);
     }
   };
 
@@ -68,6 +88,13 @@ function MemoryView({ selectedMemory, authorid, numMemories }) {
             </button>
           </div>
         )}
+        {isLoggedIn &&
+          (role === "ADMIN" || userid === authorid) &&
+          selectedMemory.memoryOrder !== 1 && (
+            <button className={styles.button} onClick={handleSetThumbnailClick}>
+              썸네일로
+            </button>
+          )}
       </div>
 
       {memoryType === "text" && (

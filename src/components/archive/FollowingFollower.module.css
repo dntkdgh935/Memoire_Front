@@ -51,6 +51,7 @@
   object-fit: cover;
   margin-right: 12px;
   background-color: #eee;
+  cursor: pointer;
 }
 
 .followuserinfo {
@@ -62,11 +63,13 @@
   font-weight: 600;
   color: #00695c;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .userid {
   font-size: 13px;
   color: #4f4f4f;
+  cursor: pointer;
 }
 
 .messagebtn {
