@@ -1,78 +1,99 @@
-/* src/pages/MyInfoPage.module.css */
 .container {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-h1,
-h2 {
-  color: #333;
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.section {
-  margin-bottom: 30px;
+  max-width: 600px;
+  margin: 0 auto;
   padding: 20px;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  background-color: #f9f9f9;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .inputGroup {
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
 .inputGroup label {
-  display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #555;
 }
 
-.inputGroup input[type="text"],
-.inputGroup input[type="tel"],
-.inputGroup input[type="date"],
-.inputGroup input[type="password"],
-.inputGroup textarea {
-  width: calc(100% - 22px); /* 패딩 고려 */
-  padding: 10px;
+.inputGroup input {
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 1em;
 }
 
-.inputGroup input[type="text"][disabled] {
-  background-color: #e9ecef;
+.inputGroup input:disabled {
+  background-color: #f0f0f0;
   cursor: not-allowed;
 }
 
+.error {
+  color: red;
+  font-size: 14px;
+}
+
+.success {
+  color: green;
+  font-size: 14px;
+}
+
 .submitButton {
-  display: block;
-  width: 100%;
-  padding: 12px 20px;
+  padding: 10px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 1.1em;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 20px;
 }
 
-.submitButton:hover {
+.submitButton:hover:not(:disabled) {
   background-color: #0056b3;
 }
 
-.divider {
-  border: 0;
-  height: 1px;
-  background-color: #ddd;
-  margin: 40px 0;
+.submitButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.toggleButton {
+  padding: 10px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.toggleButton:hover:not(:disabled) {
+  background-color: #545b62;
+}
+
+.toggleButton:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.logoutButton {
+  padding: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.logoutButton:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.logoutButton:disabled {
+  background-color: #999;
+  cursor: not-allowed;
 }

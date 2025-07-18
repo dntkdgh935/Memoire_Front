@@ -1,84 +1,83 @@
-// src/components/CheckPwd.js (수정된 코드)
+// src/components/CheckPwd.js
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import zxcvbn from "zxcvbn";
 import styles from "./CheckPwd.module.css";
 
-// onValidationChange: 비밀번호 일치 여부 (boolean)
-// onPasswordStrengthChange: 비밀번호 강도 점수 (0-4) - 새로 추가할 prop
+/**
+ * 비밀번호 유효성 검사 및 강도 측정을 위한 컴포넌트.
+ *
+ * @param {object} props - 컴포넌트 속성
+ * @param {string} props.password - 현재 입력된 비밀번호
+ * @param {string} props.confirmPwd - 비밀번호 확인 필드에 입력된 값
+ * @param {function} props.onChange - 비밀번호 입력 필드 변경 핸들러
+ * @param {function} props.onValidationChange - 비밀번호 일치 여부(boolean)를 상위로 전달하는 콜백
+ * @param {function} props.onPasswordStrengthChange - 비밀번호 강도 점수(0-4)를 상위로 전달하는 콜백
+ * @param {boolean} [props.disabled=false] - 입력 필드를 비활성화할지 여부
+ */
 function CheckPwd({
   password,
   confirmPwd,
   onChange,
   onValidationChange,
   onPasswordStrengthChange,
+  disabled = false, // disabled prop 추가 및 기본값 설정
 }) {
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [passwordScore, setPasswordScore] = useState(0);
-  const isMessageVisible = password && password.length > 0;
 
   useEffect(() => {
+    let currentScore = 0;
     if (password) {
       const result = zxcvbn(password);
-      setPasswordScore(result.score); // zxcvbn 점수는 0(가장 약함) ~ 4(가장 강함)
-      // ✅ 비밀번호 강도 점수를 상위 컴포넌트로 전달
-      if (onPasswordStrengthChange) {
-        onPasswordStrengthChange(result.score);
-      }
-    } else {
-      setPasswordScore(0);
-      // ✅ 비밀번호가 없을 때도 강도 점수를 0으로 전달
-      if (onPasswordStrengthChange) {
-        onPasswordStrengthChange(0);
-      }
+      currentScore = result.score;
     }
-  }, [password, onPasswordStrengthChange]); // onPasswordStrengthChange를 의존성 배열에 추가
+    setPasswordScore(currentScore);
+    if (onPasswordStrengthChange) {
+      onPasswordStrengthChange(currentScore);
+    }
+  }, [password, onPasswordStrengthChange]);
 
   useEffect(() => {
     const match = password === confirmPwd;
     setPasswordMatch(match);
-    // 비밀번호 일치 여부만 상위 컴포넌트로 전달
     if (onValidationChange) {
       onValidationChange(match);
     }
   }, [password, confirmPwd, onValidationChange]);
+
+  const strengthMessages = ["아주 약함", "약함", "보통", "강함", "매우 강함"];
+  const strengthClasses = [
+    styles["strength-veryWeak"],
+    styles["strength-weak"],
+    styles["strength-medium"],
+    styles["strength-strong"],
+    styles["strength-veryStrong"],
+  ];
+
+  const isStrengthMessageVisible = password && password.length > 0;
+  const isMismatchMessageVisible = !passwordMatch && password && confirmPwd;
 
   return (
     <>
       <div className={styles.inputGroup}>
         <input
           type="password"
-          name="password" // 새 비밀번호 입력 필드로 사용될 때의 이름
+          name="password"
           className={styles.input}
-          placeholder="새 비밀번호" // 또는 "비밀번호"
+          placeholder="새 비밀번호"
           value={password}
           onChange={onChange}
-          required
           maxLength={16}
+          aria-label="새 비밀번호 입력"
+          disabled={disabled} // disabled prop 적용
         />
-        {isMessageVisible && (
+        {isStrengthMessageVisible && (
           <div className={styles.messageWrapper}>
             <p
-              className={`${styles.messageSpace} ${
-                // zxcvbn 점수는 0부터 시작하므로, 인덱스 0~4에 해당하는 클래스 매핑
-                passwordScore === 0
-                  ? styles["strength-veryWeak"] // 새로 추가할 클래스 (0점)
-                  : passwordScore === 1
-                    ? styles["strength-weak"]
-                    : passwordScore === 2
-                      ? styles["strength-medium"]
-                      : passwordScore === 3
-                        ? styles["strength-strong"]
-                        : styles["strength-veryStrong"] // 4점
-              }`}
+              className={`${styles.messageSpace} ${strengthClasses[passwordScore]}`}
             >
-              비밀번호 강도:{" "}
-              {
-                // zxcvbn 점수(0~4)에 따른 메시지 매핑
-                ["아주 약함", "약함", "보통", "강함", "매우 강함"][
-                  passwordScore
-                ]
-              }
+              비밀번호 강도: {strengthMessages[passwordScore]}
             </p>
           </div>
         )}
@@ -86,15 +85,16 @@ function CheckPwd({
       <div className={styles.inputGroup}>
         <input
           type="password"
-          name="confirmPwd" // 새 비밀번호 확인 입력 필드의 이름
+          name="confirmPwd"
           className={styles.input}
-          placeholder="새 비밀번호 확인" // 또는 "비밀번호 확인"
+          placeholder="새 비밀번호 확인"
           value={confirmPwd}
           onChange={onChange}
-          required
           maxLength={16}
+          aria-label="새 비밀번호 확인 입력"
+          disabled={disabled} // disabled prop 적용
         />
-        {!passwordMatch && password && confirmPwd && (
+        {isMismatchMessageVisible && (
           <div className={styles.messageWrapper}>
             <p className={styles.errorMessage}>비밀번호가 일치하지 않습니다.</p>
           </div>
@@ -104,4 +104,4 @@ function CheckPwd({
   );
 }
 
-export default CheckPwd;
+export default React.memo(CheckPwd);
