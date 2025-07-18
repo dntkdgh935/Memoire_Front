@@ -3,6 +3,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AtelierHome.module.css";
+import PageHeader from "../../components/common/PageHeader";
 
 function AtelierHome() {
   const navigate = useNavigate();
@@ -31,21 +32,24 @@ function AtelierHome() {
   ];
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Atelier</h2>
-      <div className={styles.cardGrid}>
-        {features.map((feature) => (
-          <div
-            key={feature.title}
-            className={styles.card}
-            onClick={() => navigate(feature.route)}
-          >
-            <h3>{feature.title}</h3>
-            <p>{feature.description}</p>
-          </div>
-        ))}
+    <>
+      <PageHeader pagename={`Atelier`} />
+      <div className={styles.container}>
+        <h2 className={styles.title}>Atelier</h2>
+        <div className={styles.cardGrid}>
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className={styles.card}
+              onClick={() => navigate(feature.route)}
+            >
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useNavigate } from "react-router-dom";
 import styles from "./ChatRoomMain.module.css";
+import PageHeader from "../../components/common/PageHeader";
 
 // TODO: 로그인 상태 및 상대와의 관계 확인
 const ChatRoomMain = () => {
@@ -37,26 +38,29 @@ const ChatRoomMain = () => {
   };
 
   return (
-    <div className={styles.chatroombox}>
-      <h3 className={styles.sectiontitle}>채팅방 목록</h3>
-      <ul className={styles.chatroomlist}>
-        {chatrooms.map((room, idx) => (
-          <li
-            key={idx}
-            className={styles.chatroomitem}
-            onClick={() => handleClick(room.chatroomid)}
-          >
-            <span className={styles.chatroomname}>
-              {room.chatroomid}:{" "}
-              {room.users.map((user) => `${user.name}`).join(", ")}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <button className={styles.newchatbtn} onClick={handleNewChatroom}>
-        + 새로운 채팅방 만들기
-      </button>
-    </div>
+    <>
+      <PageHeader pagename={`채팅방 목록`} />
+      <div className={styles.chatroombox}>
+        <h3 className={styles.sectiontitle}>채팅방 목록</h3>
+        <ul className={styles.chatroomlist}>
+          {chatrooms.map((room, idx) => (
+            <li
+              key={idx}
+              className={styles.chatroomitem}
+              onClick={() => handleClick(room.chatroomid)}
+            >
+              <span className={styles.chatroomname}>
+                {room.chatroomid}:{" "}
+                {room.users.map((user) => `${user.name}`).join(", ")}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <button className={styles.newchatbtn} onClick={handleNewChatroom}>
+          + 새로운 채팅방 만들기
+        </button>
+      </div>
+    </>
   );
 };
 

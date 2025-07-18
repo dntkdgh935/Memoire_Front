@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
+import PageHeader from "../../components/common/PageHeader";
 
 function Chat() {
   const { userid } = useContext(AuthContext);
@@ -85,6 +86,8 @@ function Chat() {
   }, [messages]);
 
   return (
+
+    <PageHeader pagename={`Chatroom`} />
     <div style={{ maxWidth: 600, margin: "0 auto" }}>
       <h3>채팅방: {chatroomid}</h3>
       <div
@@ -103,33 +106,35 @@ function Chat() {
               margin: "5px 0",
             }}
           >
-            <div
-              style={{
-                display: "inline-block",
-                background: msg.userid === userid ? "#d1f8ce" : "#f0f0f0",
-                padding: "8px 12px",
-                borderRadius: "10px",
-              }}
-            >
-              {msg.messageContent}
+
+              <div
+                style={{
+                  display: "inline-block",
+                  background: msg.userid === userid ? "#d1f8ce" : "#f0f0f0",
+                  padding: "8px 12px",
+                  borderRadius: "10px",
+                }}
+              >
+                {msg.messageContent}
+              </div>
             </div>
-          </div>
-        ))}
-        <div ref={bottomRef} />
+          ))}
+          <div ref={bottomRef} />
+        </div>
+        <div style={{ marginTop: 10, display: "flex" }}>
+          <input
+            style={{ flex: 1, padding: "10px" }}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder="메시지를 입력하세요"
+          />
+          <button onClick={handleSend} style={{ marginLeft: 10 }}>
+            전송
+          </button>
+        </div>
       </div>
-      <div style={{ marginTop: 10, display: "flex" }}>
-        <input
-          style={{ flex: 1, padding: "10px" }}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="메시지를 입력하세요"
-        />
-        <button onClick={handleSend} style={{ marginLeft: 10 }}>
-          전송
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
 
