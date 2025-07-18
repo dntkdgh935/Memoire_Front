@@ -5,6 +5,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import Sidebar from "./components/common/Sidebar";
 import Header from "./components/common/Header";
 import AppRouter from "./routers/AppRouter";
+import { AuthProvider } from "./AuthProvider";
 
 import "./App.css";
 
@@ -14,17 +15,19 @@ import "./assets/styles/variables-dark.css";
 
 function App() {
   return (
-    <Router>
-      <div className="app-container">
-        <Sidebar />
-        <div className="main-area">
-          <Header />
-          <div className="page-content">
-            <AppRouter />
+    <AuthProvider>
+      <Router>
+        <div className="app-container">
+          <Sidebar />
+          <div className="main-area">
+            <Header />
+            <div className="page-content">
+              <AppRouter />
+            </div>
           </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 
