@@ -1,18 +1,74 @@
 // // src/components/common/Header.js
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import apiClient from "../../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaThLarge, FaUserCircle, FaBell, FaMoon } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
 import styles from "./Header.module.css";
 import { AuthContext } from "../../AuthProvider";
+import NotificationDropdown from "./NotificationDropdown";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
   const [searchKeyword, setSearchKeyword] = useState("");
-  const navigate = useNavigate();
 
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const [showNotifications, setShowNotifications] = useState(false); // 알림 목록 토글 상태
+  const [followReqs, setfollowReqs] = useState([]); // 팔로우 요청 목록
+  const [hasNotifications, setHasNotifications] = useState(false); // 알림 배지 표시 여부
+
+  const navigate = useNavigate();
+  const { isLoggedIn, logout, userid } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (userid) {
+      // 팔로우 요청 목록 가져오기
+      apiClient
+        .get(`/api/library/followreqs?userid=${userid}`)
+        .then((response) => {
+          console.log("🧜‍♀️ 받아온 팔로우 요청: ", response.data);
+          setfollowReqs(response.data);
+          setHasNotifications(response.data.length > 0); // 알림이 있으면 배지 표시
+        })
+        .catch((error) => {
+          console.error("팔로우 요청 불러오기 실패", error);
+        });
+    }
+  }, [userid]);
+
+  // followReqs가 변경될 때마다 알림 배지 갱신
+  useEffect(() => {
+    setHasNotifications(followReqs.length > 0); // 요청이 남아 있으면 알림 배지 표시
+  }, [followReqs]); // followReqs가 변경될 때마다 실행
+
+  // 팔로우 요청 배지 클릭 시
+  const handleBellClick = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  // 팔로우 요청 승인
+  const handleFollowRequestApproval = (requesterid, targetid) => {
+    // DB 에 입력
+    console.log("🍑 팔로우 승인 진행 시작");
+    apiClient
+      .post(
+        `/api/library/followapproval?requesterid=${requesterid}&targetid=${targetid}`
+      ) // Query string으로 전달
+      .then((response) => {
+        // 승인 후 처리 (상태 갱신, 요청 목록 재조회 등)
+        setfollowReqs((prev) =>
+          prev.filter(
+            (request) =>
+              request.requesterid !== requesterid ||
+              request.targetid !== targetid
+          )
+        );
+        setHasNotifications((prev) => prev && prev.length > 0); // 요청이 남아 있으면 알림 배지 표시
+      })
+      .catch((error) => {
+        console.error("팔로우 요청 승인 실패", error);
+      });
+  };
 
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
@@ -93,7 +149,22 @@ function Header() {
           className={styles.iconButton}
           onClick={handleUserIconClick}
         />
-        <FaBell className={styles.iconButton} />
+        {/* 팔로우 요청 배지 */}
+        <div className={styles.bellWrapper} onClick={handleBellClick}>
+          <FaBell className={styles.iconButton} />
+          {hasNotifications && (
+            <div className={styles.notificationBadge}>!</div>
+          )}
+        </div>
+        {/* 알림 드롭다운 */}
+        {showNotifications && (
+          <NotificationDropdown
+            followReqs={followReqs}
+            onFollowRequestApproval={handleFollowRequestApproval}
+            closeDropdown={handleBellClick} // 드롭다운 닫기
+          />
+        )}
+
         <button
           className={styles.authButton} // 스타일 클래스 추가
           onClick={handleAuthButtonClick}
