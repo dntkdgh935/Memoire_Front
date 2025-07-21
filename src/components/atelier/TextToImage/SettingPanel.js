@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import styles from "./SettingPanel.module.css";
+import { useNavigate } from "react-router-dom";
 
 function SettingPanel({ selectedMemory, onGenerate }) {
   const [style, setStyle] = useState("");
   const [prompt, setPrompt] = useState("");
+  const navigate = useNavigate();
 
   const handleGenerate = () => {
     if (!selectedMemory) return;
+
+    // ✅ 로딩 상태 먼저 설정
+    onGenerate({ status: "loading" });
 
     const requestBody = {
       memoryId: selectedMemory.memoryid,
@@ -18,8 +23,6 @@ function SettingPanel({ selectedMemory, onGenerate }) {
       memoryType: "image",
       memoryOrder: 0,
       saveToMemory: true,
-
-      // ✅ null 방지: 빈 문자열로 content 설정
       content: selectedMemory.content || ""
     };
 
@@ -30,7 +33,15 @@ function SettingPanel({ selectedMemory, onGenerate }) {
     })
       .then((res) => res.json())
       .then((data) => onGenerate(data))
-      .catch((err) => console.error("DALL·E generate error", err));
+      .catch((err) => {
+        console.error("DALL·E generate error", err);
+        // ✅ 에러 상태 전달
+        onGenerate({ status: "error", errorMessage: err.message });
+      });
+  };
+
+  const handleNavigateToText = () => {
+    navigate("/atelier/text2text");
   };
 
   return (
@@ -60,7 +71,9 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           <div className={styles.field}>
             <label>메모리 변환 옵션</label>
             <div className={styles.optionButtons}>
-              <button className={styles.option}>AI 텍스트 변환</button>
+              <button className={styles.option} onClick={handleNavigateToText}>
+                AI 텍스트 변환
+              </button>
               <button className={styles.optionActive}>AI 이미지 변환</button>
             </div>
           </div>
