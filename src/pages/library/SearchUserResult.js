@@ -16,6 +16,7 @@ function SearchUserResult() {
   const [loading, setLoading] = useState(true);
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
+  // 팔로우 대상에 대해 요청/ 해제
   const handleToggleFollow = async (targetid, relStatus) => {
     try {
       // 0: 요청됨
@@ -61,6 +62,23 @@ function SearchUserResult() {
     }
   };
 
+  const handleUserInfoCardClick = async (targetid) => {
+    if (!isLoggedIn) {
+      alert("로그인 후 아카이브 방문 가능합니다.");
+    } else {
+      try {
+        if (userid == targetid) {
+          console.log("내 아카이브로 이동");
+          navigate(`/archive`);
+        } else {
+          navigate(`/library/archive/${targetid}`); // 이 URL로 이동
+        }
+      } catch (error) {
+        alert("이동 실패!");
+      }
+    }
+  };
+
   useEffect(() => {
     if (!searchQuery) return;
 
@@ -89,14 +107,15 @@ function SearchUserResult() {
   if (loading) {
     return <div>검색 중...</div>;
   }
-  const handleUserClick = (userId) => {
-    navigate(`/user/profile/${userId}`);
-  };
 
   return (
     <div>
       <PageHeader pagename={`${searchQuery} 검색 결과`} userid={userid} />
-      <UserGrid users={searchedUsers} onFollowBtnClick={handleToggleFollow} />
+      <UserGrid
+        users={searchedUsers}
+        onFollowBtnClick={handleToggleFollow}
+        onInfoCardClick={handleUserInfoCardClick}
+      />
     </div>
   );
 }

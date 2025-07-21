@@ -11,6 +11,7 @@ function UserInfoCard({
   userFreqTags,
   relStatusWLoginUser,
   onFollowBtnClick,
+  onInfoCardClick,
 }) {
   // 관계 상태에 따라 메시지 설정 (derived value)
   const getRelBtnMsg = (status) => {
@@ -29,7 +30,10 @@ function UserInfoCard({
   };
   const relBtnMsg = getRelBtnMsg(relStatusWLoginUser);
   return (
-    <div className={styles.cardContainer}>
+    <div
+      className={styles.cardContainer}
+      onClick={() => onInfoCardClick(userId)}
+    >
       {/* 프로필 이미지 */}
       <div className={styles.profileImage}>
         <img

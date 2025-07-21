@@ -4,7 +4,7 @@ import VisitProfileCard from "./VisitProfileCard"; // 사용자 카드 컴포넌
 import styles from "./UserGrid.module.css"; // 스타일 적용
 import UserInfoCard from "./UserInfoCard";
 
-function UserGrid({ users, onFollowBtnClick }) {
+function UserGrid({ users, onFollowBtnClick, onInfoCardClick }) {
   const breakpointColumnsObj = {
     default: 4,
     1200: 3,
@@ -36,6 +36,7 @@ function UserGrid({ users, onFollowBtnClick }) {
           userFreqTags={user.userFreqTags}
           relStatusWLoginUser={user.relStatusWLoginUser}
           onFollowBtnClick={onFollowBtnClick} // 팔로우 버튼 클릭 시 처리
+          onInfoCardClick={onInfoCardClick}
         />
       ))}
     </Masonry>
