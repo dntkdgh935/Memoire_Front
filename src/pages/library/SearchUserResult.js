@@ -16,7 +16,51 @@ function SearchUserResult() {
   const [loading, setLoading] = useState(true);
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
-  const handleFollowChange = async () => {};
+  const handleToggleFollow = async (targetid, relStatus) => {
+    try {
+      // 0: 요청됨
+      // 1: 팔로우중
+      // 2: 차단
+      // 3: 관계 없음 표시
+      let nextStatus = null;
+      switch (relStatus) {
+        case "0":
+          nextStatus = "3";
+          break;
+        case "1": //팔로잉 상태인 경우 버튼 누르면 -> 관계 삭제(3)
+          nextStatus = "3";
+          break;
+        case "2": // 차단된 경우 버튼 누르면 -> 차단 해제
+          nextStatus = "3";
+          break;
+        case "3": // 관계 없었던 경우 버튼(팔로우 요청) 누르면 -> 요청됨(0)
+          nextStatus = "0";
+          break;
+        default:
+          console.log("알 수 없는 상태");
+          return; // 기본값을 처리하지 않음
+      }
+
+      await apiClient.post(`api/library/toggleFollow`, null, {
+        params: {
+          userid: userid,
+          targetid: targetid,
+          nextRel: nextStatus,
+        },
+      });
+      // ⭐️ searchedUsers 배열에서 해당 유저의 relStatus 값만 바꿔줌
+      setSearchedUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.userId === targetid
+            ? { ...user, relStatusWLoginUser: nextStatus }
+            : user
+        )
+      );
+    } catch (e) {
+      console.error("팔로우 토글 실패", e);
+    }
+  };
+
   useEffect(() => {
     if (!searchQuery) return;
 
@@ -52,7 +96,7 @@ function SearchUserResult() {
   return (
     <div>
       <PageHeader pagename={`${searchQuery} 검색 결과`} userid={userid} />
-      <UserGrid users={searchedUsers} />
+      <UserGrid users={searchedUsers} onFollowBtnClick={handleToggleFollow} />
     </div>
   );
 }
