@@ -1,0 +1,106 @@
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  padding: 20px;
+  width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  margin: 10px;
+  text-align: center;
+}
+
+.cardContainer:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profileImage {
+  margin-bottom: 15px;
+}
+
+.profileImageImg {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f1f1f1;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.nickname {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.loginId {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.statusMessage {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.userTags {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.userTags h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.userTags ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tagItem {
+  background-color: #e0e0e0;
+  color: #555;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.tagItem:hover {
+  background-color: #bdbdbd;
+  cursor: pointer;
+}
+
+.relStatus {
+  font-size: 1rem;
+  color: #444;
+  font-weight: 600;
+}
+
+.relStatus span {
+  font-weight: 400;
+  color: #00796b;
+}
