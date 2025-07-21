@@ -13,10 +13,10 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
     );
   }
 
-  const { date, content, memoryOrder, collectionId } = result;
+  const { date, content, memoryOrder, collectionId, title: resultTitle } = result;
 
-  // ✅ GPT 결과와 상관없이 기존 제목 유지
-  const title = originalMemoryTitle;
+  // ✅ 제목 표시 우선순위: originalMemoryTitle > result.title > '제목 없음'
+  const title = originalMemoryTitle || resultTitle || "제목 없음";
 
   // 새 메모리로 저장
   const handleSaveAsNewMemory = async () => {
@@ -94,4 +94,4 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
   );
 }
 
-export default WorkResultPanel
+export default WorkResultPanel;

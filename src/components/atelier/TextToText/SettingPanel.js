@@ -1,32 +1,33 @@
 import React, { useState } from "react";
 import styles from "./SettingPanel.module.css";
+import { useNavigate } from "react-router-dom";
 
 function SettingPanel({ selectedMemory, onGenerate }) {
   const [style, setStyle] = useState("");
-  const [prompt, setPrompt] = useState(""); // 실제로는 option 필드로 사용
+  const [prompt, setPrompt] = useState("");
+  const navigate = useNavigate();
 
   const handleGenerate = () => {
     if (!selectedMemory) return;
 
     fetch("/api/atelier/text/generate", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    inputText: selectedMemory.content,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        inputText: selectedMemory.content,
         content: selectedMemory.content,
         style: style,
         memoryType: "text",
         collectionId: selectedMemory.collectionid,
         memoryOrder: 0,
         saveToMemory: true,
-        // 선택적으로 추가 가능
         title: selectedMemory.title,
         option: prompt,
         memoryId: selectedMemory.memoryid,
         userId: selectedMemory.userId || "demo"
-      }),
+      })
     })
       .then(res => {
         if (!res.ok) throw new Error("응답 실패");
@@ -39,6 +40,10 @@ function SettingPanel({ selectedMemory, onGenerate }) {
       .catch(err => {
         console.error("❌ GPT generate error", err);
       });
+  };
+
+  const handleNavigateToImage = () => {
+    navigate("/atelier/text2image");
   };
 
   return (
@@ -68,9 +73,11 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           <div className={styles.field}>
             <label>메모리 변환 옵션</label>
             <div className={styles.optionButtons}>
-              <button className={styles.option}>이대로 저장</button>
+              {/* 이대로 저장 버튼 제거 */}
               <button className={styles.optionActive}>AI 텍스트 변환</button>
-              <button className={styles.option}>AI 이미지 변환</button>
+              <button className={styles.option} onClick={handleNavigateToImage}>
+                AI 이미지 변환
+              </button>
             </div>
           </div>
 
