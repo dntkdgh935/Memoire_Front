@@ -125,6 +125,11 @@ function Login({ onLoginSuccess }) {
     }
   };
 
+  // ✅ Face ID 로그인 페이지로 이동하는 핸들러 추가
+  const handleFaceLoginNavigation = () => {
+    navigate("/user/face-login"); // 새로운 얼굴 로그인 페이지 경로
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
@@ -173,8 +178,9 @@ function Login({ onLoginSuccess }) {
           </button>
           <button
             className={styles.faceIdButton}
+            onClick={handleFaceLoginNavigation} // ✅ Face ID 버튼에 클릭 핸들러 추가
             type="button"
-            disabled={isSocialLoginProcessing} // 소셜 로그인 중에도 비활성화
+            disabled={isLoggedIn || isSocialLoginProcessing} // 소셜 로그인 중에도 비활성화
           >
             Face ID
           </button>
