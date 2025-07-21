@@ -83,6 +83,7 @@ function LibCollCard({
         <div className={styles.userName}>{coll.authorid}</div>
         <div className={styles.collectionDate}>{coll.createdDate}</div>
       </div>
+      <div className={styles.cardTags}></div>
 
       <div className={styles.cardFooter}>
         <CollActionBtn
@@ -98,11 +99,11 @@ function LibCollCard({
       </div>
 
       <div className={styles.cardTags}>
-        {/* {coll.tags.map((tag) => (
+        {coll.collTags.map((tag) => (
           <span key={tag} className={styles.tag}>
             {tag}
           </span>
-        ))} */}
+        ))}
       </div>
 
       <div className={styles.memoryList}>
