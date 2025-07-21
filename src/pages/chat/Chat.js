@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import PageHeader from "../../components/common/PageHeader";
+import styles from "./Chat.module.css";
 
 function Chat() {
-  const { userid } = useContext(AuthContext);
+  const { userid, role, isLoggedIn, secureApiRequest } =
+    useContext(AuthContext);
   const [chatroomid, setChatroomid] = useState("");
   const location = useLocation();
   const [messages, setMessages] = useState([]);
@@ -12,12 +14,38 @@ function Chat() {
   const socketRef = useRef(null);
   const bottomRef = useRef(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    if (!userid || userid === "") return;
     const pathParts = location.pathname.split("/");
     const roomIdFromPath = pathParts[pathParts.length - 1];
     setChatroomid(roomIdFromPath);
-    if (!chatroomid || chatroomid === "") return;
+  }, [location]);
+
+  useEffect(() => {
+    if (!userid || !chatroomid) return;
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+
+    if (role === "ADMIN") {
+      const fetchAdminStuff = async () => {
+        try {
+          await secureApiRequest(
+            `/chat/admin/start?userid=${userid}&chatroomid=${chatroomid}`,
+            {
+              method: "GET",
+            }
+          );
+        } catch (error) {
+          console.error("Error fetching admin chatrooms:", error);
+        }
+      };
+      fetchAdminStuff();
+    }
+
     const socketUrl = `ws://localhost:8080/chat/${chatroomid}?userid=${userid}`;
     socketRef.current = new WebSocket(socketUrl);
 
@@ -88,31 +116,20 @@ function Chat() {
   return (
     <>
       <PageHeader pagename={`Chatroom`} />
-      <div style={{ maxWidth: 600, margin: "0 auto" }}>
-        <h3>채팅방: {chatroomid}</h3>
-        <div
-          style={{
-            border: "1px solid #ccc",
-            height: "400px",
-            overflowY: "auto",
-            padding: "10px",
-          }}
-        >
+      <div className={styles.chatContainer}>
+        <h3 className={styles.chatHeader}>채팅방: {chatroomid}</h3>
+        <div className={styles.chatBox}>
           {messages.map((msg) => (
             <div
               key={msg.chatId}
-              style={{
-                textAlign: msg.userid === userid ? "right" : "left",
-                margin: "5px 0",
-              }}
+              className={`${styles.messageRow} ${
+                msg.userid === userid ? styles.messageRight : styles.messageLeft
+              }`}
             >
               <div
-                style={{
-                  display: "inline-block",
-                  background: msg.userid === userid ? "#d1f8ce" : "#f0f0f0",
-                  padding: "8px 12px",
-                  borderRadius: "10px",
-                }}
+                className={`${styles.messageBubble} ${
+                  msg.userid === userid ? styles.myMessage : styles.otherMessage
+                }`}
               >
                 {msg.messageContent}
               </div>
@@ -120,15 +137,15 @@ function Chat() {
           ))}
           <div ref={bottomRef} />
         </div>
-        <div style={{ marginTop: 10, display: "flex" }}>
+        <div className={styles.inputRow}>
           <input
-            style={{ flex: 1, padding: "10px" }}
+            className={styles.inputBox}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="메시지를 입력하세요"
           />
-          <button onClick={handleSend} style={{ marginLeft: 10 }}>
+          <button onClick={handleSend} className={styles.sendButton}>
             전송
           </button>
         </div>
