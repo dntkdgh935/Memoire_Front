@@ -18,12 +18,15 @@ function SearchCollResult() {
   const [loading, setLoading] = useState(true);
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
-  useEffect(() => {});
+  useEffect(() => {
+    console.log("💬 URL Params - query:", searchQuery);
+    console.log("💬 URL Params - type:", searchType);
+  }, [searchQuery, searchType]);
 
   //검색어에 따른 컬렉션 불러오기
   useEffect(() => {
     // 태그 검색
-    if (searchType == "tag") {
+    if (searchType === "tag") {
       if (!searchQuery) return;
 
       const fetchSearchedColls = async () => {
@@ -41,7 +44,8 @@ function SearchCollResult() {
         }
       };
       fetchSearchedColls();
-    } else if (searchType == "collection") {
+    } else if (searchType === "collection") {
+      console.log("컬렉션 검색 수행");
       if (!searchQuery) return;
 
       const fetchSearchedColls = async () => {
@@ -61,7 +65,7 @@ function SearchCollResult() {
       };
       fetchSearchedColls();
     }
-  }, [searchQuery]);
+  }, [searchQuery, searchType]);
 
   if (loading) {
     return <div>검색 중...</div>;

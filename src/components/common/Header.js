@@ -88,12 +88,18 @@ function Header() {
 
     try {
       if (searchType == "collection") {
-        navigate(`library/searchCollection?query=${searchKeyword}`);
+        navigate(
+          `library/searchCollection?query=${searchKeyword}&type=${searchType}`
+        );
       } else if (searchType == "user") {
-        navigate(`library/searchUser?query=${searchKeyword}`);
+        navigate(
+          `library/searchUser?query=${searchKeyword}&type=${searchType}`
+        );
       } else if (searchType == "tag") {
         //TODO: 오류시 수정
-        navigate(`library/searchCollection?query=${searchKeyword}&type=tag`);
+        navigate(
+          `library/searchCollection?query=${searchKeyword}&type=${searchType}`
+        );
       }
     } catch (error) {
       console.error("검색 요청 실패 : ", error);
