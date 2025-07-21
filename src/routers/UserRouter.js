@@ -7,6 +7,8 @@ import SignUp from "../pages/user/SignUp";
 import FindId from "../pages/user/FindId";
 import FindPwd from "../pages/user/FindPwd";
 import MyInfo from "../pages/user/MyInfo";
+import FaceRegister from "../pages/user/FaceRegister";
+import FaceLogin from "../pages/user/FaceLogin";
 
 function UserRouter() {
   return (
@@ -16,6 +18,8 @@ function UserRouter() {
       <Route path="findId" element={<FindId />} />
       <Route path="findPWD" element={<FindPwd />} />
       <Route path="myInfo" element={<MyInfo />} />
+      <Route path="face-register/:userid" element={<FaceRegister />} />
+      <Route path="face-login" element={<FaceLogin />} />
     </Routes>
   );
 }

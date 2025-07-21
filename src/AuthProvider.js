@@ -42,7 +42,8 @@ export const AuthProvider = ({ children }) => {
     userid: "",
     autoLoginFlag: "",
     nickname: "",
-    setAuthInfo: () => {}, // 초기값으로 빈 함수 설정
+    profileImagePath: "", // <-- profileImagePath 상태 추가
+    setAuthInfo: () => {},
   });
 
   console.log("AuthProvider: 초기 authInfo 상태:", authInfo);
@@ -59,6 +60,7 @@ export const AuthProvider = ({ children }) => {
       userid: "",
       autoLoginFlag: "",
       nickname: "",
+      profileImagePath: "", // <-- 초기화 시에도 포함
       setAuthInfo,
     });
   };
@@ -82,6 +84,7 @@ export const AuthProvider = ({ children }) => {
           userid: parsedToken.userid || "",
           autoLoginFlag: parsedToken.autoLoginFlag || "N",
           nickname: parsedToken.nickname || "",
+          profileImagePath: authInfo.profileImagePath, // 기존 값 유지 (토큰에는 없을 수 있음)
           setAuthInfo,
         };
         console.log("updateTokens: 새로운 authInfo:", newAuthInfo);
@@ -95,6 +98,16 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("refreshToken", refreshToken);
     }
   };
+
+  // <-- 새로운 함수 추가: 프로필 이미지 경로 업데이트
+  const updateProfileImagePath = (newPath) => {
+    setAuthInfo((prev) => ({
+      ...prev,
+      profileImagePath: newPath,
+    }));
+    console.log("AuthContext: profileImagePath 업데이트됨:", newPath);
+  };
+  // -->
 
   const handleReissueTokens = async (extendLogin = false) => {
     let accessToken = localStorage.getItem("accessToken")?.trim();
@@ -164,17 +177,40 @@ export const AuthProvider = ({ children }) => {
       console.log("AuthProvider useEffect: parsedAccessToken=", parsedToken);
 
       if (parsedToken) {
-        const newAuthInfo = {
-          isLoggedIn: true,
-          role: parsedToken.role || "",
-          name: parsedToken.name || "",
-          userid: parsedToken.userid || "",
-          autoLoginFlag: storedAutoLoginFlag || "N",
-          nickname: parsedToken.nickname || "",
-          setAuthInfo,
+        // 초기 로드 시 사용자 정보와 함께 프로필 이미지 경로도 가져옴
+        const fetchUserProfileImage = async () => {
+          try {
+            const userInfoResponse = await apiClient.get(`/user/myinfo-detail`); // 백엔드에서 사용자 상세 정보 가져오기
+            const profilePath = userInfoResponse.data.profileImagePath || "";
+            setAuthInfo({
+              isLoggedIn: true,
+              role: parsedToken.role || "",
+              name: parsedToken.name || "",
+              userid: parsedToken.userid || "",
+              autoLoginFlag: storedAutoLoginFlag || "N",
+              nickname: parsedToken.nickname || "",
+              profileImagePath: profilePath, // <-- 여기에서 설정
+              setAuthInfo,
+            });
+            console.log(
+              "AuthProvider useEffect: authInfo 설정 (프로필 이미지 포함)"
+            );
+          } catch (error) {
+            console.error("프로필 이미지 로드 실패:", error);
+            // 실패 시에도 기본 정보로 설정
+            setAuthInfo({
+              isLoggedIn: true,
+              role: parsedToken.role || "",
+              name: parsedToken.name || "",
+              userid: parsedToken.userid || "",
+              autoLoginFlag: storedAutoLoginFlag || "N",
+              nickname: parsedToken.nickname || "",
+              profileImagePath: "", // 실패 시 빈 값
+              setAuthInfo,
+            });
+          }
         };
-        console.log("AuthProvider useEffect: authInfo 설정:", newAuthInfo);
-        setAuthInfo(newAuthInfo);
+        fetchUserProfileImage();
       } else {
         console.log("AccessToken 유효하지 않음. 재발급 시도 또는 로그아웃");
         handleReissueTokens(storedAutoLoginFlag === "Y").catch(() => {
@@ -191,10 +227,11 @@ export const AuthProvider = ({ children }) => {
         userid: "",
         autoLoginFlag: "",
         nickname: "",
+        profileImagePath: "",
         setAuthInfo,
       });
     }
-  }, []);
+  }, []); // 의존성 배열에 secureApiRequest를 추가하지 않음 (무한 루프 방지)
 
   const secureApiRequest = async (URL, options = {}, retry = true) => {
     console.log("secureApiRequest 실행: URL=", URL, "options=", options);
@@ -296,6 +333,7 @@ export const AuthProvider = ({ children }) => {
         updateTokens,
         logout,
         logoutAndRedirect,
+        updateProfileImagePath, // <-- 새로 추가된 함수 제공
       }}
     >
       {children}

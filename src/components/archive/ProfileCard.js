@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
-import apiClient from "../../utils/axios";
 import styles from "./ProfileCard.module.css";
 
 function ProfileCard() {
-  const { userid, secureApiRequest } = useContext(AuthContext);
+  const { userid, secureApiRequest, profileImagePath, nickname, loginId } =
+    useContext(AuthContext);
 
   const [user, setUser] = useState({
     loginId: "",
     nickname: "",
-    profileImage: "",
   });
 
   const [stats, setStats] = useState({
@@ -43,12 +42,11 @@ function ProfileCard() {
         );
         console.log(userInfo.data);
 
-        setUser({
+        setUser((prevUser) => ({
+          ...prevUser,
           loginId: userInfo.data.loginId,
           nickname: userInfo.data.nickname,
-          profileImage: userInfo.data.profileImagePath,
-        });
-
+        }));
         setStatusMessage(userInfo.data.statusMessage || "");
 
         const collectionNum = await secureApiRequest(
@@ -95,7 +93,7 @@ function ProfileCard() {
       }
     };
     fetchStuff();
-  }, [userid]);
+  }, [userid, secureApiRequest]);
 
   const handleEditProfile = () => {
     alert("프로필 수정 기능이 실행됩니다!");
@@ -113,10 +111,14 @@ function ProfileCard() {
 
   const handleStatusSave = async () => {
     try {
-      await apiClient.post("/archive/updateStatusMessage", null, {
-        params: {
+      await secureApiRequest("/archive/updateStatusMessage", {
+        method: "POST",
+        body: JSON.stringify({
           userid: userid,
           statusMessage: editStatusMessage,
+        }),
+        headers: {
+          "Content-Type": "application/json",
         },
       });
 
@@ -156,8 +158,8 @@ function ProfileCard() {
         <div className={styles["profileavatar"]}>
           <img
             src={
-              user.profileImage
-                ? `http://localhost:8080/upload_files/user_profile/${user.profileImage}`
+              profileImagePath // AuthContext에서 가져온 profileImagePath 사용
+                ? `http://localhost:8080${profileImagePath}` // <-- 이 부분을 수정: /upload_files/user_profile/user_xxx.jpg
                 : "https://static.mothership.sg/1/2021/07/cat.jpg"
             }
             alt="Profile"
@@ -166,9 +168,7 @@ function ProfileCard() {
           />
         </div>
         <div className={styles.profileinfo}>
-          <h2 className={styles.username}>
-            {user.nickname || "닉네임이 없습니다"}
-          </h2>
+          <h2 className={styles.username}>{nickname || "닉네임이 없습니다"}</h2>
           <p className={styles.handle}>@{user.loginId || "소셜로그인"}</p>
         </div>
       </div>

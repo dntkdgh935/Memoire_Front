@@ -97,3 +97,32 @@
   background-color: #999;
   cursor: not-allowed;
 }
+
+.faceIdButton {
+  width: 100%;
+  padding: 12px 20px;
+  margin-top: 20px; /* 정보 수정 버튼과 간격 */
+  background-color: #6a0dad; /* 보라색 계열 */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.faceIdButton:hover {
+  background-color: #8a2be2; /* 호버 시 더 밝은 보라색 */
+  transform: translateY(-2px);
+}
+
+.faceIdButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}

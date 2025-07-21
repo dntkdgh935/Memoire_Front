@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import CheckPwd from "../../components/user/CheckPwd";
 import UserVerification from "../../components/user/UserVerification";
+import ProfileUploader from "../../components/user/ProfileUploader";
 import styles from "./MyInfo.module.css";
 
 const MyInfo = () => {
   const navigate = useNavigate();
   const context = useContext(AuthContext);
+  const [originalPhone, setOriginalPhone] = useState("");
 
   const { isLoggedIn, userid, nickname, secureApiRequest, setAuthInfo } =
     context || {};
@@ -20,6 +22,7 @@ const MyInfo = () => {
     prevPwd: "",
     password: "",
     confirmPwd: "",
+    profileImagePath: "", // 프로필 이미지 경로 추가
   });
 
   const [passwordMatch, setPasswordMatch] = useState(true);
@@ -55,22 +58,22 @@ const MyInfo = () => {
           method: "GET",
         });
 
-        // --- 이 부분이 핵심입니다: apiResponse.data에 접근 ---
-        const userData = apiResponse.data; // <--- 이 라인 추가!
+        const userData = apiResponse.data;
 
-        console.log("MyInfo - API Full Response Object:", apiResponse); // Axios 응답 객체 전체
-        console.log("MyInfo - Parsed User Data (from .data):", userData); // 실제 사용자 데이터
+        console.log("MyInfo - API Full Response Object:", apiResponse);
+        console.log("MyInfo - Parsed User Data (from .data):", userData);
         console.log("MyInfo - Parsed User Data nickname:", userData.nickname);
         console.log("MyInfo - Parsed User Data birthday:", userData.birthday);
-        // ----------------------------------------------------
 
         setFormData((prev) => ({
           ...prev,
-          nickname: userData.nickname || "", // userData 사용
-          phone: userData.phone || "", // userData 사용
-          birthday: userData.birthday || "", // userData 사용 (YYYY-MM-DD 형식 그대로)
-          statusMessage: userData.statusMessage || "", // userData 사용
+          nickname: userData.nickname || "",
+          phone: userData.phone || "",
+          birthday: userData.birthday || "",
+          statusMessage: userData.statusMessage || "",
+          profileImagePath: userData.profileImagePath || "",
         }));
+        setOriginalPhone(userData.phone || ""); // 초기 로드된 전화번호 저장
         console.log("MyInfo: 사용자 데이터 로드 성공, formData 업데이트됨");
       } catch (err) {
         console.error("MyInfo: 사용자 정보 로드 오류:", err);
@@ -113,7 +116,7 @@ const MyInfo = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setIsUpdating(true); // 업데이트 시작
+    setIsUpdating(true);
 
     if (!userid) {
       setError("사용자 ID가 없습니다. 다시 로그인해주세요.");
@@ -150,7 +153,8 @@ const MyInfo = () => {
       }
     }
 
-    if (formData.phone && !isVerified) {
+    if (formData.phone !== originalPhone && !isVerified) {
+      // 전화번호가 변경되었고 인증되지 않았다면
       setError("전화번호 인증을 완료해주세요.");
       setIsUpdating(false);
       return;
@@ -160,8 +164,9 @@ const MyInfo = () => {
       const infoPayload = {
         userId: userid,
         nickname: formData.nickname,
-        birthday: formData.birthday, // YYYY-MM-DD 형식으로 이미 준비됨
+        birthday: formData.birthday,
         statusMessage: formData.statusMessage,
+        profileImagePath: formData.profileImagePath, // 프로필 이미지 경로 추가
       };
 
       if (isVerified && formData.phone) {
@@ -188,7 +193,6 @@ const MyInfo = () => {
             method: "PATCH",
             body: JSON.stringify(passwordPayload),
           });
-          // 비밀번호 변경 성공 시 메시지는 infoResponse에서 오지 않으므로 따로 설정
           setSuccess("정보가 성공적으로 변경되었습니다.");
         } catch (passwordErr) {
           console.error("MyInfo: 비밀번호 변경 오류:", passwordErr);
@@ -199,13 +203,10 @@ const MyInfo = () => {
           passwordChangeSuccess = false;
         }
       } else {
-        // 비밀번호 변경 시도가 없었을 경우
         setSuccess(infoResponse.message || "정보가 성공적으로 변경되었습니다.");
       }
 
-      // 최종 성공 메시지 설정 및 폼 초기화 (비밀번호 필드만)
       if (passwordChangeSuccess) {
-        // 비밀번호 변경이 성공했거나 시도하지 않았을 때
         setFormData((prev) => ({
           ...prev,
           prevPwd: "",
@@ -232,6 +233,18 @@ const MyInfo = () => {
     }
   };
 
+  // 얼굴 ID 등록 페이지로 이동하는 핸들러
+  const handleNavigateToFaceRegister = () => {
+    console.log("MyInfo: 현재 userid:", userid);
+    if (userid) {
+      // userid를 URL에 안전하게 인코딩하여 전달
+      const encodedUserId = encodeURIComponent(userid);
+      navigate(`/user/face-register/${encodedUserId}`); // 사용자 ID를 URL 파라미터로 전달
+    } else {
+      setError("사용자 ID를 찾을 수 없습니다. 로그인 후 다시 시도해주세요.");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.container}>
@@ -250,6 +263,11 @@ const MyInfo = () => {
       {error && <p className={styles.error}>{error}</p>}
       {success && <p className={styles.success}>{success}</p>}
 
+      {/* ProfileUploader 컴포넌트 추가 */}
+      <div className={styles.profileUploaderSection}>
+        <ProfileUploader />
+      </div>
+
       <form onSubmit={handleUpdate} className={styles.form}>
         {/* 닉네임 */}
         <div className={styles.inputGroup}>
@@ -258,7 +276,7 @@ const MyInfo = () => {
             type="text"
             id="nickname"
             name="nickname"
-            value={formData.nickname} // formData.nickname 사용
+            value={formData.nickname}
             onChange={handleInputChange}
             placeholder="닉네임을 입력하세요"
             maxLength={50}
@@ -286,7 +304,7 @@ const MyInfo = () => {
             type="date"
             id="birthday"
             name="birthday"
-            value={formData.birthday} // formData.birthday 사용
+            value={formData.birthday}
             onChange={handleInputChange}
             placeholder="YYYY-MM-DD"
             disabled={isUpdating}
@@ -341,6 +359,15 @@ const MyInfo = () => {
           {isUpdating ? "수정 중..." : "정보 수정"}
         </button>
       </form>
+
+      {/* 얼굴 ID 등록 페이지로 이동하는 버튼 추가 */}
+      <button
+        onClick={handleNavigateToFaceRegister}
+        className={styles.faceIdButton} // 새로운 스타일 클래스
+        disabled={isUpdating || !userid}
+      >
+        얼굴 ID 등록/수정
+      </button>
     </div>
   );
 };
