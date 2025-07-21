@@ -207,3 +207,37 @@
 .profile-card.error .edit-profile-btn:hover {
   background: #ff5252;
 }
+
+.userTags {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.userTags h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.userTags ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tagItem {
+  background-color: #e0e0e0;
+  color: #555;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.tagItem:hover {
+  background-color: #bdbdbd;
+  cursor: pointer;
+}
