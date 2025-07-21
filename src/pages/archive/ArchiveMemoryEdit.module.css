@@ -119,3 +119,66 @@
   font-size: 1rem;
   cursor: pointer;
 }
+
+.tagInputContainer {
+  margin-bottom: 10px;
+}
+
+.tagInputWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  min-height: 40px;
+  align-items: center;
+  background-color: #fff;
+}
+
+.inlineTag {
+  background-color: #e0e0e0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.removeTagButton {
+  background: none;
+  border: none;
+  margin-left: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+}
+
+.inlineTagInput {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 120px;
+  font-size: 14px;
+}
+
+.suggestionList {
+  list-style: none;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.suggestionItem {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.suggestionItem:hover {
+  background-color: #f0f0f0;
+}

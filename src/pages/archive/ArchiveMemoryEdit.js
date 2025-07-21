@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ArchiveMemoryEdit.module.css";
@@ -12,6 +12,10 @@ function ArchiveMemoryEdit() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [file, setFile] = useState(null);
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
+  const [recommendedTags, setRecommendedTags] = useState([]);
+  const debounceTimer = useRef(null);
 
   useEffect(() => {
     if (isLoggedIn === false) {
@@ -24,10 +28,52 @@ function ArchiveMemoryEdit() {
       navigate("/archive");
       return;
     }
+    if (memory.collectionid) {
+      const fetchStuff = async () => {
+        try {
+          const response = await secureApiRequest(
+            `/archive/tags?collectionid=${memory.collectionid}`,
+            {
+              method: "GET",
+            }
+          );
+          console.log(response.data);
+          setTags(response.data);
+        } catch (error) {
+          console.error("태그 추천 불러오기 실패", error);
+        }
+      };
+      fetchStuff();
+    }
     setTab(memory.memoryType === "text" ? "text" : "media");
     setTitle(memory.title);
     setContent(memory.content);
   }, [isLoggedIn, userid, memory, navigate]);
+
+  useEffect(() => {
+    if (tagInput.trim().length < 1) {
+      setRecommendedTags([]);
+      return;
+    }
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+    debounceTimer.current = setTimeout(async () => {
+      try {
+        const response = await secureApiRequest(
+          `/archive/tags/search?keyword=${encodeURIComponent(tagInput)}`,
+          {
+            method: "GET",
+          }
+        );
+        const result = await response.data;
+        const filtered = result.filter((tag) => !tags.includes(tag));
+        setRecommendedTags(filtered);
+      } catch (e) {
+        console.error("태그 자동완성 실패", e);
+      }
+    }, 300);
+  }, [tagInput]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -68,6 +114,9 @@ function ArchiveMemoryEdit() {
     formData.append("memoryOrder", memory.memoryOrder);
     formData.append("previousFileType", memory.memoryType);
     formData.append("previousFileName", memory.filename);
+    tags.forEach((tag) => {
+      formData.append("tags", tag);
+    });
     try {
       await secureApiRequest("/archive/editMemory", {
         method: "POST",
@@ -81,6 +130,61 @@ function ArchiveMemoryEdit() {
       alert("업로드 중 오류 발생");
     }
     navigate("/archive");
+  };
+
+  const handleTagKeyDown = (e) => {
+    if (
+      (e.key === "Enter" || e.key === "," || e.key === "Tab") &&
+      tagInput.trim() !== ""
+    ) {
+      e.preventDefault();
+      const newTag = tagInput.trim();
+
+      if (/\s/.test(newTag)) {
+        alert("태그에는 공백을 포함할 수 없습니다.");
+        setTagInput("");
+        return;
+      }
+
+      if (!/^[가-힣a-zA-Z0-9]+$/.test(newTag)) {
+        alert("태그에는 특수문자를 포함할 수 없습니다.");
+        setTagInput("");
+        return;
+      }
+
+      if (new Blob([newTag]).size > 50) {
+        alert("태그가 너무 깁니다");
+        setTagInput("");
+        return;
+      }
+
+      if (tags.length >= 15) {
+        alert("태그는 최대 15개까지 입력할 수 있습니다.");
+        setTagInput("");
+        return;
+      }
+
+      if (!tags.includes(newTag)) {
+        setTags([...tags, newTag]);
+      }
+
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleSuggestionClick = (tag) => {
+    if (!tags.includes(tag)) {
+      setTags((prev) => [...prev, tag]);
+    }
+
+    // 다음 tick에 tagInput 비우기
+    setTimeout(() => {
+      setTagInput("");
+    }, 0);
   };
 
   return (
@@ -163,6 +267,46 @@ function ArchiveMemoryEdit() {
             </div>
           )}
         </div>
+        <label className={styles.label}>태그</label>
+        <div className={styles.tagInputWrapper}>
+          {tags.map((tag, index) => (
+            <span key={index} className={styles.inlineTag}>
+              {tag}
+              <button
+                type="button"
+                className={styles.removeTagButton}
+                onClick={() => removeTag(tag)}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <input
+            className={styles.inlineTagInput}
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagKeyDown}
+            placeholder="엔터로 태그 입력"
+          />
+        </div>
+        {recommendedTags.length > 0 && (
+          <ul className={styles.suggestionList}>
+            {recommendedTags.map((tag, index) => (
+              <li
+                key={index}
+                className={styles.suggestionItem}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSuggestionClick(tag);
+                }}
+              >
+                #{tag}
+              </li>
+            ))}
+          </ul>
+        )}
         <button type="submit" className={styles.uploadBtn}>
           업로드
         </button>

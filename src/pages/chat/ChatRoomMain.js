@@ -7,26 +7,51 @@ import PageHeader from "../../components/common/PageHeader";
 // TODO: 로그인 상태 및 상대와의 관계 확인
 const ChatRoomMain = () => {
   const [chatrooms, setChatrooms] = useState([]);
-  const { userid, secureApiRequest } = useContext(AuthContext);
+  const { userid, role, isLoggedIn, secureApiRequest } =
+    useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!userid || userid === "") return;
-    const fetchStuff = async () => {
-      try {
-        const chatroomsInfo = await secureApiRequest(
-          `/chat/chatrooms?userid=${userid}`,
-          {
-            method: "GET",
-          }
-        );
-        console.log(chatroomsInfo.data);
-        setChatrooms(chatroomsInfo.data);
-      } catch (error) {
-        console.error("Error fetching user chatrooms:", error);
-      }
-    };
-    fetchStuff();
+
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+    if (role === "ADMIN") {
+      const fetchAdminStuff = async () => {
+        try {
+          const chatroomsInfo = await secureApiRequest(
+            `/chat/admin/chatrooms?userid=${userid}`,
+            {
+              method: "GET",
+            }
+          );
+          console.log(chatroomsInfo.data);
+          setChatrooms(chatroomsInfo.data);
+        } catch (error) {
+          console.error("Error fetching admin chatrooms:", error);
+        }
+      };
+      fetchAdminStuff();
+    } else {
+      const fetchStuff = async () => {
+        try {
+          const chatroomsInfo = await secureApiRequest(
+            `/chat/chatrooms?userid=${userid}`,
+            {
+              method: "GET",
+            }
+          );
+          console.log(chatroomsInfo.data);
+          setChatrooms(chatroomsInfo.data);
+        } catch (error) {
+          console.error("Error fetching user chatrooms:", error);
+        }
+      };
+      fetchStuff();
+    }
   }, [userid]);
 
   const handleClick = (chatroomid) => {
@@ -35,6 +60,30 @@ const ChatRoomMain = () => {
 
   const handleNewChatroom = () => {
     navigate("/chat/new");
+  };
+
+  const handleAdminChat = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("user", userid);
+      const chatroomInfo = await secureApiRequest("/chat/admin/check", {
+        method: "POST",
+        body: formData,
+      });
+      console.log(chatroomInfo.data);
+      if (chatroomInfo.data === null || chatroomInfo.data === "") {
+        const newChatroomInfo = await secureApiRequest("/chat/admin/new", {
+          method: "POST",
+          body: formData,
+        });
+        console.log(newChatroomInfo.data);
+        navigate(`/chat/room/${newChatroomInfo.data}`);
+      } else {
+        navigate(`/chat/room/${chatroomInfo.data}`);
+      }
+    } catch (err) {
+      console.error("메시지 전송 페이지로 이동 실패:", err);
+    }
   };
 
   return (
@@ -49,10 +98,13 @@ const ChatRoomMain = () => {
               className={styles.chatroomitem}
               onClick={() => handleClick(room.chatroomid)}
             >
-              <span className={styles.chatroomname}>
-                {room.chatroomid}:{" "}
-                {room.users.map((user) => `${user.name}`).join(", ")}
-              </span>
+              {room.chatroomid.startsWith("admin") ? (
+                <span className={styles.chatroomname}>관리자 채팅</span>
+              ) : (
+                <span className={styles.chatroomname}>
+                  {room.users.map((user) => `${user.name}`).join(", ")}
+                </span>
+              )}
             </li>
           ))}
         </ul>
@@ -60,6 +112,7 @@ const ChatRoomMain = () => {
           + 새로운 채팅방 만들기
         </button>
       </div>
+      <button onClick={handleAdminChat}>관리자와 채팅하기</button>
     </>
   );
 };

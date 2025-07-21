@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ArchiveCollectionEdit.module.css";
@@ -13,6 +13,10 @@ function ArchiveCollectionEdit() {
     visibility: "",
     color: "",
   });
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
+  const [recommendedTags, setRecommendedTags] = useState([]);
+  const debounceTimer = useRef(null);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -29,7 +33,50 @@ function ArchiveCollectionEdit() {
     setCollection({
       ...coll,
     });
+
+    if (coll.collectionid) {
+      const fetchStuff = async () => {
+        try {
+          const response = await secureApiRequest(
+            `/archive/tags?collectionid=${coll.collectionid}`,
+            {
+              method: "GET",
+            }
+          );
+          console.log(response.data);
+          setTags(response.data);
+        } catch (error) {
+          console.error("태그 추천 불러오기 실패", error);
+        }
+      };
+      fetchStuff();
+    }
   }, [isLoggedIn, userid, coll, navigate]);
+
+  useEffect(() => {
+    if (tagInput.trim().length < 1) {
+      setRecommendedTags([]);
+      return;
+    }
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+    debounceTimer.current = setTimeout(async () => {
+      try {
+        const response = await secureApiRequest(
+          `/archive/tags/search?keyword=${encodeURIComponent(tagInput)}`,
+          {
+            method: "GET",
+          }
+        );
+        const result = await response.data;
+        const filtered = result.filter((tag) => !tags.includes(tag));
+        setRecommendedTags(filtered);
+      } catch (e) {
+        console.error("태그 자동완성 실패", e);
+      }
+    }, 300);
+  }, [tagInput]);
 
   if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
     return <div>로딩중...</div>;
@@ -51,6 +98,9 @@ function ArchiveCollectionEdit() {
     data.append("visibility", collection.visibility);
     data.append("titleEmbedding", coll.titleEmbedding);
     data.append("color", collection.color);
+    tags.forEach((tag) => {
+      data.append("tags", tag);
+    });
 
     try {
       await secureApiRequest("/archive/editColl", {
@@ -75,6 +125,61 @@ function ArchiveCollectionEdit() {
     }));
   };
 
+  const handleTagKeyDown = (e) => {
+    if (
+      (e.key === "Enter" || e.key === "," || e.key === "Tab") &&
+      tagInput.trim() !== ""
+    ) {
+      e.preventDefault();
+      const newTag = tagInput.trim();
+
+      if (/\s/.test(newTag)) {
+        alert("태그에는 공백을 포함할 수 없습니다.");
+        setTagInput("");
+        return;
+      }
+
+      if (!/^[가-힣a-zA-Z0-9]+$/.test(newTag)) {
+        alert("태그에는 특수문자를 포함할 수 없습니다.");
+        setTagInput("");
+        return;
+      }
+
+      if (new Blob([newTag]).size > 50) {
+        alert("태그가 너무 깁니다");
+        setTagInput("");
+        return;
+      }
+
+      if (tags.length >= 15) {
+        alert("태그는 최대 15개까지 입력할 수 있습니다.");
+        setTagInput("");
+        return;
+      }
+
+      if (!tags.includes(newTag)) {
+        setTags([...tags, newTag]);
+      }
+
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleSuggestionClick = (tag) => {
+    if (!tags.includes(tag)) {
+      setTags((prev) => [...prev, tag]);
+    }
+
+    // 다음 tick에 tagInput 비우기
+    setTimeout(() => {
+      setTagInput("");
+    }, 0);
+  };
+
   return (
     <>
       <div className={styles.container}>
@@ -82,6 +187,7 @@ function ArchiveCollectionEdit() {
           <label className={styles.label}>컬렉션 제목</label>
           <label className={styles.label}>공유범위</label>
           <label className={styles.label}>테마</label>
+          <label className={styles.label}>태그</label>
         </div>
 
         <div className={styles.rightColumn}>
@@ -116,6 +222,45 @@ function ArchiveCollectionEdit() {
               value={collection.color}
               required
             />
+            <div className={styles.tagInputWrapper}>
+              {tags.map((tag, index) => (
+                <span key={index} className={styles.inlineTag}>
+                  {tag}
+                  <button
+                    type="button"
+                    className={styles.removeTagButton}
+                    onClick={() => removeTag(tag)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <input
+                className={styles.inlineTagInput}
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder="엔터로 태그 입력"
+              />
+            </div>
+            {recommendedTags.length > 0 && (
+              <ul className={styles.suggestionList}>
+                {recommendedTags.map((tag, index) => (
+                  <li
+                    key={index}
+                    className={styles.suggestionItem}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSuggestionClick(tag);
+                    }}
+                  >
+                    #{tag}
+                  </li>
+                ))}
+              </ul>
+            )}
             <div>
               <input type="submit" value="변경하기" /> &nbsp; &nbsp;
               <input
