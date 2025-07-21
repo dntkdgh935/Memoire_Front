@@ -19,11 +19,15 @@ export default function WorkResultPanel({
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
+    const payload = {
+      title: originalMemoryTitle,
+      ...result.resultDto,
+    };
     try {
       const response = await fetch(`/atelier/imtim/${selectedCollectionId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.resultDto),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error("새 메모리 저장 실패");
       alert("새 메모리로 저장되었습니다!");

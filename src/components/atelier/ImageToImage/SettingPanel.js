@@ -2,23 +2,18 @@ import React, { useState, useEffect } from "react";
 import styles from "./SettingPanel.module.css";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
-  const [title, setTitle] = useState(selectedMemory?.title || "");
   const [stylePrompt, setStylePrompt] = useState("");
-  const [extraPrompt, setExtraPrompt] = useState("");
-
-  useEffect(() => {
-    setTitle(selectedMemory?.title || "");
-  }, [selectedMemory]);
 
   const handleGenerate = () => {
     if (!selectedMemory || !stylePrompt) return;
+    console.log("selectedMemory:", selectedMemory);
 
     const payload = {
-      title,
-      imageUrl: selectedMemory.imageUrl,
-      stylePrompt,
-      extraPrompt,
+      prompt: stylePrompt,
+      image_url: `http://localhost:8080/upload_files/memory_img/${selectedMemory.filename}`,
     };
+
+    console.log("payload ▶", payload);
 
     fetch("/atelier/imtim/generate", {
       method: "POST",
@@ -56,8 +51,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         <label>제목</label>
         <input
           type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={selectedMemory.title}
+          readOnly
           className={styles.input}
         />
       </div>
@@ -71,18 +66,6 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
           onChange={(e) => setStylePrompt(e.target.value)}
           placeholder="예: 빈티지, 모던"
           className={styles.input}
-        />
-      </div>
-
-      {/* 기타 요청 */}
-      <div className={styles.field}>
-        <label>기타 요청</label>
-        <textarea
-          value={extraPrompt}
-          onChange={(e) => setExtraPrompt(e.target.value)}
-          placeholder="추가로 원하는 효과나 설명"
-          className={styles.textarea}
-          rows={2}
         />
       </div>
 
