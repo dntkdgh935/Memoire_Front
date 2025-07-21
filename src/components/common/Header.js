@@ -46,6 +46,15 @@ function Header() {
     setShowNotifications(!showNotifications);
   };
 
+  // useEffect(() => {
+  //   if (searchType === "tag") {
+  //     setSearchKeyword((prev) => {
+  //       // 이미 #로 시작하면 그대로 두고, 아니면 # 추가
+  //       return prev.startsWith("#") ? prev : `#${prev}`;
+  //     });
+  //   }
+  // }, [searchType]);
+
   // 팔로우 요청 승인
   const handleFollowRequestApproval = (requesterid, targetid) => {
     // DB 에 입력
@@ -82,6 +91,9 @@ function Header() {
         navigate(`library/searchCollection?query=${searchKeyword}`);
       } else if (searchType == "user") {
         navigate(`library/searchUser?query=${searchKeyword}`);
+      } else if (searchType == "tag") {
+        //TODO: 오류시 수정
+        navigate(`library/searchCollection?query=${searchKeyword}&type=tag`);
       }
     } catch (error) {
       console.error("검색 요청 실패 : ", error);
@@ -125,6 +137,11 @@ function Header() {
       {/* 중앙: 검색 박스 */}
       <div className={styles.centerSection}>
         <div className={styles.searchBox}>
+          {searchType === "tag" ? (
+            <span className={styles.prefix}>#</span>
+          ) : (
+            <></>
+          )}
           <input
             type="text"
             placeholder="키워드 입력 후 엔터"
@@ -140,6 +157,7 @@ function Header() {
           >
             <option value="collection">컬렉션 검색</option>
             <option value="user">유저 검색</option>
+            <option value="tag">태그 검색</option>
           </select>
           <button className={styles.searchButton} onClick={handleSearch}>
             <IoIosSearch />
