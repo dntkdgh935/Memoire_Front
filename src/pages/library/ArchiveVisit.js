@@ -20,6 +20,7 @@ function ArchiveVisit() {
   // 방문한 아카이브 소유자 정보
   const [relStatus, setRelStatus] = useState("3");
   const [relBtnMsg, setRelBtnMsg] = useState(""); // 버튼에 나타날 텍스트
+  const [userFreqTags, setUserFreqTags] = useState([]);
 
   // 아카이브 소유자 컬렉션 유형 선택 탭
   const [activeTab, setActiveTab] = useState("myColl");
@@ -135,11 +136,6 @@ function ArchiveVisit() {
     }
   }, [ownerid, myid]);
 
-  //  if (isLoggedIn === null || isLoggedIn === undefined || !userid) {
-  //    return <div>로딩중...</div>;
-  //  }
-
-  // 팔로우 상태 변경 (수정요망)
   const handleToggleFollow = async () => {
     try {
       // 0: 요청됨

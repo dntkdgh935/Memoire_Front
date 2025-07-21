@@ -42,7 +42,7 @@ function LibCollDetailView() {
         const res = await axios.get(
           `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
         );
-        console.log(res.data);
+        console.log("컬렉션 태그 확인해!!!" + res.data);
         setCollection(res.data);
         // // 컬렉션에 속한 메모리 리스트 불러오기
         // console.log("** id는: " + collection.collectionid);

@@ -12,32 +12,60 @@ function SearchCollResult() {
 
   const location = useLocation(); // 현재 URL 정보
   const searchQuery = new URLSearchParams(location.search).get("query");
+  const searchType = new URLSearchParams(location.search).get("type");
   const navigate = useNavigate();
   const [searchedColls, setSearchedColls] = useState([]);
   const [loading, setLoading] = useState(true);
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!searchQuery) return;
+    console.log("💬 URL Params - query:", searchQuery);
+    console.log("💬 URL Params - type:", searchType);
+  }, [searchQuery, searchType]);
 
-    const fetchSearchedColls = async () => {
-      try {
-        setLoading(true);
+  //검색어에 따른 컬렉션 불러오기
+  useEffect(() => {
+    // 태그 검색
+    if (searchType === "tag") {
+      if (!searchQuery) return;
 
-        const response = await secureApiRequest(
-          `/api/library/search/collection?query=${searchQuery}&userid=${userid}`,
-          { method: "GET" }
-        );
-        setSearchedColls(response.data); // 검색 결과 저장
-      } catch (error) {
-        console.error("검색 요청 실패 : ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const fetchSearchedColls = async () => {
+        try {
+          setLoading(true);
+          const response = await secureApiRequest(
+            `/api/library/search/tag?query=${searchQuery}&userid=${userid}`,
+            { method: "GET" }
+          );
+          setSearchedColls(response.data); // 검색 결과 저장
+        } catch (error) {
+          console.error("검색 요청 실패 : ", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSearchedColls();
+    } else if (searchType === "collection") {
+      console.log("컬렉션 검색 수행");
+      if (!searchQuery) return;
 
-    fetchSearchedColls();
-  }, [searchQuery]);
+      const fetchSearchedColls = async () => {
+        try {
+          setLoading(true);
+
+          const response = await secureApiRequest(
+            `/api/library/search/collection?query=${searchQuery}&userid=${userid}`,
+            { method: "GET" }
+          );
+          setSearchedColls(response.data); // 검색 결과 저장
+        } catch (error) {
+          console.error("검색 요청 실패 : ", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSearchedColls();
+    }
+  }, [searchQuery, searchType]);
 
   if (loading) {
     return <div>검색 중...</div>;
