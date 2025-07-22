@@ -61,7 +61,6 @@ function FindPwd() {
 
       // HTTP 상태 코드가 200 OK인 경우 (임시 비밀번호 발급 성공)
       if (findPwdResponse.status === 200) {
-        // 백엔드에서 JSON 객체 { message: "...", temporaryPassword: "..." } 형태로 응답한다고 가정
         const responseData = findPwdResponse.data;
         const message =
           responseData.message ||
@@ -70,7 +69,6 @@ function FindPwd() {
 
         alert(message);
 
-        // --- 추가된 로깅 ---
         console.log(
           "Received temporaryPassword from /user/findpwd:",
           temporaryPassword
@@ -81,15 +79,13 @@ function FindPwd() {
           "and password:",
           temporaryPassword
         );
-        // --- 끝 ---
 
         // 2. 발급받은 임시 비밀번호와 loginId로 자동 로그인 시도
         try {
-          // --- 추가된 로깅 ---
           console.log("Sending login request with:");
-          console.log("  loginId:", formData.loginId);
-          console.log("  password:", temporaryPassword);
-          // --- 끝 ---
+          console.log("   loginId:", formData.loginId);
+          console.log("   password:", temporaryPassword);
+
           const loginResponse = await apiClient.post("/login", {
             loginId: formData.loginId,
             password: temporaryPassword, // 추출한 임시 비밀번호 사용
@@ -100,7 +96,8 @@ function FindPwd() {
             const { accessToken, refreshToken } = loginResponse.data;
             updateTokens(accessToken, refreshToken); // AuthContext를 통해 토큰 업데이트
             alert("임시 비밀번호로 자동 로그인되었습니다.");
-            navigate("/"); // 로그인 성공 시 메인 페이지로 이동
+            // MyInfo 페이지로 이동하면서 임시 비밀번호를 state로 전달
+            navigate("/user/myinfo", { state: { tempPwd: temporaryPassword } });
           } else {
             // 자동 로그인 실패 (예: 백엔드에서 200 외 다른 상태 코드 반환 시)
             alert("자동 로그인에 실패했습니다. 로그인 페이지로 이동합니다.");
@@ -131,21 +128,18 @@ function FindPwd() {
 
       // 백엔드에서 오류 응답 (예: 404 Not Found, 400 Bad Request, 500 Internal Server Error)을 보낸 경우
       if (error.response) {
-        console.error("Backend Error Response:", error.response); // 백엔드 응답 객체 전체 로깅
-        console.error("Backend Error Data:", error.response.data); // 백엔드 응답 데이터 로깅
+        console.error("Backend Error Response:", error.response);
+        console.error("Backend Error Data:", error.response.data);
 
         let errorMessage = "비밀번호 찾기에 실패했습니다. 다시 시도해 주세요.";
         if (typeof error.response.data === "string") {
-          // 백엔드에서 문자열 형태의 오류 메시지를 보낸 경우
           errorMessage = error.response.data;
         } else if (
           typeof error.response.data === "object" &&
           error.response.data.message
         ) {
-          // 백엔드에서 { message: "오류 메시지" }와 같은 JSON 객체를 보낸 경우
           errorMessage = error.response.data.message;
         } else if (typeof error.response.data === "object") {
-          // 그 외의 JSON 객체 형태인 경우, JSON.stringify로 변환하여 표시
           errorMessage = JSON.stringify(error.response.data);
         }
         alert(errorMessage);

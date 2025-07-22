@@ -1,0 +1,85 @@
+/* src/pages/user/FindId.module.css */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: white;
+  padding: 20px;
+}
+
+.findIdBox {
+  background-color: #fdfaf6;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px; /* SignUp과 동일한 최대 너비 */
+  text-align: center;
+  border: 1px solid #e0dcd7;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 입력 필드 간 간격 */
+}
+
+/* 이름 입력 그룹 (UserVerification과 함께 사용) */
+.idInputGroup {
+  /* FindId에서는 이름 입력과 UserVerification이 병렬로 나열되므로, flex-direction: column을 사용합니다. */
+  display: flex;
+  flex-direction: column; /* 이름을 먼저, 그 다음 휴대폰 인증 컴포넌트 */
+  gap: 20px; /* 이름 입력 필드와 UserVerification 컴포넌트 사이의 간격 */
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fffdfb;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px; /* SignUp.module.css와 동일하게 높이 설정 */
+}
+
+.input:focus {
+  outline: none;
+  border-color: #b0a49b;
+  box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
+}
+
+.findIdButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%; /* 너비를 100%로 설정 */
+  box-sizing: border-box; /* padding과 border가 width에 포함되도록 */
+}
+
+.findIdButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.findIdButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

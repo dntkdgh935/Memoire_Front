@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // useLocation 추가
 import { AuthContext } from "../../AuthProvider";
 import CheckPwd from "../../components/user/CheckPwd";
 import UserVerification from "../../components/user/UserVerification";
@@ -8,6 +8,7 @@ import styles from "./MyInfo.module.css";
 
 const MyInfo = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // useLocation 훅 추가
   const context = useContext(AuthContext);
   const [originalPhone, setOriginalPhone] = useState("");
 
@@ -19,9 +20,9 @@ const MyInfo = () => {
     phone: "",
     birthday: "",
     statusMessage: "",
-    prevPwd: "",
-    password: "",
-    confirmPwd: "",
+    prevPwd: "", // 현재 비밀번호 필드
+    password: "", // 새 비밀번호 필드
+    confirmPwd: "", // 새 비밀번호 확인 필드
     profileImagePath: "", // 프로필 이미지 경로 추가
   });
 
@@ -34,7 +35,7 @@ const MyInfo = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태
 
-  // 사용자 정보 불러오기
+  // 사용자 정보 불러오기 및 임시 비밀번호 초기 설정
   useEffect(() => {
     if (isLoggedIn === null || isLoggedIn === undefined) {
       console.log("MyInfo: AuthContext 또는 isLoggedIn 초기화 대기 중...");
@@ -65,6 +66,10 @@ const MyInfo = () => {
         console.log("MyInfo - Parsed User Data nickname:", userData.nickname);
         console.log("MyInfo - Parsed User Data birthday:", userData.birthday);
 
+        // FindPwd에서 전달된 임시 비밀번호가 있다면 prevPwd에 설정
+        const { tempPwd } = location.state || {}; // useLocation에서 state 추출
+        console.log("Received tempPwd from location state:", tempPwd);
+
         setFormData((prev) => ({
           ...prev,
           nickname: userData.nickname || "",
@@ -72,6 +77,7 @@ const MyInfo = () => {
           birthday: userData.birthday || "",
           statusMessage: userData.statusMessage || "",
           profileImagePath: userData.profileImagePath || "",
+          prevPwd: tempPwd || "", // 임시 비밀번호가 있으면 prevPwd에 설정
         }));
         setOriginalPhone(userData.phone || ""); // 초기 로드된 전화번호 저장
         console.log("MyInfo: 사용자 데이터 로드 성공, formData 업데이트됨");
@@ -90,7 +96,7 @@ const MyInfo = () => {
     if (isLoggedIn && userid) {
       loadUserData();
     }
-  }, [isLoggedIn, userid, navigate, secureApiRequest]);
+  }, [isLoggedIn, userid, navigate, secureApiRequest, location.state]); // location.state를 의존성 배열에 추가
 
   // 입력 필드 변경 핸들러
   const handleInputChange = useCallback((e) => {
@@ -338,6 +344,7 @@ const MyInfo = () => {
             placeholder="현재 비밀번호 (비밀번호 변경 시 필수)"
             maxLength={16}
             disabled={isUpdating}
+            // `tempPwd`가 설정되어 있을 때 읽기 전용으로 만들 수 있지만, 사용자가 직접 변경할 수 있도록 `disabled`는 유지
           />
         </div>
 

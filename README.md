@@ -9,6 +9,7 @@
 - npm install libphonenumber-js cleave.js : 전화번호 유효성 및 하이픈'-' 자동 추가 lib
 - npm install zxcvbn : 비밀번호 강도 확인용
 - npm start
+- npm install face-api.js
 
 # npm install
 
