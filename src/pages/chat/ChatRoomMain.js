@@ -111,8 +111,10 @@ const ChatRoomMain = () => {
         <button className={styles.newchatbtn} onClick={handleNewChatroom}>
           + 새로운 채팅방 만들기
         </button>
+        <button className={styles.adminChatButton} onClick={handleAdminChat}>
+          관리자와 채팅하기
+        </button>
       </div>
-      <button onClick={handleAdminChat}>관리자와 채팅하기</button>
     </>
   );
 };

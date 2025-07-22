@@ -1,46 +1,83 @@
 .container {
   display: flex;
-  align-items: flex-start;
-  gap: 40px;
-  padding: 20px;
-  font-family: sans-serif;
+  justify-content: center; /* 수평 가운데 정렬 */
+  margin-top: 60px; /* 원하는 만큼 위 여백 */
 }
 
-.leftColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  font-weight: bold;
-  font-size: 18px;
-  color: #000;
-}
-
-.rightColumn {
+.form {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  border: 1px solid #5e4b3c;
+  border: 1px solid #5e4b3c;
+  padding: 32px 40px; /* 내부 공백 */
+  border-radius: 12px; /* 둥근 모서리 */
+  background-color: #fff8f3; /* 배경 흰색 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 약한 그림자 */
 }
 
-.input {
-  padding: 8px 12px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 220px;
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
+.label {
+  font-weight: bold;
+  font-size: 18px;
+  width: 120px;
+  color: #000;
+}
+
+.input,
 .select {
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 240px;
+  border: 1px solid #5e4b3c;
+  border-radius: 8px;
+  width: 280px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #5e4b3c;
+  box-shadow: 0 0 0 2px #5e4b3c;
 }
 
 .colorPicker {
-  width: 48px;
-  height: 32px;
-  border: none;
-  padding: 0;
+  width: 60px;
+  height: 36px;
+  border: 1px solid #5e4b3c;
+  border-radius: 6px;
   cursor: pointer;
+  background-color: #fff;
+  padding: 0;
+}
+
+.buttonGroup {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+input[type="submit"],
+input[type="button"] {
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #5e4b3c;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  background-color: #9e8471;
 }

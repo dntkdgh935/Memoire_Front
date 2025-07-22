@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import styles from "./UserInfoCard.module.css"; // 스타일을 위한 CSS 파일 (필요시 추가)
+import default_profile from "../../assets/images/default_profile.jpg";
 
 function UserInfoCard({
   userId,
@@ -37,7 +38,7 @@ function UserInfoCard({
       {/* 프로필 이미지 */}
       <div className={styles.profileImage}>
         <img
-          src={profileImagePath || "/default-profile.jpg"} // 기본 이미지 경로
+          src={profileImagePath || default_profile}
           alt={nickname}
           className={styles.profileImageImg}
         />

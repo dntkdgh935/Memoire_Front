@@ -27,9 +27,9 @@
 
 .tab.active {
   background-color: white;
-  color: #00695c;
+  color: #694400;
   font-weight: 600;
-  border-bottom: 2px solid #00695c;
+  border-bottom: 2px solid #d8ad79;
 }
 
 .followlist {
@@ -61,7 +61,7 @@
 
 .username {
   font-weight: 600;
-  color: #00695c;
+  color: #7e4f09;
   font-size: 14px;
   cursor: pointer;
 }

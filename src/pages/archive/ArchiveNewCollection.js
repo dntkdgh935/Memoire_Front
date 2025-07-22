@@ -57,14 +57,9 @@ function ArchiveNewCollection() {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.leftColumn}>
-          <label className={styles.label}>컬렉션 제목</label>
-          <label className={styles.label}>공유범위</label>
-          <label className={styles.label}>테마</label>
-        </div>
-
-        <div className={styles.rightColumn}>
-          <form className={styles.form} onSubmit={handleNext}>
+        <form className={styles.form} onSubmit={handleNext}>
+          <div className={styles.formRow}>
+            <label className={styles.label}>컬렉션 제목</label>
             <input
               type="text"
               name="collectionTitle"
@@ -74,7 +69,9 @@ function ArchiveNewCollection() {
               placeholder="텍스트를 입력하세요"
               required
             />
-
+          </div>
+          <div className={styles.formRow}>
+            <label className={styles.label}>공유범위</label>
             <select
               name="visibility"
               onChange={handleChange}
@@ -87,6 +84,9 @@ function ArchiveNewCollection() {
               <option value="2">팔로워</option>
               <option value="3">비공개</option>
             </select>
+          </div>
+          <div className={styles.formRow}>
+            <label className={styles.label}>테마</label>
             <input
               type="color"
               name="color"
@@ -95,18 +95,18 @@ function ArchiveNewCollection() {
               value={collection.color}
               required
             />
-            <div>
-              <input type="submit" value="다음" /> &nbsp; &nbsp;
-              <input
-                type="button"
-                value="뒤로가기"
-                onClick={() => {
-                  navigate(-1);
-                }}
-              />
-            </div>
-          </form>
-        </div>
+          </div>
+          <div className={styles.buttonGroup}>
+            <input type="submit" value="다음" /> &nbsp; &nbsp;
+            <input
+              type="button"
+              value="뒤로가기"
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+          </div>
+        </form>
       </div>
     </>
   );

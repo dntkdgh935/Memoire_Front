@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import styles from "./AvatarWName.module.css";
 import { useNavigate } from "react-router-dom";
+import default_profile from "../../assets/images/default_profile.jpg";
 
 function AvatarWName({ user, type }) {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ function AvatarWName({ user, type }) {
         style={{ cursor: "pointer" }}
       >
         <img
-          src={profileImageUrl}
+          src={profileImageUrl || default_profile}
           alt="profile"
           className={styles.avatarSmall}
         />
@@ -58,7 +59,7 @@ function AvatarWName({ user, type }) {
         style={{ cursor: "pointer" }}
       >
         <img
-          src={profileImageUrl}
+          src={profileImageUrl || default_profile}
           alt="profile"
           className={styles.avatarLarge}
         />

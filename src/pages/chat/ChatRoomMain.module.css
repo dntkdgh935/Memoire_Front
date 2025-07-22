@@ -3,21 +3,22 @@
   margin: 40px auto;
   border: 1px solid #e1e1e1;
   border-radius: 8px;
-  padding: 16px;
+  padding: 20px;
   font-family: "Arial", sans-serif;
-  background-color: #fff;
+  background-color: #fffaf6;
 }
 
 .sectiontitle {
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin-bottom: 20px;
+  font-size: 24px;
   font-weight: bold;
   color: #333;
+  text-align: center;
 }
 
 .chatroomlist {
   list-style: none;
-  padding: 0;
+  padding: 2px;
   margin: 0;
 }
 
@@ -26,25 +27,34 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 4px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #c4c4c4;
+  border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(255, 223, 186, 0.3);
   transition: background 0.2s;
 }
 
 .chatroomitem:hover {
-  background-color: #f9f9f9;
+  background-color: #e2cec3;
 }
 
 .chatroomname {
-  font-size: 14px;
+  font-size: 20px;
   color: #444;
+  display: inline-block;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 }
 
 .newchatbtn {
   margin-top: 14px;
   width: 100%;
   padding: 10px;
-  background-color: #fafafa;
+  background-color: #5e4b3c;
+  color: white;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
@@ -53,5 +63,25 @@
 }
 
 .newchatbtn:hover {
-  background-color: #f0f0f0;
+  background-color: #9e8471;
+}
+
+.adminChatButton {
+  color: #1a73e8; /* 링크 색상 파란색 계열 */
+  text-decoration: underline; /* 밑줄 */
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  background: none;
+  border: none;
+  padding: 10px;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.adminChatButton:hover,
+.adminChatButton:focus {
+  color: #0049b7; /* 진한 파란색으로 호버 효과 */
+  outline: none;
+  text-decoration: none; /* 호버 시 밑줄 없애도 됨 */
 }

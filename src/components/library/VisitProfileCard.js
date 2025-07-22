@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
+import default_profile from "../../assets/images/default_profile.jpg";
 import styles from "./VisitProfileCard.module.css";
 
 /*
@@ -127,7 +128,7 @@ function VisitProfileCard({
             src={
               owner.profileImage
                 ? `http://localhost:8080${owner.profileImage}`
-                : "https://static.mothership.sg/1/2021/07/cat.jpg"
+                : default_profile
             }
             alt="Profile"
             className={`${styles["avatar-img"]} ${avatarClicked ? styles["avatar-clicked"] : ""}`}

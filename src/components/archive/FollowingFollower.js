@@ -3,8 +3,9 @@ import { AuthContext } from "../../AuthProvider";
 import apiClient from "../../utils/axios";
 import styles from "./FollowingFollower.module.css";
 import { useNavigate, useLocation } from "react-router-dom";
+import default_profile from "../../assets/images/default_profile.jpg";
 
-function FollowingFollower() {
+function FollowingFollower({ mode, excludeUserIds = [], onInviteComplete }) {
   const { userid, secureApiRequest } = useContext(AuthContext);
 
   const [followers, setFollowers] = useState([]);
@@ -93,6 +94,33 @@ function FollowingFollower() {
     }
   };
 
+  const handleInviteToChatroom = async () => {
+    if (selectedUsers.length === 0) {
+      alert("초대할 사용자를 선택하세요.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("chatroomid", location.pathname.split("/").pop()); // 현재 chatroomid
+      selectedUsers.forEach((id) => {
+        formData.append("users", id);
+      });
+
+      await secureApiRequest(`/chat/invite`, {
+        method: "POST",
+        body: formData,
+      });
+
+      alert("사용자들을 채팅방에 초대했습니다.");
+      setSelectedUsers([]);
+      if (onInviteComplete) onInviteComplete(); // 모달 닫기
+    } catch (err) {
+      console.error("초대 실패:", err);
+      alert("초대에 실패했습니다.");
+    }
+  };
+
   const toggleUserSelection = (userId) => {
     setSelectedUsers((prevSelected) =>
       prevSelected.includes(userId)
@@ -105,6 +133,13 @@ function FollowingFollower() {
     navigate(`/library/archive/${userid}`);
   };
 
+  const filteredFollowing = following.filter(
+    (user) => !excludeUserIds.includes(user.userId)
+  );
+  const filteredFollowers = followers.filter(
+    (user) => !excludeUserIds.includes(user.userId)
+  );
+
   return (
     <div className={styles.followcard}>
       <div className={styles.followtabs}>
@@ -112,28 +147,44 @@ function FollowingFollower() {
           className={`${styles.tab} ${activeTab === "following" ? styles.active : ""}`}
           onClick={() => setActiveTab("following")}
         >
-          팔로잉 ({following.length})
+          팔로잉 (
+          {mode === "invite" ? filteredFollowing.length : following.length})
         </button>
         <button
           className={`${styles.tab} ${activeTab === "follower" ? styles.active : ""}`}
           onClick={() => setActiveTab("follower")}
         >
-          팔로워 ({followers.length})
+          팔로워 (
+          {mode === "invite" ? filteredFollowers.length : followers.length})
         </button>
       </div>
 
       <div className={styles.followlist}>
-        {(activeTab === "following" ? following : followers).length === 0 ? (
+        {(activeTab === "following"
+          ? mode === "invite"
+            ? filteredFollowing
+            : following
+          : mode === "invite"
+            ? filteredFollowers
+            : followers
+        ).length === 0 ? (
           <p>아직 유저가 없습니다.</p>
         ) : (
-          (activeTab === "following" ? following : followers).map((user) => (
+          (activeTab === "following"
+            ? mode === "invite"
+              ? filteredFollowing
+              : following
+            : mode === "invite"
+              ? filteredFollowers
+              : followers
+          ).map((user) => (
             // TODO: 클릭 시 해당 유저의 프로필 페이지로 이동함
             <div key={user.userId} className={styles.followuseritem}>
               <img
                 src={
                   user.profileImagePath
                     ? `http://localhost:8080/upload_files/user_profile/${user.profileImagePath}`
-                    : "https://static.mothership.sg/1/2021/07/cat.jpg"
+                    : default_profile
                 }
                 alt="Profile"
                 className={styles.followavatar}
@@ -153,7 +204,7 @@ function FollowingFollower() {
                   @{user.loginId || "소셜로그인"}
                 </div>
               </div>
-              {location.pathname === "/chat/new" ? (
+              {mode === "invite" || location.pathname === "/chat/new" ? (
                 <input
                   type="checkbox"
                   className={styles.userCheckbox}
@@ -171,12 +222,18 @@ function FollowingFollower() {
             </div>
           ))
         )}
-        {location.pathname === "/chat/new" && (
+        {(mode === "invite" || location.pathname === "/chat/new") && (
           <button
             className={styles.messagebtn}
-            onClick={handleGroupMessageClick}
+            onClick={
+              mode === "invite"
+                ? handleInviteToChatroom
+                : handleGroupMessageClick
+            }
           >
-            채팅방 초대하기: {selectedUsers.length}명
+            {mode === "invite"
+              ? `초대하기 (${selectedUsers.length}명)`
+              : `채팅방 초대하기: ${selectedUsers.length}명`}
           </button>
         )}
       </div>
