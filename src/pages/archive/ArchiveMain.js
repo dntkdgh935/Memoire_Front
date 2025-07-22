@@ -163,20 +163,25 @@ function ArchiveMain() {
           <FollowingFollower />
         </div>
         <div className={styles.content}>
-          <div className={styles.tabs}>
+          <div className={styles.tabsRow}>
+            <div className={styles.tabs}>
+              <button
+                className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
+                onClick={handleMyCollClick}
+              >
+                내 컬렉션
+              </button>
+              <button
+                className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
+                onClick={handleBookmarkCollClick}
+              >
+                북마크한 컬렉션
+              </button>
+            </div>
             <button
-              className={`${styles.tab} ${activeTab === "myColl" ? styles.active : ""}`}
-              onClick={handleMyCollClick}
+              className={styles.newCollButton}
+              onClick={handleNewCollection}
             >
-              내 컬렉션
-            </button>
-            <button
-              className={`${styles.tab} ${activeTab === "bookmarkColl" ? styles.active : ""}`}
-              onClick={handleBookmarkCollClick}
-            >
-              북마크한 컬렉션
-            </button>
-            <button className={styles.button} onClick={handleNewCollection}>
               새 컬렉션
             </button>
           </div>

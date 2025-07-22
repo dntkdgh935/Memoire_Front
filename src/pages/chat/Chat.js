@@ -3,16 +3,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import PageHeader from "../../components/common/PageHeader";
 import styles from "./Chat.module.css";
+import Modal from "../../components/common/Modal";
+import FollowingFollower from "../../components/archive/FollowingFollower";
 
 function Chat() {
   const { userid, role, isLoggedIn, secureApiRequest } =
     useContext(AuthContext);
   const [chatroomid, setChatroomid] = useState("");
+  const [users, setUsers] = useState([]);
   const location = useLocation();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const socketRef = useRef(null);
   const bottomRef = useRef(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,14 +28,14 @@ function Chat() {
 
   useEffect(() => {
     if (!userid || !chatroomid) return;
-    if (isLoggedIn === false) {
-      alert("로그인을 하세요!");
-      navigate("/");
-      return;
-    }
 
-    if (role === "ADMIN") {
-      const fetchAdminStuff = async () => {
+    const fetchStuff = async () => {
+      if (isLoggedIn === false) {
+        alert("로그인을 하세요!");
+        navigate("/");
+        return;
+      }
+      if (role === "ADMIN") {
         try {
           await secureApiRequest(
             `/chat/admin/start?userid=${userid}&chatroomid=${chatroomid}`,
@@ -42,9 +46,25 @@ function Chat() {
         } catch (error) {
           console.error("Error fetching admin chatrooms:", error);
         }
-      };
-      fetchAdminStuff();
-    }
+      }
+
+      try {
+        const response = await secureApiRequest(
+          `/chat/users?chatroomid=${chatroomid}`,
+          {
+            method: "GET",
+          }
+        );
+        console.log("채팅방 사용자 목록:", response.data);
+        setUsers(response.data);
+        if (!response.data.some((user) => user.userId === userid)) {
+          alert("이 채팅방에 참여할 수 없습니다.");
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("채팅방 사용자 목록 가져오기 실패:", error);
+      }
+    };
 
     const socketUrl = `ws://localhost:8080/chat/${chatroomid}?userid=${userid}`;
     socketRef.current = new WebSocket(socketUrl);
@@ -86,6 +106,8 @@ function Chat() {
       console.error("WS error:", error);
     };
 
+    fetchStuff();
+
     return () => {
       socketRef.current?.close();
     };
@@ -113,11 +135,40 @@ function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const handleInvite = () => {
+    setShowInviteModal(true);
+  };
+
+  const handleInviteComplete = () => {
+    setShowInviteModal(false);
+  };
+
+  const handleLeave = async () => {
+    if (!window.confirm("채팅방에서 나가시겠습니까?")) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("chatroomid", chatroomid);
+      formData.append("userid", userid);
+      await secureApiRequest(`/chat/leave`, {
+        method: "POST",
+        body: formData,
+      });
+      alert("채팅방에서 나갔습니다.");
+      navigate("/chat");
+    } catch (error) {
+      console.error("나가기 실패:", error);
+      alert("채팅방 나가기 실패");
+    }
+  };
+
   return (
     <>
       <PageHeader pagename={`Chatroom`} />
       <div className={styles.chatContainer}>
-        <h3 className={styles.chatHeader}>채팅방: {chatroomid}</h3>
+        <h3 className={styles.chatHeader}>
+          채팅방: {users.map((user) => `${user.name}`).join(", ")}
+        </h3>
         <div className={styles.chatBox}>
           {messages.map((msg) => (
             <div
@@ -126,6 +177,10 @@ function Chat() {
                 msg.userid === userid ? styles.messageRight : styles.messageLeft
               }`}
             >
+              <span className={styles.username}>
+                {users.find((u) => u.userId === msg.userid)?.name || msg.userid}
+              </span>
+              <br />
               <div
                 className={`${styles.messageBubble} ${
                   msg.userid === userid ? styles.myMessage : styles.otherMessage
@@ -150,6 +205,26 @@ function Chat() {
           </button>
         </div>
       </div>
+      <div className={styles.chatActions}>
+        <button
+          onClick={() => setShowInviteModal(true)}
+          className={styles.inviteButton}
+        >
+          초대하기
+        </button>
+        <button onClick={handleLeave} className={styles.leaveButton}>
+          나가기
+        </button>
+      </div>
+      {showInviteModal && (
+        <Modal onClose={() => setShowInviteModal(false)}>
+          <FollowingFollower
+            mode="invite"
+            excludeUserIds={users.map((u) => u.userId)}
+            onInviteComplete={handleInviteComplete}
+          />
+        </Modal>
+      )}
     </>
   );
 }

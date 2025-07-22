@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
+import default_profile from "../../assets/images/default_profile.jpg";
 import styles from "./ProfileCard.module.css";
 
 function ProfileCard() {
@@ -111,15 +112,12 @@ function ProfileCard() {
 
   const handleStatusSave = async () => {
     try {
+      const formData = new FormData();
+      formData.append("userid", userid);
+      formData.append("statusMessage", editStatusMessage);
       await secureApiRequest("/archive/updateStatusMessage", {
         method: "POST",
-        body: JSON.stringify({
-          userid: userid,
-          statusMessage: editStatusMessage,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,
       });
 
       setStatusMessage(editStatusMessage);
@@ -160,7 +158,7 @@ function ProfileCard() {
             src={
               profileImagePath // AuthContext에서 가져온 profileImagePath 사용
                 ? `http://localhost:8080${profileImagePath}` // <-- 이 부분을 수정: /upload_files/user_profile/user_xxx.jpg
-                : "https://static.mothership.sg/1/2021/07/cat.jpg"
+                : default_profile
             }
             alt="Profile"
             className={`${styles.avatarimg} ${avatarClicked ? styles.avatarclicked : ""}`}

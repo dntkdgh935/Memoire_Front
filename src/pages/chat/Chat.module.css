@@ -26,6 +26,11 @@
   text-align: left;
 }
 
+.username {
+  font-size: 0.75rem;
+  color: #888;
+}
+
 .messageBubble {
   display: inline-block;
   padding: 8px 12px;
@@ -52,4 +57,30 @@
 
 .sendButton {
   margin-left: 10px;
+}
+
+.chatActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.inviteButton,
+.leaveButton {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.inviteButton {
+  background-color: #4caf50;
+  color: white;
+}
+
+.leaveButton {
+  background-color: #f44336;
+  color: white;
 }
