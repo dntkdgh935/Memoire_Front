@@ -26,46 +26,35 @@ function LibCollDetailView() {
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // // collection 상태 변경시 재렌더링
+  // useEffect(() => {
+  //   if (collection) {
+  //     console.log("✅ [변경됨] collection 상태 업데이트:", collection);
+  //   }
+  // }, [collection]); // collection이 변경될 때마다 호출
+
+  //1.  컬렉션 정보 및 내부 메모리 목록 가져오기
   useEffect(() => {
     console.log("안녕!!");
     const fetchCollectionDetail = async () => {
       setLoading(true);
-
-      //로그인 유저일 경우의, 디테일 확인할 컬렉션 정보와 메모리 가져오기
-      if (currentUserid != null) {
-        try {
-          const res = await axios.get(
-            `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
-          );
-          console.log("컬렉션 태그 확인해!!!" + res.data);
-          setCollection(res.data);
-          // // 컬렉션에 속한 메모리 리스트 불러오기
-          // console.log("** id는: " + collection.collectionid);
-          //console.log(collection);
-          await fetchMemoryList(res.data.collectionid); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
-        } catch (err) {
-          console.error("🚨 컬렉션 정보 불러오기 실패", err);
-          console.log("✅로그인 실패한 유저: ", userid);
-          alert("이 컬렉션에 접근할 수 없습니다.");
-          navigate("library/main"); // 이전 페이지로 돌아가기
-        } finally {
-          setLoading(false);
-        }
-      }
-      //비로그인 유저일 경우디테일 확인할 컬렉션 정보와 메모리 가져오기
-      else {
-        try {
-          const res = await axios.get(
-            `http://localhost:8080/api/library/collection/${id}`
-          );
-          setCollection(res.data);
-          await fetchMemoryList(res.data.collectionid);
-        } catch (err) {
-          alert("비로그인 - 이 컬렉션에 접근할 수 없습니다.");
-          navigate("library/main"); // 이전 페이지로 돌아가기
-        } finally {
-          setLoading(false);
-        }
+      try {
+        const res = await axios.get(
+          `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
+        );
+        console.log("컬렉션 태그 확인해!!!" + res.data);
+        setCollection(res.data);
+        // // 컬렉션에 속한 메모리 리스트 불러오기
+        // console.log("** id는: " + collection.collectionid);
+        console.log(collection);
+        await fetchMemoryList(res.data.collectionid); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
+      } catch (err) {
+        console.error("🚨 컬렉션 정보 불러오기 실패", err);
+        console.log("✅로그인 실패한 유저: ", userid);
+        alert("이 컬렉션에 접근할 수 없습니다.");
+        navigate("library/main"); // 이전 페이지로 돌아가기
+      } finally {
+        setLoading(false);
       }
     };
     fetchCollectionDetail();
@@ -136,6 +125,12 @@ function LibCollDetailView() {
         );
       }
 
+      // // // 2. 서버에서 최신 데이터를 받아와 상태 업데이트
+      // const res = await axios.get(
+      //   `http://localhost:8080/api/library/collection/${collectionId}/${currentUserid}`
+      // );
+      // setCollection(res.data); // 최신 상태로 갱신
+
       //UI 상태 변경
       setCollection((prev) => {
         if (!prev) return prev;
@@ -164,31 +159,18 @@ function LibCollDetailView() {
     <>
       <PageHeader pagename={`컬렉션 상세보기`} />
       <div className={styles.detailContainer}>
-        {collection ? (
-          <LibCollCard
-            coll={collection}
-            memoryList={memoryList}
-            onMemoryClick={handleMemoryClick}
-            onActionChange={handleActionChange}
-            selectedMemoryId={selectedMemoryId}
-          />
-        ) : (
-          <div>컬렉션 정보를 불러올 수 없습니다.</div>
-        )}
-        {collection ? (
-          <MemoryView
-            selectedMemory={selectedMemory}
-            authorid={collection.authorid}
-            numMemories={memoryList.length}
-          />
-        ) : (
-          <div>컬렉션 정보를 불러올 수 없습니다.</div>
-        )}
-        {/* <MemoryView
+        <LibCollCard
+          coll={collection}
+          memoryList={memoryList}
+          onMemoryClick={handleMemoryClick}
+          onActionChange={handleActionChange}
+          selectedMemoryId={selectedMemoryId}
+        />
+        <MemoryView
           selectedMemory={selectedMemory}
           authorid={collection.authorid}
           numMemories={memoryList.length}
-        /> */}
+        />
       </div>
     </>
   );
