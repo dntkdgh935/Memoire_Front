@@ -30,6 +30,7 @@ function LibraryMain() {
       console.log("로그인 회원 추천");
       const fetchCollections = async () => {
         // TODO: 전체/ 팔로잉 <-- 이런 태그는 만들 수 없게 하기
+
         try {
           const res = await apiClient.get(
             `api/library/discover/${selectedTag}/${userid}`
@@ -47,9 +48,17 @@ function LibraryMain() {
       console.log("비회원 추천");
       const fetchCollections = async () => {
         try {
-          const res = await apiClient(`api/library/discover/${selectedTag}`);
-          setRecColls(res.data);
-          console.log("비회원 추천 내용:", res.data);
+          // 전체/ 기타 태그일 경우
+          if (
+            selectedTag != null &&
+            (selectedTag == "전체" || selectedTag != "팔로잉")
+          ) {
+            const res = await apiClient(`api/library/discover/${selectedTag}`);
+            setRecColls(res.data);
+            console.log("비회원 추천 내용:", res.data);
+          } else if (selectedTag == "팔로잉") {
+            alert("로그인 후 사용 가능합니다.");
+          }
         } catch (err) {
           console.error("🚨 컬렉션 불러오기 실패", err);
         }
