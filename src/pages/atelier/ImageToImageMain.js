@@ -93,13 +93,15 @@ export default function ImageToImageMain() {
         <div className={styles.centerPanel}>
           <SettingPanel
             selectedMemory={selectedMemory}
-            onGenerate={(dto) =>
+            onGenerate={(dto) => {
+              console.log("imagetoimagemain got dto", dto);
+              const image = `http://localhost:8080/upload_files/memory_img/${dto.filename}`;
               setResult({
                 status: "success",
                 resultDto: dto,
-                imageUrl: dto.imageUrl,
-              })
-            }
+                imageUrl: image,
+              });
+            }}
           />
         </div>
 

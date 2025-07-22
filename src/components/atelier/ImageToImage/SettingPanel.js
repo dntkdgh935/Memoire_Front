@@ -24,7 +24,10 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         if (!res.ok) throw new Error("이미지 변환 실패");
         return res.json();
       })
-      .then((dto) => onGenerate(dto))
+      .then((dto) => {
+        console.log("received DTO in SettingPanel", dto);
+        onGenerate(dto);
+      })
       .catch((err) => console.error("변환 요청 오류:", err));
   };
 
