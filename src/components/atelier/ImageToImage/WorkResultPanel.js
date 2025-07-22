@@ -20,8 +20,9 @@ export default function WorkResultPanel({
       return;
     }
     const payload = {
-      title: originalMemoryTitle,
+      collectionId: selectedCollectionId,
       ...result.resultDto,
+      title: originalMemoryTitle,
     };
     try {
       const response = await fetch(`/atelier/imtim/${selectedCollectionId}`, {
@@ -68,7 +69,7 @@ export default function WorkResultPanel({
 
       {isLoading && (
         <div className={styles.loadingBox}>
-          <img src={loadingImg} alt="로딩 중" />
+          <img src={result.imageUrl} alt="로딩 중" />
           <p>
             이미지 생성중
             <br />
