@@ -1,29 +1,30 @@
 /* src/pages/user/FindPwd.module.css */
+
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f0f2f5;
+  background-color: white;
   padding: 20px;
-  box-sizing: border-box;
 }
 
 .findPwdBox {
-  background-color: #ffffff;
+  background-color: #fdfaf6;
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
   text-align: center;
+  border: 1px solid #e0dcd7;
 }
 
 .title {
-  font-size: 28px;
-  color: #333;
-  margin-bottom: 30px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 24px;
 }
 
 .form {
@@ -33,49 +34,49 @@
 }
 
 .inputGroup {
-  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
 }
 
 .input {
-  width: 100%;
-  padding: 12px 15px;
+  padding: 12px;
+  font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 16px;
-  box-sizing: border-box;
+  background-color: #fffdfb;
   transition: border-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;
 }
 
 .input:focus {
-  border-color: #007bff;
   outline: none;
+  border-color: #b0a49b;
+  box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
 }
 
 .findPwdButton {
-  width: 100%;
-  padding: 15px;
-  background-color: #007bff;
-  color: white;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
   border: none;
   border-radius: 8px;
-  font-size: 18px;
-  font-weight: 600;
   cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    transform 0.1s ease;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  transition: background-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.findPwdButton:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
+.findPwdButton:hover:not(:disabled) {
+  background-color: #4a3728;
 }
 
-.findPwdButton:active {
-  transform: translateY(0);
+.findPwdButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
-
-/* UserVerification 컴포넌트 내부 스타일과 충돌하지 않도록 주의 */
-/* UserVerification 컴포넌트가 자체적으로 스타일을 가지고 있으므로,
-   여기서는 FindPwd 컴포넌트의 전체적인 레이아웃에만 집중합니다. */

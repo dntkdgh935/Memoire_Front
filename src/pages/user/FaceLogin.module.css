@@ -1,0 +1,158 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: white; /* 기존과 동일 */
+  padding: 20px;
+  font-family: "Inter", sans-serif;
+}
+
+.card {
+  background-color: #fdfbf8; /* 배경색 */
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); /* 그림자 */
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid #b0b0b0; /* 테두리 */
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #5b4f46;
+  margin-bottom: 24px;
+}
+
+.description {
+  font-size: 16px;
+  color: #5b4f46;
+  margin-bottom: 24px;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 1rem;
+}
+
+.loginButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fdfbf8;
+  background-color: #5b4f46;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.loginButton:hover:not(:disabled) {
+  background-color: #4a3728;
+  transform: translateY(-3px);
+}
+
+.loginButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.7;
+}
+
+.normalButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #5b4f46;
+  background-color: transparent;
+  border: 1px solid #d4ccbb;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+  user-select: none;
+}
+
+.normalButton:hover:not(:disabled) {
+  background-color: rgba(212, 204, 187, 0.2);
+  border-color: #b0b0b0;
+}
+
+.normalButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.message {
+  margin-top: 1rem;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(117, 84, 38, 0.1);
+  text-align: center;
+}
+
+.loadingMessage {
+  background-color: #fff7e7; /* 연한 배경 */
+  color: #5b4f46; /* 텍스트 */
+}
+
+.normalMessage {
+  background-color: #fdfbf8; /* 연한 배경 */
+  color: #5b4f46;
+}
+
+.loadingContainer {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.spinner {
+  border: 3px solid rgba(91, 79, 70, 0.2);
+  border-top-color: #5b4f46;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+
+.loadingText {
+  color: #5b4f46;
+  font-size: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.footerText {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #5b4f46;
+}
+
+/* 에러 메시지 */
+.errorMessage {
+  font-size: 12px;
+  color: #de4949;
+  margin-top: 8px;
+  text-align: center;
+}

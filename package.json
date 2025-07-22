@@ -14,6 +14,7 @@
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "face-api.js": "^0.22.2",
     "libphonenumber-js": "^1.12.9",
     "prettier": "^3.6.2",
     "react": "^19.1.0",

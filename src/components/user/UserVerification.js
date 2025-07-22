@@ -55,7 +55,6 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
     setPhone(rawValue);
     setIsCodeSent(false);
     setIsVerified(false);
-    // setVerificationCode(""); // ✅ 이 부분 제거
     setDisplayedCode(""); // ✅ 표시할 인증번호 초기화
     setMessage({ text: "", type: "" });
     if (timerInterval) {
@@ -85,7 +84,24 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
 
     setIsLoading(true);
     showMessage("");
+
     try {
+      // ✅ 1. 전화번호로 유저 존재 여부 확인
+      const checkUserResponse = await apiClient.get(`/user/check-phone`, {
+        params: { phone: phone },
+      });
+
+      if (checkUserResponse.data.exists) {
+        // 유저가 이미 존재하면 알림 메시지 표시 후 중단
+        showMessage(
+          "이미 가입된 휴대폰 번호입니다. 다른 번호를 사용해주세요.",
+          "error"
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // ✅ 2. 유저가 존재하지 않으면 인증번호 발급 절차 진행
       const response = await apiClient.post(`${API_BASE_URL}/generate-code`, {
         phone: phone,
       });
@@ -109,11 +125,12 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
         );
       }
     } catch (error) {
-      console.error("인증번호 생성 오류:", error);
-      showMessage(
-        "인증번호 발급 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-        "error"
-      );
+      console.error("인증번호 생성 또는 유저 확인 오류:", error);
+      // 서버 응답에 따라 구체적인 오류 메시지를 표시할 수 있음
+      const errorMessage =
+        error.response?.data?.message ||
+        "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+      showMessage(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +138,6 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
 
   const handleVerifyCode = async () => {
     if (!phone || !displayedCode) {
-      // ✅ displayedCode 사용
       showMessage("휴대폰 번호와 인증번호를 모두 입력해주세요.", "error");
       return;
     }
@@ -192,7 +208,9 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (

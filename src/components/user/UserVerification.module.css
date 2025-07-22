@@ -7,6 +7,7 @@
   position: relative;
   margin-bottom: 15px;
   box-sizing: border-box;
+  flex-grow: 1; /* ✅ 추가: inputGroup이 사용 가능한 공간을 채우도록 함 */
 }
 
 .errorText {
@@ -61,8 +62,8 @@
   justify-content: center;
   white-space: nowrap;
   box-sizing: border-box;
-  position: relative;
-  top: 1px; /* 버튼 살짝 내려서 시각적 정렬 맞춤 */
+  /* position: relative; */ /* ✅ 제거: flex 정렬에 맡김 */
+  /* top: 1px; */ /* ✅ 제거: flex 정렬에 맡김 */
 }
 
 .actionButton:hover:not(:disabled) {
@@ -83,8 +84,9 @@
 .phoneInputWithButton,
 .verificationInputGroup {
   display: flex;
+  align-items: flex-start; /* ✅ 변경: 아이템들을 위쪽에 정렬 */
   gap: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   position: relative;
   width: 100%;
   max-width: 500px; /* 입력 라인 최대 너비 제한 */
@@ -102,6 +104,8 @@
 .verificationInputGroup .actionButton {
   flex: none;
   width: 120px;
+  /* ✅ 높이 고정 (input과 동일하게) */
+  height: 48px;
 }
 
 /* === 타이머 표시 === */
@@ -110,22 +114,26 @@
   top: 50%;
   right: 12px;
   transform: translateY(-50%);
-  background-color: #f0f0f0;
+  background-color: #e9ecef;
   color: #333;
   padding: 4px 8px;
   border-radius: 5px;
   font-size: 0.9rem;
   white-space: nowrap;
+  /* ✅ input 안에 정렬되도록 top, transform 조정 */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* === 메시지 박스 === */
 .messageBox {
   padding: 12px 15px;
   border-radius: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   font-size: 0.9rem;
   line-height: 1.4;
   word-break: keep-all;
+  max-width: 500px; /* 메시지 박스도 너비 제한 */
 }
 
 .messageBox.success {
@@ -167,4 +175,5 @@
   text-align: center;
   font-weight: bold;
   font-size: 1rem;
+  max-width: 500px; /* 인증 완료 메시지도 너비 제한 */
 }
