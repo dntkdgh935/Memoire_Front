@@ -17,69 +17,102 @@ function LibraryMain() {
   const [recColls, setRecColls] = useState([]);
   const loaderRef = useRef(null);
   const scrollContainerRef = useRef(null); // CollGrid 내부 스크롤 영역
-  const MAX_ITEMS = 50; // 프론트 리셋 기준
-  const [loading, setLoading] = useState(false);
 
-  // **** '추천' 상태에서 recColl이 0개가 되면 30개씩 가져옴
-  useEffect(() => {
-    if (recColls.length === 0 && selectedTag === "추천") {
-      console.log("🌀 비어 있어서 추천 요청");
-      fetchMoreCollections();
+  const [page, setPage] = useState(0);
+
+  const fetchCollections4LoginUser = async () => {
+    console.log("fetchCollections4LoginUser 수행중");
+    try {
+      const res = await apiClient.get(
+        `api/library/discover/${selectedTag}/${userid}`
+      );
+      console.log("받은 데이터");
+      console.log(res.data);
+      setRecColls(res.data);
+      return res.data;
+    } catch (err) {
+      console.error("요청중 실패");
+      return [];
     }
-  }, [recColls.length, selectedTag]);
+  };
 
-  // **** 추천된 컬렉션이 변할 때마다 observer 업데이트? (0이 될 때도 변하나?)
+  const fetchCollections4Anon = async () => {
+    console.log("fetchCollections4Anon 수행중");
+    try {
+      const res = await apiClient.get(`api/library/discover/${selectedTag}`);
+      console.log("받은 데이터");
+      console.log(res.data);
+      setRecColls(res.data);
+      return res.data;
+    } catch (err) {
+      console.error("요청중 실패");
+      return [];
+    }
+  };
+
+  const recColls4LoginUser = async () => {
+    console.log("recColls4LoginUser 수행중");
+    try {
+      const res = await apiClient.get(`/api/library/recommend/${userid}`, {
+        params: page,
+      });
+      console.log("받은 데이터");
+      console.log(res.data.content);
+      setRecColls(res.data.content);
+      return res.data;
+    } catch (err) {
+      console.error("요청중 실패");
+      return [];
+    }
+  };
+
+  const recColls4Anon = async () => {
+    console.log("recColls4Anon 수행중");
+    try {
+      const res = await apiClient.get(`/api/library/recommend/guest`, {
+        params: page,
+      });
+      console.log("받은 데이터");
+      console.log(res.data.content);
+      setRecColls(res.data.content);
+      return res.data;
+    } catch (err) {
+      console.error("요청중 실패");
+      return [];
+    }
+  };
+
+  // 탭 클릭 지정 완료시 수행
   useEffect(() => {
-    if (!scrollContainerRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) fetchMoreCollections();
-      },
-      {
-        root: scrollContainerRef.current,
-        threshold: 1.0,
+    //로그인시
+    if (isLoggedIn) {
+      switch (selectedTag) {
+        case "추천":
+          recColls4LoginUser();
+          break;
+        default: //팔로잉, 기타 태그 처리
+          console.log("선택 탭에 따라 처리:" + selectedTag);
+          fetchCollections4LoginUser();
+          break;
       }
-    );
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    return () => {
-      if (loaderRef.current) observer.unobserve(loaderRef.current);
-    };
-  }, [loading]); //[recColls]); //[recColls]);
+    }
 
-  // selectedTag / 로그인 상태 달라지면 수행됨.
-  // 전체/ 팔로잉/ 태그 선택 모두 처리
-  useEffect(() => {
-    setRecColls([]); // 항상 초기화
-    console.log("추천 리스트 초기화됨");
-
-    if (selectedTag === "추천") return; // 추천은 위의 useEffect에서 처리
-
-    const fetchCollections = async () => {
-      try {
-        if (isLoggedIn) {
-          console.log("👤 로그인 사용자 태그 fetch:", selectedTag);
-          const res = await apiClient.get(
-            `api/library/discover/${selectedTag}/${userid}`
-          );
-          setRecColls(res.data);
-        } else {
-          if (selectedTag === "팔로잉") {
-            alert("로그인 후 사용 가능합니다.");
-          } else {
-            console.log("👤 비회원 사용자 태그 fetch:", selectedTag);
-            const res = await apiClient.get(
-              `api/library/discover/${selectedTag}`
-            );
-            setRecColls(res.data);
-          }
-        }
-      } catch (err) {
-        console.error("🚨 컬렉션 불러오기 실패", err);
+    //비로그인시
+    else {
+      switch (selectedTag) {
+        case "추천":
+          recColls4Anon();
+          break;
+        case "팔로잉":
+          alert("로그인 후 사용 가능합니다.");
+          setSelectedTag("전체");
+          break;
+        default: //"기타 태그"
+          fetchCollections4Anon();
+          break;
       }
-    };
-
-    fetchCollections();
-  }, [selectedTag, isLoggedIn, userid]);
+    }
+  }, [selectedTag, userid, isLoggedIn]);
 
   // top tag들 가져오기
   useEffect(() => {
@@ -97,38 +130,6 @@ function LibraryMain() {
 
     fetchTags();
   }, []);
-
-  // Collection을 top 30개씩 리턴하는 fetch 함수
-  const fetchMoreCollections = async () => {
-    console.log("fetchMoreCollection 실행!");
-    if (loading) return;
-
-    if (recColls.length >= MAX_ITEMS) {
-      console.log("현재 총 컬렉션 수: " + recColls.length);
-      console.log("🔄 프론트 리셋 실행");
-
-      setRecColls([]); // 상태만 초기화
-      window.scrollTo({ top: 0, behavior: "smooth" });
-
-      return; // fetch는 하지 않음
-    }
-
-    setLoading(true);
-    try {
-      const res = await apiClient.get(
-        isLoggedIn
-          ? `/api/library/recommend/${userid}`
-          : `/api/library/recommend/guest`
-      );
-      console.log("추천 컨트롤러 요청 완료");
-      console.log("컨틀ㄹ러 반환:" + res.data.length);
-      setRecColls((prev) => [...prev, ...res.data]);
-    } catch (err) {
-      console.error("🚨 추천 컬렉션 불러오기 실패", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
   const handleActionChange = async (collectionId, actionType) => {
@@ -156,30 +157,6 @@ function LibraryMain() {
         );
       }
 
-      // UI 상태 변경
-      // setRecColls((prevState) =>
-      //   prevState.map((coll) =>
-      //     coll.collectionid === collectionId
-      //       ? {
-      //           ...coll,
-      //           [actionType]: !coll[actionType], // 상태 토글
-      //           // 좋아요/북마크 카운트 업데이트
-      //           [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-      //             coll[actionType] === true
-      //               ? coll[
-      //                   actionType === "userlike"
-      //                     ? "likeCount"
-      //                     : "bookmarkCount"
-      //                 ] - 1
-      //               : coll[
-      //                   actionType === "userlike"
-      //                     ? "likeCount"
-      //                     : "bookmarkCount"
-      //                 ] + 1,
-      //         }
-      //       : coll
-      //   )
-      // );
       setRecColls((prevState) =>
         prevState.map((coll) => {
           if (coll.collectionid !== collectionId) return coll;
