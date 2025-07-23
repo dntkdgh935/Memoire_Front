@@ -6,7 +6,7 @@ import AdminMain from "../pages/admin/AdminMain";
 function AdminRouter() {
   return (
     <Routes>
-      <Route path=" " element={<AdminMain />} />
+      <Route path="main" element={<AdminMain />} />
     </Routes>
   );
 }

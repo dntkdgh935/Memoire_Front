@@ -24,7 +24,7 @@ function Header() {
 
   const { useVideo, setUseVideo } = useTheme();
   const goAdmin = () => {
-    navigate("/admin");
+    navigate("/admin/main");
   };
 
   useEffect(() => {
@@ -85,7 +85,6 @@ function Header() {
         console.error("팔로우 요청 승인 실패", error);
       });
   };
-
 
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
@@ -184,10 +183,14 @@ function Header() {
         {/* 테마 토글 아이콘 */}
         <button
           className={styles.themeButton}
-          onClick={() => setUseVideo(v => !v)}
+          onClick={() => setUseVideo((v) => !v)}
           aria-label="Toggle background theme"
         >
-         {useVideo ? <FaSun className={styles.iconButton} /> : <FaMoon className={styles.iconButton} />}
+          {useVideo ? (
+            <FaSun className={styles.iconButton} />
+          ) : (
+            <FaMoon className={styles.iconButton} />
+          )}
         </button>
         {/* 관리자 아이콘 */}
         <img
