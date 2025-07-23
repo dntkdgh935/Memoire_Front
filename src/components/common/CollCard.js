@@ -4,10 +4,10 @@ import LibCollLabel from "../library/LibCollLabel";
 
 function CollCard({ collection, onActionChange, onCollClick }) {
   const cover = collection.thumbnailPath; // collection에서 동적으로 이미지 경로 받기
-  console.log(cover);
+  // console.log(cover);
   const isImage = collection.thumbType == "image";
   const isText = collection.thumbType === "text";
-  console.log(collection.thumbType);
+  // console.log(collection.thumbType);
 
   return (
     <div

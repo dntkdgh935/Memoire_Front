@@ -13,9 +13,9 @@ function AvatarWName({ user, type }) {
   // 출력할 아바타 유저
   const { username, displayId, profileImageUrl, userid } = user;
 
-  console.log("username: " + username + ", userid: " + userid);
-  // const { userid } = useContext(AuthContext);
-  console.log("[AvatarWName]:" + userid);
+  // console.log("username: " + username + ", userid: " + userid);
+  // // const { userid } = useContext(AuthContext);
+  // console.log("[AvatarWName]:" + userid);
 
   const handleAvatarClick = () => {
     console.log("heyyy 로그인 유저: " + loginUserId + ", authorid:" + userid);
