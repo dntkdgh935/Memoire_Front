@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import apiClient from "../../utils/axios"; // 기존 axios 인스턴스 (AuthContext에서 사용되는)
-import { AuthContext } from "../../AuthContext"; // AuthContext 임포트
+import { AuthContext } from "../../AuthProvider";
 
 function AdminNewUserChart() {
   const [chartData, setChartData] = useState([]);

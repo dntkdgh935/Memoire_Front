@@ -18,6 +18,7 @@ import LibraryRouter from "./LibraryRouter";
 import ArchiveRouter from "./ArchiveRouter";
 import UserRouter from "./UserRouter";
 import ChatRouter from "./ChatRouter";
+import AdminRouter from "./AdminRouter";
 
 function AppRouter() {
   return (
@@ -28,6 +29,7 @@ function AppRouter() {
       <Route path="/archive/*" element={<ArchiveRouter />} />
       <Route path="/user/*" element={<UserRouter />} />
       <Route path="/chat/*" element={<ChatRouter />} />
+      <Route path="/admin/*" element={<AdminRouter />} />
       <Route
         path="/oauth2/callback/success"
         element={<OAuth2CallbackSuccess />}

@@ -1,7 +1,7 @@
 // src/pages/admin/AdminMain.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../AuthContext"; // AuthContext 경로 확인
+import { AuthContext } from "../../AuthProvider";
 import { useContext } from "react";
 import AdminNewUserChart from "../../components/admin/AdminNewUserChart"; // 새로 만든 차트 컴포넌트 임포트
 
