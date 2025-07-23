@@ -67,9 +67,3 @@ div[class*="Sidebar_sidebar"] {
   background-color: transparent !important;
   border-right: none !important;
 }
-
-
-div[class*="CollCard_card"] {
-  background-color: rgba(255, 255, 255, 0.3) !important;
-  
-}
