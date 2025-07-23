@@ -54,11 +54,12 @@ function LibraryMain() {
     console.log("recColls4LoginUser 수행중");
     try {
       const res = await apiClient.get(`/api/library/recommend/${userid}`, {
-        params: page,
+        params: { page },
       });
       console.log("받은 데이터");
       console.log(res.data.content);
-      setRecColls(res.data.content);
+      //누적: rec4Anon에도 적용할 것
+      setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
       console.error("요청중 실패");
@@ -70,7 +71,7 @@ function LibraryMain() {
     console.log("recColls4Anon 수행중");
     try {
       const res = await apiClient.get(`/api/library/recommend/guest`, {
-        params: page,
+        params: { page },
       });
       console.log("받은 데이터");
       console.log(res.data.content);
@@ -86,9 +87,13 @@ function LibraryMain() {
   useEffect(() => {
     //로그인시
     if (isLoggedIn) {
+      setRecColls([]); // 💥 추천 결과 초기화
+      setPage(0); // 💥 페이지 초기화
+
       switch (selectedTag) {
         case "추천":
           recColls4LoginUser();
+          console.log(recColls);
           break;
         default: //팔로잉, 기타 태그 처리
           console.log("선택 탭에 따라 처리:" + selectedTag);
@@ -186,25 +191,56 @@ function LibraryMain() {
     navigate(`detail/${collectionId}`);
   };
 
+  //페이지 하단 감지해 페이지 증가(setPage)
+  useEffect(() => {
+    if (!loaderRef.current || selectedTag !== "추천") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log("⏬ 하단 도달 → 다음 페이지 요청");
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    observer.observe(loaderRef.current);
+
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
+    };
+  }, [selectedTag]);
+
+  useEffect(() => {
+    if (selectedTag === "추천" && isLoggedIn && page !== 0) {
+      recColls4LoginUser();
+    }
+  }, [page]);
+
   //TODO: 페이지별로 PageHeader 넣기
   return (
     <>
-      {/* <h2>hello</h2> */}
-      {/* function PageHeader({ pagename, username }) { */}
       <PageHeader pagename="Discover" userid={userid} />
       <TagBar
         selectedTag={selectedTag}
         onTagSelect={setSelectedTag}
         savedTags={topTags}
       />
-      <CollGrid
-        colls={recColls}
-        onActionChange={handleActionChange}
-        onCollClick={handleCollClick}
-        scrollRef={scrollContainerRef}
-        loaderRef={loaderRef}
-      />
-      {/* <CollCard /> */}
+      <div
+        ref={scrollContainerRef}
+        style={{
+          height: "80vh",
+          overflowY: "auto",
+        }}
+      >
+        <CollGrid
+          colls={recColls}
+          onActionChange={handleActionChange}
+          onCollClick={handleCollClick}
+        />
+      </div>
+      <div ref={loaderRef} style={{ height: "40px" }} />
     </>
   );
 }

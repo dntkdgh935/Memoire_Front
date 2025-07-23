@@ -4,13 +4,7 @@ import Masonry from "react-masonry-css";
 import CollCard from "./CollCard";
 import styles from "./CollGrid.module.css";
 
-function CollGrid({
-  colls,
-  onActionChange,
-  onCollClick,
-  scrollRef,
-  loaderRef,
-}) {
+function CollGrid({ colls, onActionChange, onCollClick }) {
   const breakpointColumnsObj = {
     default: 4,
     1200: 3,
@@ -22,29 +16,20 @@ function CollGrid({
 
   return (
     <>
-      <div
-        ref={scrollRef}
-        style={{
-          height: "80vh",
-          overflowY: "auto",
-        }}
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className={styles.myMasonryGrid}
+        columnClassName={styles.myMasonryGridColumn}
       >
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className={styles.myMasonryGrid}
-          columnClassName={styles.myMasonryGridColumn}
-        >
-          {colls.map((coll, index) => (
-            <CollCard
-              key={`${coll.collectionid}-${index}`} // ✅ 고유 key
-              collection={coll}
-              onActionChange={onActionChange}
-              onCollClick={onCollClick}
-            />
-          ))}
-        </Masonry>
-        <div ref={loaderRef} style={{ height: "40px" }} />
-      </div>
+        {colls.map((coll, index) => (
+          <CollCard
+            key={`${coll.collectionid}-${index}`} // ✅ 고유 key
+            collection={coll}
+            onActionChange={onActionChange}
+            onCollClick={onCollClick}
+          />
+        ))}
+      </Masonry>
     </>
   );
 }
