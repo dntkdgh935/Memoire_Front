@@ -3,11 +3,13 @@
 import React, { useState, useContext, useEffect } from "react";
 import apiClient from "../../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaThLarge, FaUserCircle, FaBell, FaMoon } from "react-icons/fa";
+import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
 import styles from "./Header.module.css";
 import { AuthContext } from "../../AuthProvider";
 import NotificationDropdown from "./NotificationDropdown";
+import { useTheme } from "../../ThemeContext";
+import adminIcon from "../../assets/images/admin.png";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
@@ -19,6 +21,11 @@ function Header() {
 
   const navigate = useNavigate();
   const { isLoggedIn, logout, userid } = useContext(AuthContext);
+
+  const { useVideo, setUseVideo } = useTheme();
+  const goAdmin = () => {
+    navigate("/admin");
+  };
 
   useEffect(() => {
     if (userid) {
@@ -79,6 +86,7 @@ function Header() {
       });
   };
 
+
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
     console.log(`검색 실행: 타입=${searchType}, 키워드=${searchKeyword}`);
@@ -134,7 +142,7 @@ function Header() {
 
   return (
     <header className={styles.header}>
-      {/* 왼쪽: 로고 */}
+      {/* 왼쪽: 로고  */}
       <div className={styles.leftSection}>
         <FaThLarge className={styles.logoIcon} />
         <span className={styles.logoText}>MÉMOIRE</span>
@@ -173,7 +181,21 @@ function Header() {
 
       {/* 오른쪽: 아이콘 */}
       <div className={styles.rightSection}>
-        <FaMoon className={styles.iconButton} />
+        {/* 테마 토글 아이콘 */}
+        <button
+          className={styles.themeButton}
+          onClick={() => setUseVideo(v => !v)}
+          aria-label="Toggle background theme"
+        >
+         {useVideo ? <FaSun className={styles.iconButton} /> : <FaMoon className={styles.iconButton} />}
+        </button>
+        {/* 관리자 아이콘 */}
+        <img
+          src={adminIcon}
+          alt="관리자 페이지"
+          className={styles.iconButton}
+          onClick={goAdmin}
+        />
         <FaUserCircle
           className={styles.iconButton}
           onClick={handleUserIconClick}

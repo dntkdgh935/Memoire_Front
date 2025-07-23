@@ -86,11 +86,13 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
 
       {isLoading && (
         <div className={styles.loadingBox}>
+          <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
           <img src={loadingImg} alt="로딩 중" />
           <p>
             이미지 생성중<br />
             잠시만 기다려주세요.
           </p>
+          <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
         </div>
       )}
 
@@ -121,12 +123,14 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
               새 메모리로 저장
             </button>
           </div>
+          <br/><br/><br/><br/>
         </div>
       )}
 
       {!result && (
         <p className={styles.placeholder}>
-          이미지를 생성하려면 오른쪽 버튼을 클릭하세요.
+          <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+          이미지를 생성하려면 좌측의 적용 버튼을 클릭하세요. <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
         </p>
       )}
     </div>

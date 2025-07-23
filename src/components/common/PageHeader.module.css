@@ -1,6 +1,7 @@
 .pageHeader {
   display: flex;
   align-items: center;
+  font-family: "Pretendard", sans-serif;
   font-size: 25px;
   font-weight: bold;
   color: #4a4a4a;
@@ -10,6 +11,7 @@
 .goBackButton {
   background: none;
   border: none;
+  font-family: "Pretendard", sans-serif;
   font-size: 20px;
   color: #4a4a4a;
   cursor: pointer;
@@ -17,5 +19,6 @@
 }
 
 .pageTitle {
+  font-family: "Pretendard", sans-serif;
   font-weight: 500;
 }

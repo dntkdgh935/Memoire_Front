@@ -54,7 +54,7 @@ function AtelierHome() {
       <PageHeader pagename="Atelier" />
 
       <div className={styles.container}>
-        <h2 className={styles.title}>Atelier</h2>
+        {/* <h2 className={styles.title}>Atelier</h2>  제거 */}
 
         {/* ① 소개 섹션: 배경 비디오 + 텍스트 */}
         <div className={styles.intro}>
