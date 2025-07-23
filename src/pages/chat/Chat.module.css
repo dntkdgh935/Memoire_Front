@@ -38,14 +38,14 @@
 }
 
 .myMessage {
-  background: #d1f8ce;
-}
-
-.otherMessage {
   background: #f0f0f0;
 }
 
-.inputRow {
+.otherMessage {
+  background: #e9cfb1;
+}
+
+/* .inputRow {
   margin-top: 10px;
   display: flex;
 }
@@ -57,30 +57,95 @@
 
 .sendButton {
   margin-left: 10px;
+} */
+
+.inputRow {
+  margin-top: 10px;
+  display: flex;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 10px;
+}
+
+/* 입력창 스타일 */
+.inputBox {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.inputBox:focus {
+  border-color: #d8c191;
+  box-shadow: 0 0 0 3px rgba(173, 118, 0, 0.2);
+}
+
+/* 전송 버튼 스타일 */
+.sendButton {
+  margin-left: 10px;
+  padding: 10px 20px;
+  background-color: #755d3c;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+.sendButton:hover {
+  background-color: #856a44;
+}
+
+.sendButton:active {
+  transform: scale(0.9);
 }
 
 .chatActions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  margin-bottom: 10px;
+  margin: 20px auto;
+  max-width: 600px;
+  padding: 0 10px;
 }
 
 .inviteButton,
 .leaveButton {
-  padding: 6px 12px;
+  padding: 8px 16px;
   font-size: 0.875rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
 }
 
 .inviteButton {
-  background-color: #4caf50;
+  background-color: #6a9fb5;
   color: white;
+}
+.inviteButton:hover {
+  background-color: #5a89a0;
+  transform: translateY(-1px);
 }
 
 .leaveButton {
-  background-color: #f44336;
+  background-color: #e57373;
   color: white;
+}
+.leaveButton:hover {
+  background-color: #d86060;
+  transform: translateY(-1px);
 }

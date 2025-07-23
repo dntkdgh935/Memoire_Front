@@ -53,13 +53,13 @@ function FollowingFollower({ mode, excludeUserIds = [], onInviteComplete }) {
       const formData = new FormData();
       formData.append("users", userid);
       formData.append("users", otherUserId);
-      const chatroomInfo = await secureApiRequest(`/chat/check`, {
+      const chatroomInfo = await secureApiRequest(`/chat/private/check`, {
         method: "POST",
         body: formData,
       });
       console.log(chatroomInfo.data);
       if (chatroomInfo.data === null || chatroomInfo.data === "") {
-        const newChatroomInfo = await secureApiRequest(`/chat/new`, {
+        const newChatroomInfo = await secureApiRequest(`/chat/private/new`, {
           method: "POST",
           body: formData,
         });

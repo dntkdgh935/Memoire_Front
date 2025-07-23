@@ -98,12 +98,22 @@ const ChatRoomMain = () => {
               className={styles.chatroomitem}
               onClick={() => handleClick(room.chatroomid)}
             >
-              {room.chatroomid.startsWith("admin") ? (
-                <span className={styles.chatroomname}>관리자 채팅</span>
+              {room.chatroomid.startsWith("admin") && role !== "ADMIN" ? (
+                <>
+                  <div className={styles.chatroomname}>관리자 채팅</div>
+                  <div className={styles.chatroomlastmsg}>
+                    {room.lastMessage}
+                  </div>
+                </>
               ) : (
-                <span className={styles.chatroomname}>
-                  {room.users.map((user) => `${user.name}`).join(", ")}
-                </span>
+                <>
+                  <div className={styles.chatroomname}>
+                    {room.users.map((user) => `${user.name}`).join(", ")}
+                  </div>
+                  <div className={styles.chatroomlastmsg}>
+                    {room.lastMessage}
+                  </div>
+                </>
               )}
             </li>
           ))}
@@ -111,9 +121,11 @@ const ChatRoomMain = () => {
         <button className={styles.newchatbtn} onClick={handleNewChatroom}>
           + 새로운 채팅방 만들기
         </button>
-        <button className={styles.adminChatButton} onClick={handleAdminChat}>
-          관리자와 채팅하기
-        </button>
+        {role !== "ADMIN" && (
+          <button className={styles.adminChatButton} onClick={handleAdminChat}>
+            관리자와 채팅하기
+          </button>
+        )}
       </div>
     </>
   );

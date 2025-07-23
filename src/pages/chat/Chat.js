@@ -10,6 +10,7 @@ function Chat() {
   const { userid, role, isLoggedIn, secureApiRequest } =
     useContext(AuthContext);
   const [chatroomid, setChatroomid] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [users, setUsers] = useState([]);
   const location = useLocation();
   const [messages, setMessages] = useState([]);
@@ -50,14 +51,16 @@ function Chat() {
 
       try {
         const response = await secureApiRequest(
-          `/chat/users?chatroomid=${chatroomid}`,
+          `/chat/users?userid=${userid}&chatroomid=${chatroomid}`,
           {
             method: "GET",
           }
         );
-        console.log("채팅방 사용자 목록:", response.data);
-        setUsers(response.data);
-        if (!response.data.some((user) => user.userId === userid)) {
+        console.log("채팅방 사용자 목록:", response.data.users);
+        setUsers(response.data.users);
+        console.log("단체 채팅방인지 확인:", response.data.isPrivate);
+        setIsPrivate(response.data.isPrivate);
+        if (!response.data.users.some((user) => user.userId === userid)) {
           alert("이 채팅방에 참여할 수 없습니다.");
           navigate("/");
         }
@@ -205,17 +208,20 @@ function Chat() {
           </button>
         </div>
       </div>
-      <div className={styles.chatActions}>
-        <button
-          onClick={() => setShowInviteModal(true)}
-          className={styles.inviteButton}
-        >
-          초대하기
-        </button>
-        <button onClick={handleLeave} className={styles.leaveButton}>
-          나가기
-        </button>
-      </div>
+      {!isPrivate && (
+        <div className={styles.chatActions}>
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className={styles.inviteButton}
+          >
+            초대하기
+          </button>
+          <button onClick={handleLeave} className={styles.leaveButton}>
+            나가기
+          </button>
+        </div>
+      )}
+
       {showInviteModal && (
         <Modal onClose={() => setShowInviteModal(false)}>
           <FollowingFollower
