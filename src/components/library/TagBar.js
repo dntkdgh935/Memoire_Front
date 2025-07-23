@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./TagBar.module.css";
 
 function TagBar({ selectedTag, onTagSelect, savedTags = [] }) {
-  const defaultTags = ["전체", "팔로잉"];
+  const defaultTags = ["전체", "팔로잉", "추천"];
 
   return (
     <div className={styles.tagBar}>

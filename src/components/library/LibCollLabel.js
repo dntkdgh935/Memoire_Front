@@ -10,10 +10,10 @@ import CollActionButton from "../common/CollActionBtn";
 
 function LibCollLabel({ coll, onActionChange }) {
   const { isLoggedIn, userid: myid, role } = useContext(AuthContext);
-  useEffect(() => {
-    // coll
-    console.log("LibCollLabel coll:", coll);
-  });
+  // useEffect(() => {
+  //   // coll
+  //   console.log("LibCollLabel coll:", coll);
+  // });
 
   return (
     <div className={styles.overlay}>
