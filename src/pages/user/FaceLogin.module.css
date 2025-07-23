@@ -3,7 +3,6 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: white; /* 기존과 동일 */
   padding: 20px;
   font-family: "Inter", sans-serif;
 }

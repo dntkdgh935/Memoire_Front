@@ -3,32 +3,31 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: white; /* 변경 없음 - 기존 흰색 유지 */
   padding: 20px;
 }
 
 .loginBox {
-  background-color: #fdfbf8; /* 변경: #fdfaf6 -> #FDFBF8 (Rectangle 10 배경색) */
+  background-color: #fdfbf8;
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); /* 변경: 그림자 색상 불투명도 조정 (Rectangle 10 그림자) */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   width: 100%;
   max-width: 400px;
   text-align: center;
-  border: 1px solid #b0b0b0; /* 변경: #e0dcd7 -> #B0B0B0 (Rectangle 10 테두리) */
+  border: 1px solid #b0b0b0;
 }
 
 .title {
   font-size: 24px;
   font-weight: 600;
-  color: #5b4f46; /* 변경: #444 -> #5B4F46 (로그인 제목 색상) */
+  color: #5b4f46;
   margin-bottom: 24px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .inputGroup {
@@ -38,32 +37,42 @@
 }
 
 .input {
+  box-sizing: border-box;
+  height: 48px;
   padding: 12px;
   font-size: 16px;
-  border: 1px solid #e5e2d8; /* 변경: #ddd -> #E5E2D8 (Rectangle 74, 75 테두리) */
+  border: 1px solid #e5e2d8;
   border-radius: 8px;
-  background-color: #ffffff; /* 변경: #fffdfb -> #FFFFFF (Rectangle 74, 75 배경색) */
+  background-color: #ffffff;
   transition: border-color 0.3s ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: #b0b0b0; /* 변경: #b0a49b -> #B0B0B0 (loginBox 테두리 색상과 통일) */
-  box-shadow: 0 0 0 3px rgba(176, 176, 176, 0.1); /* 변경: border-color와 통일 */
+  border-color: #b0b0b0;
+  box-shadow: 0 0 0 3px rgba(176, 176, 176, 0.1);
+}
+
+.errorMessage {
+  font-size: 9px;
+  color: #de4949;
+  margin-top: 5px;
+  text-align: left;
+  padding-left: 4px;
 }
 
 .checkboxGroup {
   display: flex;
   justify-content: flex-start;
-  align-items: center;
-  margin: 12px 0;
+  align-items: flex-start;
+  margin: 4px 0 12px 0;
 }
 
 .checkboxLabel {
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #000000; /* 변경: #444 -> #000000 (자동 로그인 텍스트 색상) */
+  color: #000000;
   cursor: pointer;
 }
 
@@ -71,15 +80,18 @@
   width: 16px;
   height: 16px;
   margin-right: 8px;
-  accent-color: #03dac5; /* 변경 없음 - 기존 유지 (체크박스 체크 색상) */
+  margin-top: 2px;
+  border-radius: 100%;
+  accent-color: #03dac5;
 }
 
 .loginButton {
+  width: 100%;
   padding: 12px;
   font-size: 16px;
   font-weight: 500;
-  color: #fdfbf8; /* 변경: #fff -> #FDFBF8 (로그인 버튼 텍스트 색상) */
-  background-color: #5b4f46; /* 변경: #5b4534 -> #5B4F46 (Frame 149 배경색) */
+  color: #fdfbf8;
+  background-color: #5b4f46;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -87,31 +99,32 @@
 }
 
 .loginButton:hover:not(:disabled) {
-  background-color: #4a3728; /* 변경 없음 - 기존 유지 */
+  background-color: #4a3728;
 }
 
 .loginButton:disabled {
-  background-color: #cccccc; /* 변경 없음 - 기존 유지 */
+  background-color: #cccccc;
   cursor: not-allowed;
 }
 
 .faceIdButton {
+  width: 100%;
   padding: 12px;
   font-size: 16px;
   font-weight: 500;
-  color: #5b4f46; /* 변경: #fff -> #5B4F46 (Face ID 텍스트 색상) */
-  background-color: transparent; /* 변경: #e0dcd7 -> transparent (Frame 150 배경 없음) */
-  border: 1px solid #d4ccbb; /* 변경: none -> 1px solid #D4CCBB (Frame 150 테두리) */
+  color: #5b4f46;
+  background-color: transparent;
+  border: 1px solid #d4ccbb;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 12px;
   transition:
     background-color 0.3s ease,
-    border-color 0.3s ease; /* transition 추가 */
+    border-color 0.3s ease;
 }
 
 .faceIdButton:hover {
-  background-color: rgba(212, 204, 187, 0.2); /* 호버 시 약간의 배경색 추가 */
+  background-color: rgba(212, 204, 187, 0.2);
 }
 
 .socialLogin {
@@ -121,17 +134,13 @@
   margin-top: 16px;
 }
 
-/* 소셜 버튼 배경색은 각 버튼의 HTML에 별도 클래스를 주거나, 자바스크립트로 동적으로 적용하는 것을 고려하세요. */
-/* 아래는 예시입니다. HTML에 class="socialButton google" 또는 class="socialButton kakao" 등으로 적용해야 합니다. */
-/* .socialButton.google { background-color: white; border: 1px solid #D4CCBB; } */
-/* .socialButton.kakao { background-color: #FEE500; } */
 .socialButton {
   width: 40px;
   height: 40px;
-  border: none; /* 기본적으로 border none 유지 */
+  border: none;
   border-radius: 50%;
   cursor: pointer;
-  background-color: transparent; /* 기본은 투명 유지 */
+  background-color: transparent;
   transition: transform 0.3s ease;
 }
 
@@ -163,25 +172,11 @@
   background-size: contain;
 }
 
-.signUpLink {
-  margin-top: 16px;
-}
-
-.signUpLink span {
-  font-size: 14px;
-  color: #5b4f46; /* 변경 없음 - 기존 유지 (회원가입 텍스트 색상) */
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.signUpLink span:hover {
-  text-decoration: underline;
-}
-
 .additionalText {
-  margin-top: 16px;
+  margin-top: 24px;
   font-size: 14px;
-  color: #5b4f46; /* 변경 없음 - 기존 유지 */
+  color: #5b4f46;
+  text-align: center;
 }
 
 .findGroup {
@@ -189,15 +184,23 @@
   cursor: pointer;
   text-decoration: none;
 }
+
 .findGroup:hover {
   text-decoration: underline;
 }
 
-/* 에러 메시지 스타일 (새로운 코드에서 발견된 색상 #DE4949) */
-/* 이 클래스는 HTML에서 에러 메시지를 표시할 요소에 적용하면 됩니다. */
-.errorMessage {
-  font-size: 9px;
-  color: #de4949; /* *아이디 또는 비밀번호가 잘못되었습니다. 색상 */
-  margin-top: 5px; /* 필요에 따라 마진 조정 */
+.signUpLink {
+  margin-top: 20px;
   text-align: center;
+}
+
+.signUpLink span {
+  font-size: 14px;
+  color: #5b4f46;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.signUpLink span:hover {
+  text-decoration: underline;
 }
