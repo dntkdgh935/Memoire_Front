@@ -1,22 +1,21 @@
-import React, { useState, useCallback, useContext, useEffect } from "react";
-import { AuthContext } from "../../AuthProvider";
-import styles from "./ProfileUploader.module.css"; // CSS 모듈 임포트
+import React, { useState, useCallback, useEffect } from "react";
+import styles from "./ProfileUploader.module.css";
 
-const ProfileUploader = () => {
-  const { secureApiRequest, userid, updateProfileImagePath, profileImagePath } =
-    useContext(AuthContext);
-
-  const [selectedFile, setSelectedFile] = useState(null);
+const ProfileUploader = ({
+  initialProfileImagePath,
+  onFileChange, // 선택된 파일 전달 (new)
+  onSafetyCheckComplete, // 안전성 검사 결과 전달 (new)
+  isUpdating, // MyInfo의 isUpdating 상태를 전달받아 disabled 처리 (new)
+  secureApiRequest, // secureApiRequest prop으로 받음 (new)
+}) => {
   const [preview, setPreview] = useState("");
-  const [isSafe, setIsSafe] = useState(false);
-  const [message, setMessage] = useState("이미지를 선택해주세요.");
+  const [message, setMessage] = useState("");
   const [isChecking, setIsChecking] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [fileName, setFileName] = useState(""); // 선택한 파일명 상태 추가
+  const [fileName, setFileName] = useState("");
 
   useEffect(() => {
-    if (profileImagePath) {
-      setPreview(`http://localhost:8080${profileImagePath}`);
+    if (initialProfileImagePath) {
+      setPreview(`http://localhost:8080${initialProfileImagePath}`);
       setMessage(
         "현재 프로필 이미지입니다. 변경하려면 새로운 이미지를 선택하세요."
       );
@@ -24,45 +23,46 @@ const ProfileUploader = () => {
       setPreview("");
       setMessage("프로필 이미지가 없습니다. 이미지를 선택해주세요.");
     }
-  }, [profileImagePath]);
+  }, [initialProfileImagePath]);
 
   const handleFileChange = useCallback(
     (event) => {
       const file = event.target.files[0];
+
       if (!file) {
-        if (profileImagePath) {
-          setPreview(`http://localhost:8080${profileImagePath}`);
-          setMessage(
-            "현재 프로필 이미지입니다. 변경하려면 새로운 이미지를 선택하세요."
-          );
-        } else {
-          setPreview("");
-          setMessage("이미지를 선택해주세요.");
-        }
-        setSelectedFile(null);
+        setPreview(
+          initialProfileImagePath
+            ? `http://localhost:8080${initialProfileImagePath}`
+            : ""
+        );
+        setMessage(
+          initialProfileImagePath
+            ? "현재 프로필 이미지입니다. 변경하려면 새로운 이미지를 선택하세요."
+            : "이미지를 선택해주세요."
+        );
         setFileName("");
-        setIsSafe(false);
+        onFileChange(null); // 파일 없음
+        onSafetyCheckComplete(false); // 안전하지 않음
         return;
       }
 
-      setSelectedFile(file);
-      setFileName(file.name); // 파일명 저장
-
+      setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
       };
       reader.readAsDataURL(file);
 
+      onFileChange(file); // 선택된 파일 객체를 부모로 전달
       checkImageSafety(file);
     },
-    [profileImagePath]
+    [initialProfileImagePath, onFileChange, onSafetyCheckComplete]
   );
 
   const checkImageSafety = async (file) => {
     setIsChecking(true);
-    setIsSafe(false);
     setMessage("이미지 유해성을 검사 중입니다...");
+    onSafetyCheckComplete(false); // 검사 시작 시 안전하지 않은 상태로 초기화
 
     const formData = new FormData();
     formData.append("image", file);
@@ -74,56 +74,22 @@ const ProfileUploader = () => {
       });
 
       if (response.data.safe) {
-        setIsSafe(true);
-        setMessage("안전한 이미지입니다. 저장 버튼을 눌러 업로드하세요.");
+        setMessage(
+          "안전한 이미지입니다. 정보 수정 버튼을 눌러 변경사항을 저장하세요."
+        );
+        onSafetyCheckComplete(true); // 안전함
       } else {
-        setIsSafe(false);
         setMessage(
           "유해 가능성이 있는 이미지입니다. 다른 이미지를 선택해주세요."
         );
+        onSafetyCheckComplete(false); // 안전하지 않음
       }
     } catch (error) {
-      console.error("이미지 안전성 검사 중 오류:", error);
+      console.error("이미지 안전성 검사 중 오류 발생:", error);
       setMessage("이미지 검사 중 오류가 발생했습니다.");
+      onSafetyCheckComplete(false);
     } finally {
       setIsChecking(false);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile || !isSafe) {
-      alert("업로드할 수 있는 이미지가 아닙니다.");
-      return;
-    }
-    if (!userid) {
-      alert("사용자 ID를 찾을 수 없습니다. 로그인 상태를 확인해주세요.");
-      return;
-    }
-
-    setIsUploading(true);
-    setMessage("이미지를 업로드하는 중입니다...");
-
-    const formData = new FormData();
-    formData.append("image", selectedFile);
-
-    try {
-      const response = await secureApiRequest(`/user/${userid}/profile-image`, {
-        method: "POST",
-        body: formData,
-      });
-      setMessage("프로필 이미지가 성공적으로 변경되었습니다.");
-      setIsSafe(false);
-
-      if (response.data.filePath) {
-        updateProfileImagePath(response.data.filePath);
-      }
-    } catch (error) {
-      console.error("이미지 업로드 중 오류:", error);
-      setMessage("이미지 업로드 중 오류가 발생했습니다.");
-    } finally {
-      setIsUploading(false);
-      setSelectedFile(null);
-      setFileName("");
     }
   };
 
@@ -143,23 +109,25 @@ const ProfileUploader = () => {
         type="file"
         accept="image/*"
         onChange={handleFileChange}
-        disabled={isChecking || isUploading}
+        disabled={isChecking || isUpdating} // isUpdating 상태도 disabled에 반영
         className={styles.fileInput}
       />
 
       {fileName && <div className={styles.fileName}>{fileName}</div>}
 
-      <p className={isSafe ? styles.safeMessage : styles.unsafeMessage}>
+      <p
+        className={
+          isChecking
+            ? styles.infoMessage
+            : message.includes("안전한")
+              ? styles.safeMessage
+              : styles.unsafeMessage
+        }
+      >
         {message}
       </p>
 
-      <button
-        onClick={handleUpload}
-        disabled={!isSafe || isChecking || isUploading}
-        className={styles.uploadButton}
-      >
-        {isUploading ? "업로드 중..." : "프로필 이미지 저장"}
-      </button>
+      {/* ProfileUploader 자체의 업로드 버튼은 제거됩니다. */}
     </div>
   );
 };

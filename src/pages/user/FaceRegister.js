@@ -1,23 +1,27 @@
 import React, { useRef, useEffect, useState, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { AuthContext } from "../../AuthProvider";
+import { AuthContext } from "../../AuthProvider"; // AuthContext 임포트 확인
 import WebcamFaceDetector from "../../components/user/WebcamFaceDetector";
 import styles from "./FaceRegister.module.css"; // CSS 모듈 import
 
 function FaceRegister() {
   const webcamRef = useRef(null);
-  const { userid: encodedUserId } = useParams();
-  const userId = decodeURIComponent(encodedUserId);
+  const location = useLocation();
   const navigate = useNavigate();
+
+  // AuthContext에서 userid와 nickname을 가져옵니다.
+  const context = useContext(AuthContext);
+  const { userid, nickname, secureApiRequest } = context || {}; // userid와 nickname 구조 분해 할당
+
+  // userId를 location.state에서 가져오거나, AuthContext의 userid를 사용 (fallback)
+  // MyInfo에서 state로 넘겨주므로 location.state?.userId를 우선 사용합니다.
+  const currentUserId = location.state?.userId || userid;
 
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFaceDetectedOnScreen, setIsFaceDetectedOnScreen] = useState(false);
   const [webcamDetectionScore, setWebcamDetectionScore] = useState(0);
-
-  const context = useContext(AuthContext);
-  const { secureApiRequest } = context || {};
 
   const handleFaceDetected = (score) => {
     setMessage(
@@ -36,15 +40,18 @@ function FaceRegister() {
   };
 
   useEffect(() => {
-    if (!userId || userId === "undefined" || userId.trim() === "") {
-      setMessage("사용자 ID가 유효하지 않습니다. 마이페이지로 돌아가주세요.");
+    // userId가 state로 넘어오지 않았거나 유효하지 않은 경우 처리
+    if (
+      !currentUserId ||
+      currentUserId === "undefined" ||
+      currentUserId.trim() === ""
+    ) {
+      setMessage("사용자 정보가 유효하지 않습니다. 마이페이지로 돌아가주세요.");
       navigate("/user/myinfo");
     } else {
-      setMessage(
-        `사용자 ID: ${userId} - 웹캠을 활성화하고 얼굴을 정면으로 보여주세요.`
-      );
+      setMessage("웹캠을 활성화하고 얼굴을 정면으로 보여주세요.");
     }
-  }, [userId, navigate]);
+  }, [currentUserId, navigate]); // 의존성 배열에 currentUserId 추가
 
   const handleRegisterFace = async () => {
     if (!secureApiRequest) {
@@ -53,8 +60,12 @@ function FaceRegister() {
       );
       return;
     }
-    if (!userId || userId === "undefined" || userId.trim() === "") {
-      setMessage("유효한 사용자 ID가 없습니다. 마이페이지로 돌아가주세요.");
+    if (
+      !currentUserId ||
+      currentUserId === "undefined" ||
+      currentUserId.trim() === ""
+    ) {
+      setMessage("유효한 사용자 정보가 없습니다. 마이페이지로 돌아가주세요.");
       navigate("/user/myinfo");
       return;
     }
@@ -78,7 +89,7 @@ function FaceRegister() {
       formData.append("file", imageBlob, "face_register.jpg");
 
       const apiResponse = await secureApiRequest(
-        `/user/${userId}/face-embedding`,
+        `/user/${currentUserId}/face-embedding`, // 서버에는 실제 userId를 전달
         {
           method: "POST",
           body: formData,
@@ -86,8 +97,7 @@ function FaceRegister() {
       );
 
       setMessage(
-        apiResponse.data?.message ||
-          `${userId}의 얼굴 임베딩이 성공적으로 등록되었습니다.`
+        apiResponse.data?.message || `얼굴 임베딩이 성공적으로 등록되었습니다.`
       );
     } catch (error) {
       console.error("얼굴 임베딩 등록 요청 중 오류 발생:", error);
@@ -107,8 +117,10 @@ function FaceRegister() {
     <div className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.title}>얼굴 ID 등록</h1>
+        {/* 닉네임을 표시하고, 닉네임이 없을 경우 "알 수 없는 사용자"로 표시 */}
         <p className={styles.userIdText}>
-          <span className={styles.userIdHighlight}>사용자 ID:</span> {userId}
+          <span className={styles.userIdHighlight}>사용자:</span>{" "}
+          {nickname || "알 수 없는 사용자"}
         </p>
 
         <WebcamFaceDetector
@@ -153,9 +165,6 @@ function FaceRegister() {
           </div>
         )}
       </div>
-      <p className={styles.footerText}>
-        이 페이지에서 웹캠을 통해 사용자 얼굴 임베딩을 등록할 수 있습니다.
-      </p>
     </div>
   );
 }

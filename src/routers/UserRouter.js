@@ -18,7 +18,7 @@ function UserRouter() {
       <Route path="findId" element={<FindId />} />
       <Route path="findPWD" element={<FindPwd />} />
       <Route path="myInfo" element={<MyInfo />} />
-      <Route path="face-register/:userid" element={<FaceRegister />} />
+      <Route path="face-register" element={<FaceRegister />} />
       <Route path="face-login" element={<FaceLogin />} />
     </Routes>
   );
