@@ -44,7 +44,7 @@ function LibraryMain() {
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
-  }, [recColls]); //[recColls]);
+  }, [loading]); //[recColls]); //[recColls]);
 
   // selectedTag / 로그인 상태 달라지면 수행됨.
   // 전체/ 팔로잉/ 태그 선택 모두 처리
@@ -120,8 +120,8 @@ function LibraryMain() {
           ? `/api/library/recommend/${userid}`
           : `/api/library/recommend/guest`
       );
-      console.log("추천 컨트롤러 요청");
-      console.log(res.data);
+      console.log("추천 컨트롤러 요청 완료");
+      console.log("컨틀ㄹ러 반환:" + res.data.length);
       setRecColls((prev) => [...prev, ...res.data]);
     } catch (err) {
       console.error("🚨 추천 컬렉션 불러오기 실패", err);
