@@ -15,14 +15,6 @@ export default function ImageToImageMain() {
   const [result, setResult] = useState(null);
   const { isLoggedIn, userid } = useContext(AuthContext);
 
-  // 선택된 메모리 객체
-  const selectedMemory =
-    selectedMemoryId && memories.length > 0
-      ? memories.find(
-          (m) => m.memoryid?.toString() === selectedMemoryId.toString()
-        )
-      : null;
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +33,6 @@ export default function ImageToImageMain() {
         return res.json();
       })
       .then((data) => {
-        // TextToImageMain 과 동일한 포맷팅
         const formatted = data.map((c) => ({
           id: c.collectionid,
           title: c.collectionTitle,
@@ -72,6 +63,14 @@ export default function ImageToImageMain() {
         setMemories([]);
       });
   }, [selectedCollectionId]);
+
+  // 선택된 메모리 객체
+  const selectedMemory =
+    selectedMemoryId && memories.length > 0
+      ? memories.find(
+          (m) => m.memoryid?.toString() === selectedMemoryId.toString()
+        )
+      : null;
 
   return (
     <>

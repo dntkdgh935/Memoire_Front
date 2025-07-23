@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import styles from "./SettingPanel.module.css";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
-  const [title, setTitle] = useState(selectedMemory?.title || "");
+  //립싱크 모델 사용 여부 설정
+  const [useLipSync, setUseLipSync] = useState();
 
   // TTS 설정
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -16,17 +17,20 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
 
   // 비디오 설정
   const [videoPrompt, setVideoPrompt] = useState("");
-  const [extraPrompt, setExtraPrompt] = useState("");
   const [videoLoading, setVideoLoading] = useState(false);
   const [videoError, setVideoError] = useState(null);
 
   useEffect(() => {
-    setTitle(selectedMemory?.title || "");
-  }, [selectedMemory]);
+    if (useLipSync) setTtsEnabled(true);
+  }, [useLipSync]);
 
   if (!selectedMemory) {
     return <p className={styles.placeholder}>왼쪽에서 메모리를 선택해주세요</p>;
   }
+
+  const handleTtsToggle = (val) => {
+    if (!useLipSync) setTtsEnabled(val);
+  };
 
   const handleGenerateTts = async () => {
     setTtsLoading(true);
@@ -53,13 +57,15 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
   const handleGenerateVideo = async () => {
     setVideoLoading(true);
     setVideoError(null);
+    console.log("selectedMemory : ", selectedMemory);
+    const imageUrl = `http://localhost:8080/upload_files/memory_img/${selectedMemory.filename}`;
+
     try {
       const payload = {
-        title,
-        imageUrl: selectedMemory.imageUrl,
+        imageUrl: imageUrl,
         videoPrompt,
-        extraPrompt,
         ttsUrl: ttsEnabled ? ttsUrl : undefined,
+        lipSyncEnabled: useLipSync,
       };
       const resp = await fetch("/atelier/video/generate-video", {
         method: "POST",
@@ -83,8 +89,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         <label>제목</label>
         <input
           type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={selectedMemory.title}
+          readOnly
           className={styles.input}
         />
       </div>
@@ -92,24 +98,45 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         <label>원본 이미지</label>
         <img
           src={`http://localhost:8080/upload_files/memory_img/${selectedMemory.filename}`}
-          alt="원본"
+          alt={selectedMemory.title}
           className={styles.imagePreview}
         />
       </div>
 
-      {/* 1단계: TTS 설정 */}
+      {/* 립싱크 모델 사용 설정 */}
+      <div className={styles.field}>
+        <label>립싱크 모델 사용</label>
+        <div className={styles.optionButtons}>
+          <button
+            className={!useLipSync ? styles.optionActive : styles.option}
+            onClick={() => setUseLipSync(false)}
+            disabled={ttsEnabled && ttsGenerated}
+          >
+            미사용
+          </button>
+          <button
+            className={useLipSync ? styles.optionActive : styles.option}
+            onClick={() => setUseLipSync(true)}
+          >
+            사용
+          </button>
+        </div>
+      </div>
+
+      {/* TTS 설정 */}
       <div className={styles.field}>
         <label>음성 생성 여부</label>
         <div className={styles.optionButtons}>
           <button
             className={!ttsEnabled ? styles.optionActive : styles.option}
-            onClick={() => setTtsEnabled(false)}
+            onClick={() => handleTtsToggle(false)}
+            disabled={useLipSync}
           >
             TTS 사용 안 함
           </button>
           <button
             className={ttsEnabled ? styles.optionActive : styles.option}
-            onClick={() => setTtsEnabled(true)}
+            onClick={() => handleTtsToggle(true)}
           >
             TTS 사용
           </button>
@@ -193,7 +220,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         </>
       )}
 
-      {/* 2단계: 비디오 설정 */}
+      {/* 비디오 설정 */}
       {(ttsGenerated || !ttsEnabled) && (
         <>
           <hr />
@@ -207,7 +234,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
               onChange={(e) => setVideoPrompt(e.target.value)}
             />
           </div>
-          <div className={styles.field}>
+          {/* <div className={styles.field}>
             <label>기타 요청</label>
             <textarea
               rows={3}
@@ -216,7 +243,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
               value={extraPrompt}
               onChange={(e) => setExtraPrompt(e.target.value)}
             />
-          </div>
+          </div> */}
           {videoError && <p className={styles.errorText}>{videoError}</p>}
           <div className={styles.footer}>
             <button

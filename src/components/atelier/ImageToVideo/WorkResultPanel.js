@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./WorkResultPanel.module.css";
 import loadingImg from "../../../assets/loading_pen.png";
 import errorImg from "../../../assets/error_rain.png";
+import { useNavigate } from "react-router-dom";
 
 function WorkResultPanel({
   result,
@@ -11,7 +12,9 @@ function WorkResultPanel({
 }) {
   const isLoading = result?.status === "loading";
   const isError = result?.status === "error";
-  const isSuccess = result?.videoUrl; // imageUrl → videoUrl 체크
+  const isSuccess = result?.videoUrl;
+
+  const navigate = useNavigate();
 
   // 새 메모리로 저장
   const handleSaveAsNewMemory = async () => {
@@ -23,15 +26,21 @@ function WorkResultPanel({
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
+    const payload = {
+      collectionId: selectedCollectionId,
+      ...result.resultDto,
+      title: originalMemoryTitle,
+    };
     try {
       const response = await fetch(`/atelier/video/${selectedCollectionId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.resultDto),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error("새 메모리 저장 실패");
       alert("새 메모리로 저장되었습니다!");
-      window.location.reload();
+      navigate("/");
+      // window.location.reload();
     } catch (err) {
       console.error(err);
       alert("저장 중 오류 발생");
@@ -52,7 +61,9 @@ function WorkResultPanel({
       });
       if (!response.ok) throw new Error("덮어쓰기 실패");
       alert("원본 메모리가 덮어쓰기 되었습니다!");
-      window.location.reload();
+      navigate("/");
+
+      // window.location.reload();
     } catch (err) {
       console.error(err);
       alert("업데이트 중 오류 발생");
@@ -94,7 +105,7 @@ function WorkResultPanel({
             src={result.videoUrl}
             controls
             autoPlay={false}
-            poster={result.previewImageUrl /* 선택 사항 */}
+            poster={result.previewImageUrl}
           />
           <div className={styles.buttonGroup}>
             <button
