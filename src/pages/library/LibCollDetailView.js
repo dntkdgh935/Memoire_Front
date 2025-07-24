@@ -16,7 +16,8 @@ function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
   const navigate = useNavigate();
 
-  const { isLoggedIn, userid, role } = useContext(AuthContext);
+  const { isLoggedIn, userid, role, secureApiRequest } =
+    useContext(AuthContext);
   //userid가 새로고침 후에도 정상적으로 유지되도록
   //localStorage 또는 sessionStorage에 userid를 저장하고, 컴포넌트가 로드될 때 이를 읽어와서 사용
   const storedUserid = localStorage.getItem("userid");
@@ -58,12 +59,17 @@ function LibCollDetailView() {
     console.log(selectedMemory);
 
     try {
-      await apiClient.post(
+      await secureApiRequest(
         `/api/library/report/${selectedMemory.memoryid}/${userid}`,
         {
-          content: reportContent,
+          method: "POST",
+          //data가 아니라 body로 해야함(현재 secureRequest 설정상)
+          body: {
+            content: reportContent,
+          },
         }
       );
+
       alert("신고가 접수되었습니다.");
       setIsReportModalOpen(false);
       setReportContent("");
@@ -79,7 +85,14 @@ function LibCollDetailView() {
       if (!collection || !collection.collectionid || !userid) return;
 
       try {
-        const res = await apiClient.get("/api/library/whoLiked", {
+        // const res = await apiClient.get("/api/library/whoLiked", {
+        //   params: {
+        //     collectionid: collection.collectionid,
+        //     userid: userid,
+        //   },
+        // });
+        const res = await secureApiRequest("/api/library/whoLiked", {
+          method: "GET",
           params: {
             collectionid: collection.collectionid,
             userid: userid,
@@ -101,7 +114,14 @@ function LibCollDetailView() {
       if (!collection || !collection.collectionid || !userid) return;
 
       try {
-        const res = await apiClient.get("/api/library/whoBookmarked", {
+        // const res = await apiClient.get("/api/library/whoBookmarked", {
+        //   params: {
+        //     collectionid: collection.collectionid,
+        //     userid: userid,
+        //   },
+        // });
+        const res = await secureApiRequest("/api/library/whoBookmarked", {
+          method: "GET",
           params: {
             collectionid: collection.collectionid,
             userid: userid,
