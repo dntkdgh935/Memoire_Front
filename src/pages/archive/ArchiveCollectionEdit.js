@@ -174,7 +174,6 @@ function ArchiveCollectionEdit() {
       setTags((prev) => [...prev, tag]);
     }
 
-    // 다음 tick에 tagInput 비우기
     setTimeout(() => {
       setTagInput("");
     }, 0);
@@ -183,15 +182,9 @@ function ArchiveCollectionEdit() {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.leftColumn}>
-          <label className={styles.label}>컬렉션 제목</label>
-          <label className={styles.label}>공유범위</label>
-          <label className={styles.label}>테마</label>
-          <label className={styles.label}>태그</label>
-        </div>
-
-        <div className={styles.rightColumn}>
-          <form className={styles.form} onSubmit={handleSubmit}>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.formRow}>
+            <label className={styles.label}>컬렉션 제목</label>
             <input
               type="text"
               name="collectionTitle"
@@ -201,7 +194,9 @@ function ArchiveCollectionEdit() {
               placeholder="텍스트를 입력하세요"
               required
             />
-
+          </div>
+          <div className={styles.formRow}>
+            <label className={styles.label}>공유범위</label>
             <select
               name="visibility"
               onChange={handleChange}
@@ -214,6 +209,9 @@ function ArchiveCollectionEdit() {
               <option value="2">팔로워</option>
               <option value="3">비공개</option>
             </select>
+          </div>
+          <div className={styles.formRow}>
+            <label className={styles.label}>테마</label>
             <input
               type="color"
               name="color"
@@ -222,6 +220,9 @@ function ArchiveCollectionEdit() {
               value={collection.color}
               required
             />
+          </div>
+          <div className={styles.formRow}>
+            <label className={styles.label}>태그</label>
             <div className={styles.tagInputWrapper}>
               {tags.map((tag, index) => (
                 <span key={index} className={styles.inlineTag}>
@@ -261,18 +262,19 @@ function ArchiveCollectionEdit() {
                 ))}
               </ul>
             )}
-            <div>
-              <input type="submit" value="변경하기" /> &nbsp; &nbsp;
-              <input
-                type="button"
-                value="뒤로가기"
-                onClick={() => {
-                  navigate(-1);
-                }}
-              />
-            </div>
-          </form>
-        </div>
+          </div>
+
+          <div className={styles.buttonGroup}>
+            <input type="submit" value="변경하기" /> &nbsp; &nbsp;
+            <input
+              type="button"
+              value="뒤로가기"
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+          </div>
+        </form>
       </div>
     </>
   );
