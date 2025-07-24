@@ -10,6 +10,7 @@
 - npm install zxcvbn : 비밀번호 강도 확인용
 - npm start
 - npm install face-api.js
+- npm install recharts 차트생성용
 
 # npm install
 

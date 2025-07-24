@@ -3,16 +3,20 @@ import styles from "./ProfileUploader.module.css";
 
 const ProfileUploader = ({
   initialProfileImagePath,
-  onFileChange, // 선택된 파일 전달 (new)
-  onSafetyCheckComplete, // 안전성 검사 결과 전달 (new)
-  isUpdating, // MyInfo의 isUpdating 상태를 전달받아 disabled 처리 (new)
-  secureApiRequest, // secureApiRequest prop으로 받음 (new)
+  onFileChange,
+  onSafetyCheckComplete,
+  isUpdating,
+  secureApiRequest,
 }) => {
+  // 현재 미리보기 URL을 관리하는 상태. 초기값은 빈 문자열로 설정합니다.
   const [preview, setPreview] = useState("");
   const [message, setMessage] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [fileName, setFileName] = useState("");
 
+  // ⭐ useEffect를 사용하여 initialProfileImagePath가 변경될 때만 미리보기 URL을 설정합니다.
+  // 이 훅은 처음 컴포넌트가 마운트되거나, MyInfo.js에서 사용자 정보가 로드되어
+  // initialProfileImagePath prop이 유효한 값으로 바뀔 때 실행됩니다.
   useEffect(() => {
     if (initialProfileImagePath) {
       setPreview(`http://localhost:8080${initialProfileImagePath}`);
@@ -23,6 +27,7 @@ const ProfileUploader = ({
       setPreview("");
       setMessage("프로필 이미지가 없습니다. 이미지를 선택해주세요.");
     }
+    // 이 훅은 파일 선택 상태와 별개로, 부모로부터 받은 초기 경로에만 반응합니다.
   }, [initialProfileImagePath]);
 
   const handleFileChange = useCallback(
@@ -30,30 +35,32 @@ const ProfileUploader = ({
       const file = event.target.files[0];
 
       if (!file) {
-        setPreview(
-          initialProfileImagePath
-            ? `http://localhost:8080${initialProfileImagePath}`
-            : ""
-        );
-        setMessage(
-          initialProfileImagePath
-            ? "현재 프로필 이미지입니다. 변경하려면 새로운 이미지를 선택하세요."
-            : "이미지를 선택해주세요."
-        );
+        // 파일 선택을 취소했을 때,
+        // 기존의 initialProfileImagePath로 미리보기를 복원합니다.
+        if (initialProfileImagePath) {
+          setPreview(`http://localhost:8080${initialProfileImagePath}`);
+          setMessage(
+            "현재 프로필 이미지입니다. 변경하려면 새로운 이미지를 선택하세요."
+          );
+        } else {
+          setPreview("");
+          setMessage("프로필 이미지가 없습니다. 이미지를 선택해주세요.");
+        }
         setFileName("");
-        onFileChange(null); // 파일 없음
-        onSafetyCheckComplete(false); // 안전하지 않음
+        onFileChange(null);
+        onSafetyCheckComplete(false);
         return;
       }
 
       setFileName(file.name);
+      // FileReader를 사용하여 선택된 새 파일의 미리보기를 생성합니다.
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result);
+        setPreview(reader.result); // ⭐ 새로 선택된 파일의 Data URL로 미리보기를 설정합니다.
       };
       reader.readAsDataURL(file);
 
-      onFileChange(file); // 선택된 파일 객체를 부모로 전달
+      onFileChange(file);
       checkImageSafety(file);
     },
     [initialProfileImagePath, onFileChange, onSafetyCheckComplete]
@@ -62,7 +69,7 @@ const ProfileUploader = ({
   const checkImageSafety = async (file) => {
     setIsChecking(true);
     setMessage("이미지 유해성을 검사 중입니다...");
-    onSafetyCheckComplete(false); // 검사 시작 시 안전하지 않은 상태로 초기화
+    onSafetyCheckComplete(false);
 
     const formData = new FormData();
     formData.append("image", file);
@@ -77,12 +84,12 @@ const ProfileUploader = ({
         setMessage(
           "안전한 이미지입니다. 정보 수정 버튼을 눌러 변경사항을 저장하세요."
         );
-        onSafetyCheckComplete(true); // 안전함
+        onSafetyCheckComplete(true);
       } else {
         setMessage(
           "유해 가능성이 있는 이미지입니다. 다른 이미지를 선택해주세요."
         );
-        onSafetyCheckComplete(false); // 안전하지 않음
+        onSafetyCheckComplete(false);
       }
     } catch (error) {
       console.error("이미지 안전성 검사 중 오류 발생:", error);
@@ -97,6 +104,7 @@ const ProfileUploader = ({
     <div className={styles.uploaderContainer}>
       <h3 className={styles.title}>프로필 이미지 변경</h3>
 
+      {/* preview 상태에 값이 있을 때만 이미지를 렌더링합니다. */}
       {preview && (
         <img src={preview} alt="Profile Preview" className={styles.preview} />
       )}
@@ -109,7 +117,7 @@ const ProfileUploader = ({
         type="file"
         accept="image/*"
         onChange={handleFileChange}
-        disabled={isChecking || isUpdating} // isUpdating 상태도 disabled에 반영
+        disabled={isChecking || isUpdating}
         className={styles.fileInput}
       />
 
@@ -121,13 +129,13 @@ const ProfileUploader = ({
             ? styles.infoMessage
             : message.includes("안전한")
               ? styles.safeMessage
-              : styles.unsafeMessage
+              : message.includes("유해")
+                ? styles.unsafeMessage
+                : styles.infoMessage // 기본 메시지 스타일
         }
       >
         {message}
       </p>
-
-      {/* ProfileUploader 자체의 업로드 버튼은 제거됩니다. */}
     </div>
   );
 };

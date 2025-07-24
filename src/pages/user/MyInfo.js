@@ -12,34 +12,38 @@ const MyInfo = () => {
   const context = useContext(AuthContext);
   const [originalPhone, setOriginalPhone] = useState("");
 
-  const { isLoggedIn, userid, nickname, secureApiRequest, setAuthInfo } =
-    context || {};
+  const {
+    isLoggedIn,
+    userid,
+    nickname,
+    secureApiRequest,
+    setAuthInfo,
+    logoutAndRedirect,
+  } = context || {}; // clearAuthInfo 대신 logoutAndRedirect 사용
 
   const [formData, setFormData] = useState({
     nickname: "",
     phone: "",
     birthday: "",
     statusMessage: "",
-    prevPwd: "", // 현재 비밀번호 필드
-    password: "", // 새 비밀번호 필드
-    confirmPwd: "", // 새 비밀번호 확인 필드
-    profileImagePath: "", // 프로필 이미지 경로 추가
+    prevPwd: "",
+    password: "",
+    confirmPwd: "",
+    profileImagePath: "",
   });
 
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [passwordStrength, setPasswordStrength] = useState(0); // 0-4
   const [isVerified, setIsVerified] = useState(false); // 전화번호 인증 상태
 
-  // 프로필 이미지 관련 상태 추가
-  const [selectedProfileFile, setSelectedProfileFile] = useState(null); // ProfileUploader에서 선택된 파일
-  const [isProfileImageSafe, setIsProfileImageSafe] = useState(false); // ProfileUploader에서 검사된 이미지 안전성
+  const [selectedProfileFile, setSelectedProfileFile] = useState(null);
+  const [isProfileImageSafe, setIsProfileImageSafe] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 사용자 정보 불러오기 및 임시 비밀번호 초기 설정
   useEffect(() => {
     if (isLoggedIn === null || isLoggedIn === undefined) {
       console.log("MyInfo: AuthContext 또는 isLoggedIn 초기화 대기 중...");
@@ -76,12 +80,11 @@ const MyInfo = () => {
           phone: userData.phone || "",
           birthday: userData.birthday || "",
           statusMessage: userData.statusMessage || "",
-          profileImagePath: userData.profileImagePath || "",
-          prevPwd: tempPwd || "",
+          prevPwd: tempPwd || "", // 임시 비밀번호가 있으면 현재 비밀번호 필드에 채움
+          password: "",
+          confirmPwd: "",
         }));
         setOriginalPhone(userData.phone || "");
-        // 프로필 이미지는 변경 여부를 판단하기 위해 따로 original 값을 관리하지 않아도 됩니다.
-        // selectedProfileFile의 유무로 변경 여부 판단 및 isProfileImageSafe로 안전성 판단.
         console.log("MyInfo: 사용자 데이터 로드 성공, formData 업데이트됨");
       } catch (err) {
         console.error("MyInfo: 사용자 정보 로드 오류:", err);
@@ -100,7 +103,6 @@ const MyInfo = () => {
     }
   }, [isLoggedIn, userid, navigate, secureApiRequest, location.state]);
 
-  // 입력 필드 변경 핸들러
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -109,27 +111,22 @@ const MyInfo = () => {
     }));
   }, []);
 
-  // ProfileUploader에서 파일 선택 시 호출될 콜백
   const handleProfileFileChange = useCallback((file) => {
     setSelectedProfileFile(file);
   }, []);
 
-  // ProfileUploader에서 이미지 안전성 검사 완료 시 호출될 콜백
   const handleProfileSafetyCheckComplete = useCallback((isSafe) => {
     setIsProfileImageSafe(isSafe);
   }, []);
 
-  // CheckPwd 컴포넌트에서 비밀번호 일치 여부 콜백
   const handleValidationChange = useCallback((isValid) => {
     setPasswordMatch(isValid);
   }, []);
 
-  // CheckPwd 컴포넌트에서 비밀번호 강도 점수 콜백
   const handlePasswordStrengthChange = useCallback((score) => {
     setPasswordStrength(score);
   }, []);
 
-  // 폼 제출 핸들러 (정보 업데이트)
   const handleUpdate = async (e) => {
     e.preventDefault();
     setError("");
@@ -143,44 +140,14 @@ const MyInfo = () => {
       return;
     }
 
+    // 비밀번호 변경 시도 여부 판단 (prevPwd, password, confirmPwd 중 하나라도 입력되었는지)
     const isPasswordChangeAttempted =
       formData.prevPwd || formData.password || formData.confirmPwd;
+    let passwordChangeSuccessful = false; // 비밀번호 변경 성공 여부 추적
 
-    if (isPasswordChangeAttempted) {
-      if (!formData.prevPwd) {
-        setError("현재 비밀번호를 입력해주세요.");
-        setIsUpdating(false);
-        return;
-      }
-      if (!formData.password || !formData.confirmPwd) {
-        setError("새 비밀번호와 비밀번호 확인을 모두 입력해주세요.");
-        setIsUpdating(false);
-        return;
-      }
-      if (!passwordMatch) {
-        setError("새 비밀번호가 일치하지 않습니다.");
-        setIsUpdating(false);
-        return;
-      }
-      if (passwordStrength < 2) {
-        setError(
-          "새 비밀번호가 너무 약합니다. 더 강한 비밀번호를 입력해주세요."
-        );
-        setIsUpdating(false);
-        return;
-      }
-    }
-
-    if (formData.phone !== originalPhone && !isVerified) {
-      setError("전화번호 인증을 완료해주세요.");
-      setIsUpdating(false);
-      return;
-    }
-
-    // 프로필 이미지 변경 로직
-    let newProfileImagePath = formData.profileImagePath; // 현재 폼 데이터의 이미지 경로 (기존 또는 선택된 미리보기)
+    // 프로필 이미지 업로드 처리 (비밀번호 변경보다 먼저 처리하여 경로를 확보)
+    let newProfileImagePath = formData.profileImagePath;
     if (selectedProfileFile) {
-      // 새로운 파일이 선택되었고, 안전성 검사를 통과했을 경우
       if (!isProfileImageSafe) {
         setError("선택된 프로필 이미지가 안전하지 않습니다.");
         setIsUpdating(false);
@@ -204,7 +171,7 @@ const MyInfo = () => {
           setAuthInfo((prev) => ({
             ...prev,
             profileImagePath: newProfileImagePath,
-          })); // AuthContext 업데이트
+          }));
           console.log(
             "프로필 이미지 업로드 및 경로 업데이트 성공:",
             newProfileImagePath
@@ -223,17 +190,82 @@ const MyInfo = () => {
       }
     }
 
-    // 기타 사용자 정보 업데이트
+    // 비밀번호 변경이 시도된 경우, 비밀번호 유효성 검사 및 업데이트를 먼저 수행
+    if (isPasswordChangeAttempted) {
+      if (!formData.prevPwd) {
+        setError("현재 비밀번호를 입력해주세요.");
+        setIsUpdating(false);
+        return;
+      }
+      if (!formData.password || !formData.confirmPwd) {
+        setError("새 비밀번호와 비밀번호 확인을 모두 입력해주세요.");
+        setIsUpdating(false);
+        return;
+      }
+      if (!passwordMatch) {
+        setError("새 비밀번호가 일치하지 않습니다.");
+        setIsUpdating(false);
+        return;
+      }
+      if (passwordStrength < 2) {
+        // 비밀번호 강도 '보통' 이상 (0: 매우 약함, 1: 약함, 2: 보통, 3: 강함, 4: 매우 강함)
+        setError(
+          "새 비밀번호가 너무 약합니다. 더 강한 비밀번호를 입력해주세요."
+        );
+        setIsUpdating(false);
+        return;
+      }
+
+      // 비밀번호 업데이트 요청
+      try {
+        console.log("MyInfo: 비밀번호 변경 요청 시도");
+        const passwordPayload = {
+          userId: userid,
+          prevPwd: formData.prevPwd,
+          currPwd: formData.password,
+        };
+        await secureApiRequest("/user/update/password", {
+          method: "PATCH",
+          body: JSON.stringify(passwordPayload),
+        });
+        passwordChangeSuccessful = true; // 비밀번호 변경 성공
+        setSuccess("비밀번호가 성공적으로 변경되었습니다."); // 비밀번호 변경 성공 메시지
+        // 비밀번호 변경 성공 시 prevPwd, password, confirmPwd 초기화
+        setFormData((prev) => ({
+          ...prev,
+          prevPwd: "",
+          password: "",
+          confirmPwd: "",
+        }));
+      } catch (passwordErr) {
+        console.error("MyInfo: 비밀번호 변경 오류:", passwordErr);
+        setError(
+          passwordErr.response?.data?.message ||
+            "비밀번호 변경 중 오류가 발생했습니다. 현재 비밀번호를 확인해주세요."
+        );
+        setIsUpdating(false);
+        return; // 비밀번호 변경 실패 시 전체 업데이트 중단
+      }
+    }
+
+    // 전화번호 변경 시 인증 여부 확인
+    if (formData.phone !== originalPhone && !isVerified) {
+      setError("전화번호 인증을 완료해주세요.");
+      setIsUpdating(false);
+      return;
+    }
+
+    // 일반 사용자 정보 업데이트
     try {
       const infoPayload = {
         userId: userid,
         nickname: formData.nickname,
         birthday: formData.birthday,
         statusMessage: formData.statusMessage,
-        profileImagePath: newProfileImagePath, // 업로드된 새 경로 또는 기존 경로 사용
+        profileImagePath: newProfileImagePath,
       };
 
-      if (isVerified && formData.phone) {
+      if (formData.phone && (formData.phone !== originalPhone || isVerified)) {
         infoPayload.phone = formData.phone;
       }
 
@@ -244,48 +276,39 @@ const MyInfo = () => {
         body: JSON.stringify(infoPayload),
       });
 
-      let passwordChangeSuccess = true;
-      if (isPasswordChangeAttempted) {
-        console.log("MyInfo: 비밀번호 변경 요청 시도");
-        const passwordPayload = {
-          userId: userid,
-          prevPwd: formData.prevPwd,
-          currPwd: formData.password,
-        };
-        try {
-          await secureApiRequest("/user/update/password", {
-            method: "PATCH",
-            body: JSON.stringify(passwordPayload),
-          });
-        } catch (passwordErr) {
-          console.error("MyInfo: 비밀번호 변경 오류:", passwordErr);
-          setError(
-            passwordErr.response?.data?.message ||
-              "비밀번호 변경 중 오류가 발생했습니다. 현재 비밀번호를 확인해주세요."
-          );
-          passwordChangeSuccess = false;
-        }
-      }
-
-      if (passwordChangeSuccess) {
+      // 일반 정보 업데이트 성공 메시지 (비밀번호 변경 메시지와 중복되지 않도록)
+      if (!isPasswordChangeAttempted || passwordChangeSuccessful) {
+        // 비밀번호 변경 시도 없었거나, 비밀번호 변경도 성공했을 경우
         setSuccess(infoResponse.message || "정보가 성공적으로 변경되었습니다.");
-        // 비밀번호 필드 초기화
-        setFormData((prev) => ({
-          ...prev,
-          prevPwd: "",
-          password: "",
-          confirmPwd: "",
-          profileImagePath: newProfileImagePath, // 최종 업데이트된 경로로 formData 업데이트
-        }));
-        setSelectedProfileFile(null); // 파일 선택 상태 초기화
-        setIsProfileImageSafe(false); // 이미지 안전성 상태 초기화
       }
 
-      if (infoResponse && infoResponse.nickname && setAuthInfo) {
+      setFormData((prev) => ({
+        ...prev,
+        profileImagePath: newProfileImagePath,
+      }));
+      setSelectedProfileFile(null);
+      setIsProfileImageSafe(false);
+
+      // AuthContext의 닉네임 업데이트
+      if (
+        infoResponse &&
+        infoResponse.data &&
+        infoResponse.data.nickname &&
+        setAuthInfo
+      ) {
         setAuthInfo((prev) => ({
           ...prev,
-          nickname: infoResponse.nickname,
+          nickname: infoResponse.data.nickname,
         }));
+      }
+
+      // ✅ 최종 리다이렉션 로직
+      if (passwordChangeSuccessful) {
+        alert("비밀번호가 변경되었습니다. 다시 로그인해주세요.");
+        logoutAndRedirect(); // ✅ clearAuthInfo() 대신 logoutAndRedirect() 호출
+      } else {
+        alert("정보가 성공적으로 변경되었습니다.");
+        navigate("/library"); // 라이브러리 페이지로 이동
       }
     } catch (err) {
       console.error("MyInfo: 사용자 정보 업데이트 오류:", err);
@@ -299,11 +322,9 @@ const MyInfo = () => {
     }
   };
 
-  // 얼굴 ID 등록 페이지로 이동하는 핸들러
   const handleNavigateToFaceRegister = () => {
     console.log("MyInfo: 현재 userid:", userid);
     if (userid) {
-      // URL 파라미터 대신 state로 userId를 전달합니다.
       navigate("/user/face-register", { state: { userId: userid } });
     } else {
       setError("사용자 ID를 찾을 수 없습니다. 로그인 후 다시 시도해주세요.");
@@ -328,19 +349,17 @@ const MyInfo = () => {
       {error && <p className={styles.error}>{error}</p>}
       {success && <p className={styles.success}>{success}</p>}
 
-      {/* ProfileUploader 컴포넌트 */}
       <div className={styles.profileUploaderSection}>
         <ProfileUploader
           initialProfileImagePath={formData.profileImagePath}
           onFileChange={handleProfileFileChange}
           onSafetyCheckComplete={handleProfileSafetyCheckComplete}
-          isUpdating={isUpdating} // 부모의 isUpdating 상태 전달
-          secureApiRequest={secureApiRequest} // secureApiRequest 함수 전달
+          isUpdating={isUpdating}
+          secureApiRequest={secureApiRequest}
         />
       </div>
 
       <form onSubmit={handleUpdate} className={styles.form}>
-        {/* 닉네임 */}
         <div className={styles.inputGroup}>
           <label htmlFor="nickname">닉네임</label>
           <input
@@ -355,7 +374,6 @@ const MyInfo = () => {
           />
         </div>
 
-        {/* 전화번호 및 인증 */}
         <div className={styles.inputGroup}>
           <label>전화번호</label>
           <UserVerification
@@ -365,10 +383,10 @@ const MyInfo = () => {
             }
             onVerificationComplete={setIsVerified}
             disabled={isUpdating}
+            checkType="myinfo" // MyInfo 페이지임을 나타내는 새로운 checkType 추가
           />
         </div>
 
-        {/* 생년월일 */}
         <div className={styles.inputGroup}>
           <label htmlFor="birthday">생년월일</label>
           <input
@@ -378,11 +396,11 @@ const MyInfo = () => {
             value={formData.birthday}
             onChange={handleInputChange}
             placeholder="YYYY-MM-DD"
+            readOnly // 생년월일 필드를 읽기 전용으로 설정
             disabled={isUpdating}
           />
         </div>
 
-        {/* 상태 메시지 */}
         <div className={styles.inputGroup}>
           <label htmlFor="statusMessage">상태 메시지</label>
           <input
@@ -397,30 +415,31 @@ const MyInfo = () => {
           />
         </div>
 
-        {/* 현재 비밀번호 */}
-        <div className={styles.inputGroup}>
-          <label htmlFor="prevPwd">현재 비밀번호</label>
-          <input
-            type="password"
-            id="prevPwd"
-            name="prevPwd"
-            value={formData.prevPwd}
+        {/* 비밀번호 변경 필드는 항상 렌더링 */}
+        <>
+          <div className={styles.inputGroup} aria-label="비밀번호 변경">
+            <label htmlFor="prevPwd">현재 비밀번호</label>
+            <input
+              type="password"
+              id="prevPwd"
+              name="prevPwd"
+              value={formData.prevPwd}
+              onChange={handleInputChange}
+              placeholder="현재 비밀번호 (비밀번호 변경 시 필수)"
+              maxLength={16}
+              disabled={isUpdating}
+            />
+          </div>
+
+          <CheckPwd
+            password={formData.password}
+            confirmPwd={formData.confirmPwd}
             onChange={handleInputChange}
-            placeholder="현재 비밀번호 (비밀번호 변경 시 필수)"
-            maxLength={16}
+            onValidationChange={handleValidationChange}
+            onPasswordStrengthChange={handlePasswordStrengthChange}
             disabled={isUpdating}
           />
-        </div>
-
-        {/* 새 비밀번호 및 확인 (CheckPwd 컴포넌트) */}
-        <CheckPwd
-          password={formData.password}
-          confirmPwd={formData.confirmPwd}
-          onChange={handleInputChange}
-          onValidationChange={handleValidationChange}
-          onPasswordStrengthChange={handlePasswordStrengthChange}
-          disabled={isUpdating}
-        />
+        </>
 
         <button
           type="submit"
@@ -431,7 +450,6 @@ const MyInfo = () => {
         </button>
       </form>
 
-      {/* 얼굴 ID 등록 페이지로 이동하는 버튼 */}
       <button
         onClick={handleNavigateToFaceRegister}
         className={styles.faceIdButton}
