@@ -1,0 +1,90 @@
+.useritem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #d9cfc4;
+  background-color: #f8f3ef;
+  font-family: "Noto Sans KR", sans-serif;
+  color: #5a3e2b;
+}
+
+.userinfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+}
+
+.userinfo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #a67c52;
+}
+
+.username {
+  font-weight: 600;
+  color: #4b3221;
+  min-width: 80px;
+}
+
+.details {
+  font-size: 12px;
+  color: #8c7158;
+  line-height: 1.2;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #5a3e2b;
+  min-width: 280px;
+  justify-content: flex-end;
+}
+
+.actions button {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 5px rgba(101, 67, 33, 0.2);
+  user-select: none;
+}
+
+.msgbtn {
+  background-color: #a67c52;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(166, 124, 82, 0.5);
+}
+
+.msgbtn:hover {
+  background-color: #865e32;
+  box-shadow: 0 6px 12px rgba(134, 94, 50, 0.7);
+}
+
+.banbtn {
+  background-color: #d3b88f;
+  color: #5a3e2b;
+  box-shadow: 0 4px 8px rgba(211, 184, 143, 0.5);
+}
+
+.banbtn:hover {
+  background-color: #b08e52;
+  color: #fff;
+  box-shadow: 0 6px 12px rgba(176, 142, 82, 0.7);
+}
+
+.statusicon {
+  font-size: 20px;
+  user-select: none;
+}

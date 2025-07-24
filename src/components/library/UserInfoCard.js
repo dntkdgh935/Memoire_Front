@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../AuthProvider";
 import PropTypes from "prop-types";
 import styles from "./UserInfoCard.module.css"; // 스타일을 위한 CSS 파일 (필요시 추가)
 import default_profile from "../../assets/images/default_profile.jpg";
@@ -14,6 +15,8 @@ function UserInfoCard({
   onFollowBtnClick,
   onInfoCardClick,
 }) {
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
+
   // 관계 상태에 따라 메시지 설정 (derived value)
   const getRelBtnMsg = (status) => {
     switch (status) {
@@ -66,16 +69,19 @@ function UserInfoCard({
           </ul>
         </div>
 
-        {/* 관계 상태 */}
-        <div className={styles.relStatus}>
-          {/* <span>{relStatusWLoginUser}</span> */}
-          <button
-            className={styles["follow-btn"]}
-            onClick={() => onFollowBtnClick(userId, relStatusWLoginUser)}
-          >
-            {relBtnMsg}
-          </button>
-        </div>
+        {/* 관계 상태 - 자기 자신이 아닐 경우에만 보임 */}
+        {isLoggedIn && userId !== userid && (
+          <div className={styles.relStatus}>
+            {/* <span>{relStatusWLoginUser}</span> */}
+
+            <button
+              className={styles["follow-btn"]}
+              onClick={() => onFollowBtnClick(userId, relStatusWLoginUser)}
+            >
+              {relBtnMsg}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

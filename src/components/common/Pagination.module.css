@@ -1,0 +1,41 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #6b4c3b; /* 진한 갈색 텍스트 */
+}
+
+.pagination button {
+  background-color: #d7c4a3; /* 연한 갈색 */
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #4a3724; /* 좀 더 진한 갈색 텍스트 */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #a98958; /* 진한 갈색으로 변함 */
+  color: #fff;
+}
+
+.pagination button:disabled {
+  background-color: #f0e6d9;
+  color: #b8a88a;
+  cursor: default;
+}
+
+.pagination span {
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: center;
+}

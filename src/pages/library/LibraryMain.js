@@ -23,8 +23,11 @@ function LibraryMain() {
   const fetchCollections4LoginUser = async () => {
     console.log("fetchCollections4LoginUser 수행중");
     try {
-      const res = await apiClient.get(
-        `api/library/discover/${selectedTag}/${userid}`
+      const res = await secureApiRequest(
+        `/api/library/discover/${selectedTag}/${userid}`,
+        {
+          method: "GET",
+        }
       );
       console.log("받은 데이터");
       console.log(res.data);
@@ -39,7 +42,7 @@ function LibraryMain() {
   const fetchCollections4Anon = async () => {
     console.log("fetchCollections4Anon 수행중");
     try {
-      const res = await apiClient.get(`api/library/discover/${selectedTag}`);
+      const res = await apiClient.get(`/api/library/discover/${selectedTag}`);
       console.log("받은 데이터");
       console.log(res.data);
       setRecColls(res.data);
@@ -53,7 +56,11 @@ function LibraryMain() {
   const recColls4LoginUser = async () => {
     console.log("recColls4LoginUser 수행중");
     try {
-      const res = await apiClient.get(`/api/library/recommend/${userid}`, {
+      // const res = await apiClient.get(`/api/library/recommend/${userid}`, {
+      //   params: { page },
+      // });
+      const res = await secureApiRequest(`/api/library/recommend/${userid}`, {
+        method: "GET",
         params: { page },
       });
       console.log("받은 데이터");
@@ -152,13 +159,19 @@ function LibraryMain() {
           : undefined;
 
       if (actionType === "userlike") {
-        await axios.post(
-          `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
+        await secureApiRequest(
+          `/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`,
+          {
+            method: "POST",
+          }
         );
       }
       if (actionType === "userbookmark") {
-        await axios.post(
-          `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+        await secureApiRequest(
+          `/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
+          {
+            method: "POST",
+          }
         );
       }
 

@@ -1,5 +1,5 @@
 // src/pages/user/FindPwd.js
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/axios";
 import { AuthContext } from "../../AuthProvider"; // AuthContext 임포트
@@ -14,8 +14,7 @@ function FindPwd() {
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // API 호출 중 상태
   const navigate = useNavigate();
-  const { updateTokens } = useContext(AuthContext); // AuthContext에서 updateTokens 가져오기
-
+  const { updateTokens } = useContext(AuthContext);
   // 휴대폰 인증 완료 시 호출될 콜백 함수
   const handlePhoneVerificationComplete = (verified) => {
     setIsPhoneVerified(verified);
@@ -94,7 +93,8 @@ function FindPwd() {
 
           if (loginResponse.status === 200) {
             const { accessToken, refreshToken } = loginResponse.data;
-            updateTokens(accessToken, refreshToken); // AuthContext를 통해 토큰 업데이트
+
+            updateTokens(accessToken, refreshToken);
             alert("임시 비밀번호로 자동 로그인되었습니다.");
             // MyInfo 페이지로 이동하면서 임시 비밀번호를 state로 전달
             navigate("/user/myinfo", { state: { tempPwd: temporaryPassword } });
@@ -179,6 +179,7 @@ function FindPwd() {
               phone={formData.phone}
               setPhone={(val) => setFormData({ ...formData, phone: val })}
               onVerificationComplete={handlePhoneVerificationComplete} // 인증 완료 콜백 함수 전달
+              checkType="find"
             />
           </div>
           {/* 비밀번호 찾기 제출 버튼 */}

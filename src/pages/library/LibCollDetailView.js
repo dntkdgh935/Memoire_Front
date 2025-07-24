@@ -9,12 +9,15 @@ import MemoryView from "../../components/common/MemoryView";
 import styles from "./LibCollDetailView.module.css"; // ✅
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader";
+import Modal from "../../components/common/Modal";
+import default_profile from "../../assets/images/default_profile.jpg";
 
 function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
   const navigate = useNavigate();
 
-  const { isLoggedIn, userid, role } = useContext(AuthContext);
+  const { isLoggedIn, userid, role, secureApiRequest } =
+    useContext(AuthContext);
   //userid가 새로고침 후에도 정상적으로 유지되도록
   //localStorage 또는 sessionStorage에 userid를 저장하고, 컴포넌트가 로드될 때 이를 읽어와서 사용
   const storedUserid = localStorage.getItem("userid");
@@ -25,6 +28,115 @@ function LibCollDetailView() {
   const [selectedMemory, setSelectedMemory] = useState(null); // 메모리 리스트에서 선택된 메모리(view에 나타날 메모리)
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [isLikedUserModalOpen, setIsLikedUserModalOpen] = useState(false);
+  const [likedUsers, setLikedUsers] = useState([]);
+
+  const [isBMUserModalOpen, setIsBMMUserodalOpen] = useState(false);
+  const [bmUsers, setBMUsers] = useState([]);
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportContent, setReportContent] = useState("");
+
+  const handleOpenLilkedUsers = () => {
+    setIsLikedUserModalOpen(true);
+  };
+  const handleOpenBookmarkedUsers = () => {
+    setIsBMMUserodalOpen(true);
+  };
+
+  const handleOpenReportModal = () => {
+    if (!isLoggedIn) {
+      alert("로그인 후 사용 가능합니다.");
+      return;
+    }
+    if (!selectedMemory || !currentUserid) return;
+    setIsReportModalOpen(true);
+  };
+
+  const handleSubmitReport = async () => {
+    console.log("선택된 메모리:");
+    console.log(selectedMemory);
+
+    try {
+      await secureApiRequest(
+        `/api/library/report/${selectedMemory.memoryid}/${userid}`,
+        {
+          method: "POST",
+          //data가 아니라 body로 해야함(현재 secureRequest 설정상)
+          body: {
+            content: reportContent,
+          },
+        }
+      );
+
+      alert("신고가 접수되었습니다.");
+      setIsReportModalOpen(false);
+      setReportContent("");
+    } catch (err) {
+      console.error("🚨 신고 실패", err);
+      alert("신고에 실패했습니다.");
+    }
+  };
+
+  //컬렉션 fetch되면, 좋아요한 유저와 북마크한 유저를 불러옴
+  useEffect(() => {
+    const fetchLikedUsers = async () => {
+      if (!collection || !collection.collectionid || !userid) return;
+
+      try {
+        // const res = await apiClient.get("/api/library/whoLiked", {
+        //   params: {
+        //     collectionid: collection.collectionid,
+        //     userid: userid,
+        //   },
+        // });
+        const res = await secureApiRequest("/api/library/whoLiked", {
+          method: "GET",
+          params: {
+            collectionid: collection.collectionid,
+            userid: userid,
+          },
+        });
+
+        console.log("✅ 좋아요한 유저 리스트:", res.data);
+        setLikedUsers(res.data);
+      } catch (error) {
+        console.error("🚨 좋아요한 유저 조회 실패:", error);
+      }
+    };
+
+    fetchLikedUsers();
+  }, [collection, userid]);
+
+  useEffect(() => {
+    const fetchBookmarkedUsers = async () => {
+      if (!collection || !collection.collectionid || !userid) return;
+
+      try {
+        // const res = await apiClient.get("/api/library/whoBookmarked", {
+        //   params: {
+        //     collectionid: collection.collectionid,
+        //     userid: userid,
+        //   },
+        // });
+        const res = await secureApiRequest("/api/library/whoBookmarked", {
+          method: "GET",
+          params: {
+            collectionid: collection.collectionid,
+            userid: userid,
+          },
+        });
+
+        console.log("✅ 북마크한 유저 리스트:", res.data);
+        setBMUsers(res.data);
+      } catch (error) {
+        console.error("🚨 북마크한 유저 조회 실패:", error);
+      }
+    };
+
+    fetchBookmarkedUsers();
+  }, [collection, userid]);
 
   useEffect(() => {
     console.log("안녕!!");
@@ -171,6 +283,8 @@ function LibCollDetailView() {
             onMemoryClick={handleMemoryClick}
             onActionChange={handleActionChange}
             selectedMemoryId={selectedMemoryId}
+            onOpenLilkedUsers={handleOpenLilkedUsers}
+            onOpenBookmarkedUsers={handleOpenBookmarkedUsers}
           />
         ) : (
           <div>컬렉션 정보를 불러올 수 없습니다.</div>
@@ -180,16 +294,74 @@ function LibCollDetailView() {
             selectedMemory={selectedMemory}
             authorid={collection.authorid}
             numMemories={memoryList.length}
+            onReportClick={handleOpenReportModal}
           />
         ) : (
           <div>컬렉션 정보를 불러올 수 없습니다.</div>
         )}
-        {/* <MemoryView
-          selectedMemory={selectedMemory}
-          authorid={collection.authorid}
-          numMemories={memoryList.length}
-        /> */}
       </div>
+      {isReportModalOpen && (
+        <Modal onClose={() => setIsReportModalOpen(false)}>
+          <h3>신고 사유를 작성해주세요</h3>
+          <textarea
+            value={reportContent}
+            onChange={(e) => setReportContent(e.target.value)}
+            placeholder="신고 내용을 입력하세요..."
+            rows={5}
+            style={{ width: "100%", marginBottom: "1rem" }}
+          />
+          <button onClick={() => handleSubmitReport()}>신고 제출</button>
+        </Modal>
+      )}
+      {/**like modal */}
+      {isLikedUserModalOpen && (
+        <Modal onClose={() => setIsLikedUserModalOpen(false)}>
+          <h3>좋아요한 유저 목록</h3>
+          {likedUsers.length === 0 ? (
+            <p>아직 좋아요한 유저가 없습니다.</p>
+          ) : (
+            likedUsers.map((user, index) => (
+              <div key={index} style={{ marginBottom: "1rem" }}>
+                <img
+                  src={
+                    user.profileImagePath
+                      ? `http://localhost:8080${user.profileImagePath}`
+                      : default_profile
+                  }
+                  alt={user.nickname}
+                  style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                />
+                <span style={{ marginLeft: "0.5rem" }}>{user.nickname}</span>
+              </div>
+            ))
+          )}
+        </Modal>
+      )}
+
+      {/**BM modal */}
+      {isBMUserModalOpen && (
+        <Modal onClose={() => setIsBMMUserodalOpen(false)}>
+          <h3>북마크한 유저 목록</h3>
+          {bmUsers.length === 0 ? (
+            <p>아직 북마크한 유저가 없습니다.</p>
+          ) : (
+            bmUsers.map((user, index) => (
+              <div key={index} style={{ marginBottom: "1rem" }}>
+                <img
+                  src={
+                    user.profileImagePath
+                      ? `http://localhost:8080${user.profileImagePath}`
+                      : default_profile
+                  }
+                  alt={user.nickname}
+                  style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                />
+                <span style={{ marginLeft: "0.5rem" }}>{user.nickname}</span>
+              </div>
+            ))
+          )}
+        </Modal>
+      )}
     </>
   );
 }

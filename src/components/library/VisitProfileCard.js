@@ -29,6 +29,7 @@ function VisitProfileCard({
     nickname: "",
     profileImage: "",
   });
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
   const [stats, setStats] = useState({
     collections: 0,
@@ -180,10 +181,14 @@ function VisitProfileCard({
         </div>
       </div>
 
-      <button className={styles["follow-btn"]} onClick={onFollowBtnClick}>
-        {relBtnMsg}
-      </button>
-      <p onClick={onBlockClick}>차단하기</p>
+      {isLoggedIn && ownerid !== userid && (
+        <>
+          <button className={styles["follow-btn"]} onClick={onFollowBtnClick}>
+            {relBtnMsg}
+          </button>
+          <p onClick={onBlockClick}>차단하기</p>
+        </>
+      )}
     </div>
   );
 }

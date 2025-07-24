@@ -254,7 +254,7 @@ export const AuthProvider = ({ children }) => {
           console.log(pair[0] + ":" + pair[1]);
         }
       }
-
+      const params = options.params || null;
       const response = await apiClient({
         url: URL,
         method,
@@ -266,6 +266,7 @@ export const AuthProvider = ({ children }) => {
             : { "Content-Type": "application/json" }),
         },
         data,
+        params,
       });
       return response;
     } catch (error) {
