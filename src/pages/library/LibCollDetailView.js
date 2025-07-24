@@ -10,6 +10,7 @@ import styles from "./LibCollDetailView.module.css"; // ✅
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader";
 import Modal from "../../components/common/Modal";
+import default_profile from "../../assets/images/default_profile.jpg";
 
 function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
@@ -27,8 +28,21 @@ function LibCollDetailView() {
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [isLikedUserModalOpen, setIsLikedUserModalOpen] = useState(false);
+  const [likedUsers, setLikedUsers] = useState([]);
+
+  const [isBMUserModalOpen, setIsBMMUserodalOpen] = useState(false);
+  const [bmUsers, setBMUsers] = useState([]);
+
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportContent, setReportContent] = useState("");
+
+  const handleOpenLilkedUsers = () => {
+    setIsLikedUserModalOpen(true);
+  };
+  const handleOpenBookmarkedUsers = () => {
+    setIsBMMUserodalOpen(true);
+  };
 
   const handleOpenReportModal = () => {
     if (!isLoggedIn) {
@@ -58,6 +72,51 @@ function LibCollDetailView() {
       alert("신고에 실패했습니다.");
     }
   };
+
+  //컬렉션 fetch되면, 좋아요한 유저와 북마크한 유저를 불러옴
+  useEffect(() => {
+    const fetchLikedUsers = async () => {
+      if (!collection || !collection.collectionid || !userid) return;
+
+      try {
+        const res = await apiClient.get("/api/library/whoLiked", {
+          params: {
+            collectionid: collection.collectionid,
+            userid: userid,
+          },
+        });
+
+        console.log("✅ 좋아요한 유저 리스트:", res.data);
+        setLikedUsers(res.data);
+      } catch (error) {
+        console.error("🚨 좋아요한 유저 조회 실패:", error);
+      }
+    };
+
+    fetchLikedUsers();
+  }, [collection, userid]);
+
+  useEffect(() => {
+    const fetchBookmarkedUsers = async () => {
+      if (!collection || !collection.collectionid || !userid) return;
+
+      try {
+        const res = await apiClient.get("/api/library/whoBookmarked", {
+          params: {
+            collectionid: collection.collectionid,
+            userid: userid,
+          },
+        });
+
+        console.log("✅ 북마크한 유저 리스트:", res.data);
+        setBMUsers(res.data);
+      } catch (error) {
+        console.error("🚨 북마크한 유저 조회 실패:", error);
+      }
+    };
+
+    fetchBookmarkedUsers();
+  }, [collection, userid]);
 
   useEffect(() => {
     console.log("안녕!!");
@@ -204,6 +263,8 @@ function LibCollDetailView() {
             onMemoryClick={handleMemoryClick}
             onActionChange={handleActionChange}
             selectedMemoryId={selectedMemoryId}
+            onOpenLilkedUsers={handleOpenLilkedUsers}
+            onOpenBookmarkedUsers={handleOpenBookmarkedUsers}
           />
         ) : (
           <div>컬렉션 정보를 불러올 수 없습니다.</div>
@@ -230,6 +291,55 @@ function LibCollDetailView() {
             style={{ width: "100%", marginBottom: "1rem" }}
           />
           <button onClick={() => handleSubmitReport()}>신고 제출</button>
+        </Modal>
+      )}
+      {/**like modal */}
+      {isLikedUserModalOpen && (
+        <Modal onClose={() => setIsLikedUserModalOpen(false)}>
+          <h3>좋아요한 유저 목록</h3>
+          {likedUsers.length === 0 ? (
+            <p>아직 좋아요한 유저가 없습니다.</p>
+          ) : (
+            likedUsers.map((user, index) => (
+              <div key={index} style={{ marginBottom: "1rem" }}>
+                <img
+                  src={
+                    user.profileImagePath
+                      ? `http://localhost:8080${user.profileImagePath}`
+                      : default_profile
+                  }
+                  alt={user.nickname}
+                  style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                />
+                <span style={{ marginLeft: "0.5rem" }}>{user.nickname}</span>
+              </div>
+            ))
+          )}
+        </Modal>
+      )}
+
+      {/**BM modal */}
+      {isBMUserModalOpen && (
+        <Modal onClose={() => setIsBMMUserodalOpen(false)}>
+          <h3>북마크한 유저 목록</h3>
+          {bmUsers.length === 0 ? (
+            <p>아직 북마크한 유저가 없습니다.</p>
+          ) : (
+            bmUsers.map((user, index) => (
+              <div key={index} style={{ marginBottom: "1rem" }}>
+                <img
+                  src={
+                    user.profileImagePath
+                      ? `http://localhost:8080${user.profileImagePath}`
+                      : default_profile
+                  }
+                  alt={user.nickname}
+                  style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                />
+                <span style={{ marginLeft: "0.5rem" }}>{user.nickname}</span>
+              </div>
+            ))
+          )}
         </Modal>
       )}
     </>

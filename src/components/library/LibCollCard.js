@@ -21,6 +21,8 @@ function LibCollCard({
   onMemoryClick,
   onActionChange,
   selectedMemoryId,
+  onOpenLilkedUsers,
+  onOpenBookmarkedUsers,
 }) {
   const { isLoggedIn, userid, role, secureApiRequest } =
     useContext(AuthContext);
@@ -83,20 +85,6 @@ function LibCollCard({
         <div className={styles.userName}>{coll.authorid}</div>
         <div className={styles.collectionDate}>{coll.createdDate}</div>
       </div>
-      <div className={styles.cardTags}></div>
-
-      <div className={styles.cardFooter}>
-        <CollActionBtn
-          btnType="like"
-          coll={coll}
-          onActionChange={onActionChange}
-        />
-        <CollActionBtn
-          btnType="bookmark"
-          coll={coll}
-          onActionChange={onActionChange}
-        />
-      </div>
 
       <div className={styles.cardTags}>
         {coll.collTags.map((tag) => (
@@ -105,6 +93,30 @@ function LibCollCard({
           </span>
         ))}
       </div>
+      <div className={styles.cardFooter}>
+        <CollActionBtn
+          btnType="like"
+          coll={coll}
+          onActionChange={onActionChange}
+        />
+
+        <CollActionBtn
+          btnType="bookmark"
+          coll={coll}
+          onActionChange={onActionChange}
+        />
+      </div>
+      {/**로그인 상태이고, 자기의 컬렉션일 때만 보이는 부분 */}
+      {isLoggedIn && userid === coll.authorid && (
+        <div className={styles.interactedUsers}>
+          <div onClick={onOpenLilkedUsers} className={styles.likeUsers}>
+            좋아요한 유저
+          </div>
+          <div onClick={onOpenBookmarkedUsers} className={styles.bmUsers}>
+            북마크한 유저
+          </div>
+        </div>
+      )}
 
       <div className={styles.memoryList}>
         <MemoryList
