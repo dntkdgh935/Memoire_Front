@@ -1,7 +1,7 @@
 .container {
   display: flex;
-  justify-content: center; /* 수평 가운데 정렬 */
-  margin-top: 60px; /* 원하는 만큼 위 여백 */
+  justify-content: center;
+  margin-top: 60px;
 }
 
 .form {
@@ -10,10 +10,10 @@
   gap: 24px;
   border: 1px solid #5e4b3c;
   border: 1px solid #5e4b3c;
-  padding: 32px 40px; /* 내부 공백 */
-  border-radius: 12px; /* 둥근 모서리 */
-  background-color: #fff8f3; /* 배경 흰색 */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 약한 그림자 */
+  padding: 32px 40px;
+  border-radius: 12px;
+  background-color: #fff8f3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .formRow {

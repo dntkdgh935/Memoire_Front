@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./WorkResultPanel.module.css";
 import loadingImg from "../../../assets/loading_pen.png";
 import errorImg from "../../../assets/error_rain.png";
@@ -10,11 +10,19 @@ function WorkResultPanel({
   originalMemoryTitle,
   selectedCollectionId,
 }) {
-  const isLoading = result?.status === "loading";
-  const isError = result?.status === "error";
-  const isSuccess = result?.videoUrl;
-
   const navigate = useNavigate();
+
+  const [videoUrl, setVideoUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (result?.videoUrl) {
+      setVideoUrl(`http://localhost:8080/upload_files/${result.videoUrl}`);
+      setError(null);
+      console.log("rawVideoUrl :", videoUrl);
+    }
+  }, [result?.videoUrl]);
 
   // 새 메모리로 저장
   const handleSaveAsNewMemory = async () => {
@@ -22,6 +30,7 @@ function WorkResultPanel({
       collectionId: selectedCollectionId,
       resultDto: result.resultDto,
     });
+    setLoading(true);
     if (!result?.resultDto) {
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
@@ -40,8 +49,9 @@ function WorkResultPanel({
       if (!response.ok) throw new Error("새 메모리 저장 실패");
       alert("새 메모리로 저장되었습니다!");
       navigate("/");
-      // window.location.reload();
     } catch (err) {
+      setLoading(false);
+      setError(true);
       console.error(err);
       alert("저장 중 오류 발생");
     }
@@ -62,8 +72,6 @@ function WorkResultPanel({
       if (!response.ok) throw new Error("덮어쓰기 실패");
       alert("원본 메모리가 덮어쓰기 되었습니다!");
       navigate("/");
-
-      // window.location.reload();
     } catch (err) {
       console.error(err);
       alert("업데이트 중 오류 발생");
@@ -77,56 +85,62 @@ function WorkResultPanel({
       </div>
       <div className={styles.title}>{originalMemoryTitle || "제목 없음"}</div>
 
-      {isLoading && (
+      {loading && (
         <div className={styles.loadingBox}>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
           <img src={loadingImg} alt="로딩 중" />
           <p>
-            동영상 생성중
+            영상 생성중
             <br />
             잠시만 기다려주세요.
           </p>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
         </div>
       )}
-
-      {isError && (
+      {error && (
         <div className={styles.errorBox}>
           <img src={errorImg} alt="에러" />
-          <p className={styles.errorText}>동영상 생성 실패</p>
-          <p className={styles.errorReason}>
-            실패 사유: {result.errorMessage || "알 수 없음"}
-          </p>
+          <p className={styles.errorText}>오류: {error}</p>
         </div>
       )}
 
-      {isSuccess && (
+      {!loading && !error && videoUrl && (
         <div className={styles.videoBox}>
-          {/* HTML5 video 태그로 재생 */}
-          <video
-            src={result.videoUrl}
-            controls
-            autoPlay={false}
-            poster={result.previewImageUrl}
-          />
-          <div className={styles.buttonGroup}>
-            <button
-              className={styles.secondaryBtn}
-              onClick={handleOverwriteMemory}
-            >
-              원본 메모리 덮어쓰기
-            </button>
-            <button
-              className={styles.primaryBtn}
-              onClick={handleSaveAsNewMemory}
-            >
-              새 메모리로 저장
-            </button>
-          </div>
+          <video src={videoUrl} controls poster={result.previewImageUrl} />
+          <button
+            className={styles.secondaryBtn}
+            onClick={handleOverwriteMemory}
+          >
+            원본 메모리 덮어쓰기
+          </button>
+          <button className={styles.primaryBtn} onClick={handleSaveAsNewMemory}>
+            새 메모리로 저장
+          </button>
         </div>
       )}
 
-      {!result && (
+      {/* 초기 안내 */}
+      {!videoUrl && !loading && !error && (
         <p className={styles.placeholder}>
-          오른쪽 하단 “생성” 버튼을 눌러주세요.
+          프롬프트를 입력하시고 영상을 생성해주세요.
         </p>
       )}
     </div>

@@ -13,6 +13,7 @@ import PageHeader from "../../components/common/PageHeader";
 
 function ArchiveVisit() {
   const { userid: ownerid } = useParams();
+
   const [ownerNickname, setOwnerNickname] = useState("정보없음");
   const { userid: myid, secureApiRequest } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -35,10 +36,13 @@ function ArchiveVisit() {
     const fetchRelStatus = async () => {
       console.log("**myid: " + myid);
       try {
-        // `http://localhost:8080/api/library/collection/${id}`
-        const res = await apiClient.get(`api/library/getRelationshipStatus`, {
-          params: { userid: myid, targetid: ownerid },
-        });
+        const res = await secureApiRequest(
+          `api/library/getRelationshipStatus`,
+          {
+            method: "GET",
+            params: { userid: myid, targetid: ownerid },
+          }
+        );
         setRelStatus(String(res.data));
         // 상태에 따라 relStatus, relBtnMsg 설정
       } catch (e) {
@@ -58,9 +62,12 @@ function ArchiveVisit() {
   useEffect(() => {
     const fetchOwnerNickname = async () => {
       try {
-        const userInfo = await apiClient.get("/archive/userinfo", {
-          params: { userid: ownerid },
-        });
+        const userInfo = await secureApiRequest(
+          `/archive/userinfo?userid=${ownerid}`,
+          {
+            method: "GET",
+          }
+        );
         setOwnerNickname(userInfo.data.nickname);
       } catch (error) {
         console.error("닉네임 가져오기 실패");
@@ -97,15 +104,13 @@ function ArchiveVisit() {
     if (ownerid) {
       const fetchStuff = async () => {
         try {
-          const collectionsInfo = await apiClient.get(
-            "api/library/archiveVisit",
+          const collectionsInfo = await secureApiRequest(
+            `/api/library/archiveVisit?userid=${myid}&ownerid=${ownerid}`,
             {
-              params: {
-                userid: myid,
-                ownerid: ownerid,
-              },
+              method: "GET",
             }
           );
+
           console.log(collectionsInfo.data);
           setCollections(collectionsInfo.data);
         } catch (error) {
@@ -118,14 +123,21 @@ function ArchiveVisit() {
           }
         }
         try {
-          const bookmarksInfo = await apiClient.get(
-            "/archive/bookmarkCollections",
+          // const bookmarksInfo = await apiClient.get(
+          //   "/archive/bookmarkCollections",
+          //   {
+          //     params: {
+          //       userid: ownerid,
+          //     },
+          //   }
+          // );
+          const bookmarksInfo = await secureApiRequest(
+            `/archive/bookmarkCollections?userid=${ownerid}`,
             {
-              params: {
-                userid: ownerid,
-              },
+              method: "GET",
             }
           );
+
           console.log(bookmarksInfo.data);
           setBookmarks(bookmarksInfo.data);
         } catch (error) {
@@ -162,13 +174,20 @@ function ArchiveVisit() {
           return; // 기본값을 처리하지 않음
       }
 
-      await apiClient.post(`api/library/toggleFollow`, null, {
-        params: {
-          userid: myid,
-          targetid: ownerid,
-          nextRel: nextStatus,
-        },
-      });
+      // await apiClient.post(`api/library/toggleFollow`, null, {
+      //   params: {
+      //     userid: myid,
+      //     targetid: ownerid,
+      //     nextRel: nextStatus,
+      //   },
+      // });
+      await secureApiRequest(
+        `/api/library/toggleFollow?userid=${myid}&targetid=${ownerid}&nextRel=${nextStatus}`,
+        {
+          method: "POST",
+        }
+      );
+
       setRelStatus(nextStatus);
     } catch (e) {
       console.error("팔로우 토글 실패", e);
@@ -201,13 +220,13 @@ function ArchiveVisit() {
         nextStatus = "2";
     }
     if (nextStatus !== null) {
-      await apiClient.post(`api/library/toggleFollow`, null, {
-        params: {
-          userid: myid,
-          targetid: ownerid,
-          nextRel: nextStatus,
-        },
-      });
+      await secureApiRequest(
+        `/api/library/toggleFollow?userid=${myid}&targetid=${ownerid}&nextRel=${nextStatus}`,
+        {
+          method: "POST",
+        }
+      );
+      alert("차단되었습니다");
     }
     setRelStatus(nextStatus);
   };
@@ -216,11 +235,18 @@ function ArchiveVisit() {
   const handleMyCollClick = async () => {
     setActiveTab("myColl");
     try {
-      const collectionsInfo = await apiClient.get("/archive/collections", {
-        params: {
-          userid: ownerid,
-        },
-      });
+      // const collectionsInfo = await apiClient.get("/archive/collections", {
+      //   params: {
+      //     userid: ownerid,
+      //   },
+      // });
+      const collectionsInfo = await secureApiRequest(
+        `/archive/collections?userid=${ownerid}`,
+        {
+          method: "GET",
+        }
+      );
+
       console.log(collectionsInfo.data);
       setCollections(collectionsInfo.data);
     } catch (error) {
@@ -232,14 +258,21 @@ function ArchiveVisit() {
   const handleBookmarkCollClick = async () => {
     setActiveTab("bookmarkColl");
     try {
-      const bookmarksInfo = await apiClient.get(
-        "/archive/bookmarkCollections",
+      // const bookmarksInfo = await apiClient.get(
+      //   "/archive/bookmarkCollections",
+      //   {
+      //     params: {
+      //       userid: ownerid,
+      //     },
+      //   }
+      // );
+      const bookmarksInfo = await secureApiRequest(
+        `/archive/bookmarkCollections?userid=${ownerid}`,
         {
-          params: {
-            userid: ownerid,
-          },
+          method: "GET",
         }
       );
+
       console.log(bookmarksInfo.data);
       setBookmarks(bookmarksInfo.data);
     } catch (error) {
@@ -266,13 +299,25 @@ function ArchiveVisit() {
     //TODO: secureApiReuqest 로 추후 변경(현재 변경시 에러남)
     try {
       if (actionType === "userlike") {
-        await apiClient.post(`/api/library/togglelike`, null, {
-          params: { userid: myid, collectionId, isLiked },
-        });
+        // await apiClient.post(`/api/library/togglelike`, null, {
+        //   params: { userid: myid, collectionId, isLiked },
+        // });
+        await secureApiRequest(
+          `/api/library/togglelike?userid=${myid}&collectionId=${collectionId}&isLiked=${isLiked}`,
+          {
+            method: "POST",
+          }
+        );
       } else if (actionType === "userbookmark") {
-        await apiClient.post(`/api/library/togglebm`, null, {
-          params: { userid: myid, collectionId, isBookmarked },
-        });
+        // await apiClient.post(`/api/library/togglebm`, null, {
+        //   params: { userid: myid, collectionId, isBookmarked },
+        // });
+        await secureApiRequest(
+          `/api/library/togglebm?userid=${myid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
+          {
+            method: "POST",
+          }
+        );
       }
 
       // 상태 업데이트

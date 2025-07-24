@@ -27,19 +27,24 @@ const AdminMain = () => {
       const fetchAdminStats = async () => {
         try {
           // 총 유저 수 API 호출 (예시)
-          const usersResponse = await secureApiRequest(
-            "/admin/api/stats/total-users"
-          );
-          setTotalUsers(usersResponse.data.totalCount); // 신고된 게시물 수 API 호출 (예시)
+
+          const usersResponse = await secureApiRequest("/admin/totalUsers", {
+            method: "GET",
+          });
+          console.log(usersResponse.data);
+          setTotalUsers(usersResponse.data);
+
 
           const reportedResponse = await secureApiRequest(
-            "/admin/api/stats/reported-posts"
+            "/admin/reportedPosts",
+            {
+              method: "GET",
+            }
           );
-          setReportedPosts(reportedResponse.data.reportedCount);
+          console.log(reportedResponse.data);
+          setReportedPosts(reportedResponse.data);
         } catch (error) {
           console.error("관리자 통계 데이터 로딩 실패:", error);
-          setTotalUsers("오류");
-          setReportedPosts("오류");
         }
       };
 
@@ -48,8 +53,10 @@ const AdminMain = () => {
   }, [isLoggedIn, role, navigate, secureApiRequest]); // 권한이 없으면 렌더링하지 않음
 
   if (!isLoggedIn || role !== "ADMIN") {
-    return null;
-  } // 클릭 이벤트 핸들러 (예시)
+
+    return <>해당 페이지에 접속할 권한이 없습니다.</>;
+  }
+
 
   const handleUserClick = () => {
     navigate("/admin/users");
@@ -79,7 +86,9 @@ const AdminMain = () => {
           style={{ ...styles.statBox, ...styles.clickableBox }}
         >
           <h2 style={styles.statTitle}>
-            신고된 게시물 수:
+
+            신고된 메모리 수:{" "}
+
             {reportedPosts !== null ? `${reportedPosts}개` : "..."}
           </h2>
           <p style={styles.statText}>클릭하여 신고된 게시물 목록으로 이동</p>

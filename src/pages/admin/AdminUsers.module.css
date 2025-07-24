@@ -1,0 +1,96 @@
+.userlistcontainer {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 24px;
+  background-color: #f5efe6;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(107, 76, 59, 0.15);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #6b4c3b;
+}
+
+.userlistcontainer label {
+  font-weight: 600;
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.userlist-container select {
+  padding: 6px 12px;
+  border: 1.8px solid #d7c4a3;
+  border-radius: 6px;
+  background-color: #fff8f0;
+  color: #4a3724;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.userlistcontainer select:hover,
+.userlistcontainer select:focus {
+  border-color: #a98958;
+  outline: none;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0 24px;
+}
+
+.header input[type="text"] {
+  flex-grow: 1;
+  padding: 8px 14px;
+  border: 1.8px solid #d7c4a3;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #4a3724;
+  background-color: #fff8f0;
+  transition: border-color 0.3s ease;
+}
+
+.header input[type="text"]:focus {
+  border-color: #a98958;
+  outline: none;
+}
+
+.header button {
+  background-color: #d7c4a3;
+  border: none;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #4a3724;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.header button:hover {
+  background-color: #a98958;
+  color: #fff;
+}
+
+.userlist {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 650px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.userlist::-webkit-scrollbar {
+  width: 8px;
+}
+
+.userlist::-webkit-scrollbar-track {
+  background: #f5efe6;
+  border-radius: 4px;
+}
+
+.userlist::-webkit-scrollbar-thumb {
+  background-color: #a98958;
+  border-radius: 4px;
+}

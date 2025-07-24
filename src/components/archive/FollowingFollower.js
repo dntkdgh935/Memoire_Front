@@ -178,12 +178,11 @@ function FollowingFollower({ mode, excludeUserIds = [], onInviteComplete }) {
               ? filteredFollowers
               : followers
           ).map((user) => (
-            // TODO: 클릭 시 해당 유저의 프로필 페이지로 이동함
             <div key={user.userId} className={styles.followuseritem}>
               <img
                 src={
                   user.profileImagePath
-                    ? `http://localhost:8080/upload_files/user_profile/${user.profileImagePath}`
+                    ? `http://localhost:8080${user.profileImagePath}`
                     : default_profile
                 }
                 alt="Profile"
