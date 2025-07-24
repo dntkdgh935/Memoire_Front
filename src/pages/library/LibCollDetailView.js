@@ -31,6 +31,10 @@ function LibCollDetailView() {
   const [reportContent, setReportContent] = useState("");
 
   const handleOpenReportModal = () => {
+    if (!isLoggedIn) {
+      alert("로그인 후 사용 가능합니다.");
+      return;
+    }
     if (!selectedMemory || !currentUserid) return;
     setIsReportModalOpen(true);
   };
@@ -38,6 +42,7 @@ function LibCollDetailView() {
   const handleSubmitReport = async () => {
     console.log("선택된 메모리:");
     console.log(selectedMemory);
+
     try {
       await apiClient.post(
         `/api/library/report/${selectedMemory.memoryid}/${userid}`,
