@@ -1,0 +1,60 @@
+/* src/pages/admin/AdminMain.module.css */
+
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.topStatsRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.statBox {
+  flex: 1;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.clickableBox {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statTitle {
+  font-size: 24px;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.statText {
+  font-size: 14px;
+  color: #666;
+}
+
+.bottomChartsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chartBox {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chartTitle {
+  font-size: 18px;
+  margin: 0 0 15px 0;
+  color: #333;
+}

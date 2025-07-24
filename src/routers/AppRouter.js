@@ -1,6 +1,6 @@
 // src/routers/AppRouter.js
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 //sidebar를 통한 메인 이동
 import LibraryMain from "../pages/library/LibraryMain";
@@ -12,6 +12,9 @@ import ImageToImageMain from "../pages/atelier/ImageToImageMain";
 import ImageToVideoMain from "../pages/atelier/ImageToVideoMain";
 import OAuth2CallbackSuccess from "../pages/user/OAuth2CallbackSuccess";
 import SocialSignUp from "../pages/user/SocialSignUp";
+import TarotHome from "../pages/tarot/TarotHome";
+import TarotPage from "../pages/tarot/TarotPage";
+
 
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
@@ -35,6 +38,14 @@ function AppRouter() {
         element={<OAuth2CallbackSuccess />}
       />
       <Route path="/social-signup" element={<SocialSignUp />} />
+
+      {/* Tarot 중첩 선언 */}
+      <Route path="/tarot" element={<Outlet />}>
+        {/* 정확히 /tarot */}
+        <Route index element={<TarotHome />} />
+        {/* /tarot/read/:count */}
+        <Route path="read/:count" element={<TarotPage />} />
+      </Route>
 
       {/* 아틀리에 홈 */}
       <Route path="/atelier" element={<AtelierHome />} />

@@ -3,6 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 import AdminNewUserChart from "../../components/admin/AdminNewUserChart";
+import styles from "./AdminMain.module.css";
 import AdminNewCollectionChart from "../../components/admin/AdminNewCollectionChart";
 import AdminTopViewsCollectionList from "../../components/admin/AdminTopViewsCollectionList";
 import AdminTopLikesCollectionList from "../../components/admin/AdminTopLikesCollectionList";
@@ -67,115 +68,61 @@ const AdminMain = () => {
   };
 
   return (
-    <div className="admin-main-container" style={styles.container}>
+    <div className={styles.container}>
       {/* 상단 통계 정보 영역 */}
-      <div className="top-stats-row" style={styles.topRow}>
+      <div className={styles.topStatsRow}>
         {/* 총 유저 수 */}
         <div
           onClick={handleUserClick}
-          style={{ ...styles.statBox, ...styles.clickableBox }}
+          className={`${styles.statBox} ${styles.clickableBox}`}
         >
-          <h2 style={styles.statTitle}>
+          <h2 className={styles.statTitle}>
             총 유저: {totalUsers !== null ? `${totalUsers}명` : "..."}
           </h2>
-          <p style={styles.statText}>클릭하여 사용자 목록으로 이동</p>
+          <p className={styles.statText}>클릭하여 사용자 목록으로 이동</p>
         </div>
         {/* 신고된 게시물 수 */}
         <div
           onClick={handleReportClick}
-          style={{ ...styles.statBox, ...styles.clickableBox }}
+          className={`${styles.statBox} ${styles.clickableBox}`}
         >
-          <h2 style={styles.statTitle}>
 
+          <h2 className={styles.statTitle}>
             신고된 메모리 수:{" "}
-
             {reportedPosts !== null ? `${reportedPosts}개` : "..."}
           </h2>
-          <p style={styles.statText}>클릭하여 신고된 게시물 목록으로 이동</p>
+          <p className={styles.statText}>클릭하여 신고된 게시물 목록으로 이동</p>
         </div>
       </div>
       {/* 하단 그래프 및 목록 영역 */}
-      <div className="bottom-charts-grid" style={styles.bottomGrid}>
+      <div className={styles.bottomChartsGrid}>
         {/* 신규 가입 유저 그래프 */}
-        <div style={styles.chartBox}>
-          <h2 style={styles.chartTitle}>
+        <div className={styles.chartBox}>
+          <h2 className={styles.chartTitle}>
             신규 가입 유저 그래프 (막대 그래프로 일, 월, 년 기준)
           </h2>
           <AdminNewUserChart />
         </div>
         {/* 새로운 컬렉션 그래프 */}
-        <div style={styles.chartBox}>
-          <h2 style={styles.chartTitle}>
+        <div className={styles.chartBox}>
+          <h2 className={styles.chartTitle}>
             새로운 컬렉션 그래프 (막대 그래프로 일, 월, 년 기준)
           </h2>
           <AdminNewCollectionChart />
         </div>
         {/* TOP 좋아요 컬렉션 */}
-        <div style={styles.chartBox}>
-          <h2 style={styles.chartTitle}>TOP 좋아요 컬렉션</h2>
+        <div className={styles.chartBox}>
+          <h2 className={styles.chartTitle}>TOP 좋아요 컬렉션</h2>
           <AdminTopLikesCollectionList />
         </div>
         {/* TOP 조회수 컬렉션 */}
-        <div style={styles.chartBox}>
-          <h2 style={styles.chartTitle}>TOP 조회수 컬렉션</h2>
+        <div className={styles.chartBox}>
+          <h2 className={styles.chartTitle}>TOP 조회수 컬렉션</h2>
           <AdminTopViewsCollectionList />
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    padding: "20px",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    fontFamily: "Arial, sans-serif",
-  },
-  topRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "20px",
-    marginBottom: "20px",
-  },
-  statBox: {
-    flex: "1",
-    backgroundColor: "#fff",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "20px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  },
-  clickableBox: {
-    cursor: "pointer",
-    transition: "transform 0.2s, box-shadow 0.2s",
-  },
-  statTitle: {
-    fontSize: "24px",
-    margin: "0 0 10px 0",
-    color: "#333",
-  },
-  statText: {
-    fontSize: "14px",
-    color: "#666",
-  },
-  bottomGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "20px",
-  },
-  chartBox: {
-    backgroundColor: "#fff",
-    border: "1px solid #ddd",
-    borderRadius: "8px",
-    padding: "20px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  },
-  chartTitle: {
-    fontSize: "18px",
-    margin: "0 0 15px 0",
-    color: "#333",
-  },
 };
 
 export default AdminMain;
