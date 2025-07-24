@@ -9,6 +9,7 @@ import MemoryView from "../../components/common/MemoryView";
 import styles from "./LibCollDetailView.module.css"; // ✅
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader";
+import Modal from "../../components/common/Modal";
 
 function LibCollDetailView() {
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
@@ -25,6 +26,33 @@ function LibCollDetailView() {
   const [selectedMemory, setSelectedMemory] = useState(null); // 메모리 리스트에서 선택된 메모리(view에 나타날 메모리)
   const [memoryList, setMemoryList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportContent, setReportContent] = useState("");
+
+  const handleOpenReportModal = () => {
+    if (!selectedMemory || !currentUserid) return;
+    setIsReportModalOpen(true);
+  };
+
+  const handleSubmitReport = async () => {
+    console.log("선택된 메모리:");
+    console.log(selectedMemory);
+    try {
+      await apiClient.post(
+        `/api/library/report/${selectedMemory.memoryid}/${userid}`,
+        {
+          content: reportContent,
+        }
+      );
+      alert("신고가 접수되었습니다.");
+      setIsReportModalOpen(false);
+      setReportContent("");
+    } catch (err) {
+      console.error("🚨 신고 실패", err);
+      alert("신고에 실패했습니다.");
+    }
+  };
 
   useEffect(() => {
     console.log("안녕!!");
@@ -180,16 +208,25 @@ function LibCollDetailView() {
             selectedMemory={selectedMemory}
             authorid={collection.authorid}
             numMemories={memoryList.length}
+            onReportClick={handleOpenReportModal}
           />
         ) : (
           <div>컬렉션 정보를 불러올 수 없습니다.</div>
         )}
-        {/* <MemoryView
-          selectedMemory={selectedMemory}
-          authorid={collection.authorid}
-          numMemories={memoryList.length}
-        /> */}
       </div>
+      {isReportModalOpen && (
+        <Modal onClose={() => setIsReportModalOpen(false)}>
+          <h3>신고 사유를 작성해주세요</h3>
+          <textarea
+            value={reportContent}
+            onChange={(e) => setReportContent(e.target.value)}
+            placeholder="신고 내용을 입력하세요..."
+            rows={5}
+            style={{ width: "100%", marginBottom: "1rem" }}
+          />
+          <button onClick={() => handleSubmitReport()}>신고 제출</button>
+        </Modal>
+      )}
     </>
   );
 }
