@@ -4,14 +4,8 @@ import { AuthContext } from "../../AuthProvider";
 import styles from "./MemoryView.module.css";
 import { useNavigate } from "react-router-dom";
 
-function MemoryView({ selectedMemory, authorid, numMemories }) {
+function MemoryView({ selectedMemory, authorid, numMemories, onReportClick }) {
   console.log("🧪 [MemoryView] selectedMemory:", selectedMemory); // ✅ 정확한 확인용
-  // useEffect(() => {
-  //   console.log("메모리 뷰: " + selectedMemory); // ✅ 여긴 string + object니까 그냥 "[object Object]" 찍힘
-  //   if (selectedMemory) {
-  //     setisLoading(false);
-  //   }
-  // }, [selectedMemory]);
 
   const { isLoggedIn, userid, role, secureApiRequest } =
     useContext(AuthContext);
@@ -76,7 +70,9 @@ function MemoryView({ selectedMemory, authorid, numMemories }) {
         <span className={styles.date}>
           {new Date(createdDate).toLocaleDateString("ko-KR")}
         </span>
+
         <h2 className={styles.title}>{title}</h2>
+        <button onClick={onReportClick}>🚩 신고</button>
         <hr className={styles.divider} />
         {isLoggedIn && (role === "ADMIN" || userid === authorid) && (
           <div className={styles.buttonGroup}>

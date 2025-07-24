@@ -3,10 +3,11 @@ import styles from "./CollCard.module.css";
 import LibCollLabel from "../library/LibCollLabel";
 
 function CollCard({ collection, onActionChange, onCollClick }) {
-  const cover = collection.thumbnailPath; // collection에서 동적으로 이미지 경로 받기
+  const cover = collection.thumbnailPath; // collection에서 동적으로 이미지/ 비디오 경로 받기
   // console.log(cover);
   const isImage = collection.thumbType == "image";
   const isText = collection.thumbType === "text";
+  const isVideo = collection.thumbType == "video";
   // console.log(collection.thumbType);
 
   return (
@@ -25,12 +26,20 @@ function CollCard({ collection, onActionChange, onCollClick }) {
         <div className={styles.textContent}>
           <p>{collection.textContent}</p>
         </div>
+      ) : isVideo ? (
+        // 비디오인 경우
+        <video
+          className={styles.video}
+          src={`http://localhost:8080${cover}`}
+          autoPlay
+          muted
+          loop
+          playsInline // 모바일에서 자동재생 허용
+          style={{ width: "100%", height: "auto", objectFit: "cover" }}
+        />
       ) : (
-        <div className={styles.placeholder}>
-          <p className={styles.typeText}>
-            {collection.thumbType?.toUpperCase() || "NO IMAGE"}
-          </p>
-        </div>
+        <p></p>
+        // <span>메모리 없음</span>
       )}
 
       <LibCollLabel coll={collection} onActionChange={onActionChange} />
