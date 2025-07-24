@@ -3,13 +3,12 @@
 import React, { useState, useContext, useEffect } from "react";
 import apiClient from "../../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun } from "react-icons/fa";
+import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun, FaAngry } from "react-icons/fa";
 import { IoIosSearch } from "react-icons/io";
 import styles from "./Header.module.css";
 import { AuthContext } from "../../AuthProvider";
 import NotificationDropdown from "./NotificationDropdown";
 import { useTheme } from "../../ThemeContext";
-import adminIcon from "../../assets/images/admin.png";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
@@ -20,7 +19,7 @@ function Header() {
   const [hasNotifications, setHasNotifications] = useState(false); // 알림 배지 표시 여부
 
   const navigate = useNavigate();
-  const { isLoggedIn, logout, userid } = useContext(AuthContext);
+  const { isLoggedIn, logout, userid, role } = useContext(AuthContext);
 
   const { useVideo, setUseVideo } = useTheme();
   const goAdmin = () => {
@@ -193,12 +192,15 @@ function Header() {
           )}
         </button>
         {/* 관리자 아이콘 */}
-        <img
-          src={adminIcon}
-          alt="관리자 페이지"
+        {isLoggedIn && role === "ADMIN" && (
+        <button
           className={styles.iconButton}
           onClick={goAdmin}
-        />
+          aria-label="관리자 페이지로 이동"
+        >
+          <FaAngry />
+        </button>
+      )}
         <FaUserCircle
           className={styles.iconButton}
           onClick={handleUserIconClick}
