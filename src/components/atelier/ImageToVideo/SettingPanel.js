@@ -3,13 +3,12 @@ import styles from "./SettingPanel.module.css";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
   //립싱크 모델 사용 여부 설정
-  const [useLipSync, setUseLipSync] = useState();
+  const [useLipSync, setUseLipSync] = useState(false);
 
   // TTS 설정
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [ttsScript, setTtsScript] = useState("");
-  const [ttsStyle, setTtsStyle] = useState("default");
-  const [ttsTone, setTtsTone] = useState("neutral");
+  const [ttsSpeech, setTtsSpeech] = useState("");
   const [ttsUrl, setTtsUrl] = useState("");
   const [ttsLoading, setTtsLoading] = useState(false);
   const [ttsError, setTtsError] = useState(null);
@@ -37,7 +36,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
     setTtsError(null);
 
     try {
-      const payload = { script: ttsScript, ttsStyle, tone: ttsTone };
+      const payload = { script: ttsScript, speech: ttsSpeech };
       const res = await fetch("/atelier/video/generate-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,6 +66,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         ttsUrl: ttsEnabled ? ttsUrl : undefined,
         lipSyncEnabled: useLipSync,
       };
+      console.log("payload ▶", payload);
+
       const resp = await fetch("/atelier/video/generate-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -147,7 +148,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         <>
           {/* 스크립트 */}
           <div className={styles.field}>
-            <label>내레이션 스크립트</label>
+            <label>TTS 스크립트</label>
             <textarea
               rows={3}
               className={styles.textarea}
@@ -157,32 +158,16 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
             />
           </div>
 
-          {/* 스타일 */}
+          {/* 대사 */}
           <div className={styles.field}>
-            <label>TTS 스타일</label>
-            <select
-              className={styles.select}
-              value={ttsStyle}
-              onChange={(e) => setTtsStyle(e.target.value)}
-            >
-              <option value="default">디폴트</option>
-              <option value="warm">Warm</option>
-              <option value="energetic">Energetic</option>
-            </select>
-          </div>
-
-          {/* 톤 */}
-          <div className={styles.field}>
-            <label>톤</label>
-            <select
-              className={styles.select}
-              value={ttsTone}
-              onChange={(e) => setTtsTone(e.target.value)}
-            >
-              <option value="neutral">Neutral</option>
-              <option value="cheerful">Cheerful</option>
-              <option value="serious">Serious</option>
-            </select>
+            <label>대사 설정</label>
+            <textarea
+              rows={2}
+              className={styles.textarea}
+              placeholder="원하는 대사가 있으면 적어주세요"
+              value={ttsSpeech}
+              onChange={(e) => setTtsSpeech(e.target.value)}
+            />
           </div>
 
           {ttsError && <p className={styles.errorText}>{ttsError}</p>}
@@ -190,7 +175,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
             <button
               className={styles.generateBtn}
               onClick={handleGenerateTts}
-              disabled={ttsLoading || !ttsScript || !ttsStyle || !ttsTone}
+              disabled={ttsLoading || !ttsScript || !ttsSpeech}
             >
               {ttsLoading
                 ? "생성 중..."
@@ -234,16 +219,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
               onChange={(e) => setVideoPrompt(e.target.value)}
             />
           </div>
-          {/* <div className={styles.field}>
-            <label>기타 요청</label>
-            <textarea
-              rows={3}
-              className={styles.textarea}
-              placeholder="예: 은은한 빛깔 강조"
-              value={extraPrompt}
-              onChange={(e) => setExtraPrompt(e.target.value)}
-            />
-          </div> */}
+
           {videoError && <p className={styles.errorText}>{videoError}</p>}
           <div className={styles.footer}>
             <button
