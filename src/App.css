@@ -1,4 +1,15 @@
 /* ────────────────────────────────────────────── */
+/* 0) reset: 모든 요소를 border-box로 (padding 포함) */
+/* ────────────────────────────────────────────── */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Pretendard", sans-serif;
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+/* ────────────────────────────────────────────── */
 /* 1) 화이트 테마 (기본) — body.theme-video 가 없을 때 */
 /* ────────────────────────────────────────────── */
 body:not(.theme-video) .app-container {
@@ -41,10 +52,6 @@ body:not(.theme-video) .page-content {
 /* ────────────────────────────────────────────── */
 /* 비디오 배경 테마 — body.theme-video가 있을 때 */
 /* ────────────────────────────────────────────── */
-
-body.theme-video {
-  font-family: "Pretendard", sans-serif;
-}
 
 /* 레이아웃 */
 body.theme-video .app-container {
@@ -119,12 +126,16 @@ body.theme-video div[class*="Login_container__"] {
 /* ────────────────────────────────────────────── */
 
 /* 4-1) 헤더 내부 텍스트, 버튼, 아이콘 */
-body.theme-video header[class*="Header_header"] * {
-  color: #fff !important;
-}
+
 body.theme-video header[class*="Header_header"] svg {
   fill: #fff !important;
   stroke: #fff !important;
+}
+
+body.theme-video 
+  header[class*="Header_header"] 
+  span[class*="Header_logoText"] {
+  color: #fff !important;
 }
 
 /* 4-2) 사이드바 아이콘 */
@@ -145,18 +156,6 @@ body.theme-video div[class*="PageHeader_pageHeader"] * {
 body.theme-video div[class*="TagBar_tagBar"] * {
   color: #fff !important;
 }
-
-/* 4-5) 검색 박스 텍스트 & placeholder */
-body.theme-video .searchBox input,
-body.theme-video .searchBox select,
-body.theme-video .searchBox button {
-  color: #fff !important;
-}
-body.theme-video .searchBox input::placeholder {
-  color: rgba(255,255,255,0.7) !important;
-}
-
-
 
 /* 4-7) 공통 SVG 아이콘 (벨, 사용자, 설정 등) */
 body.theme-video svg {
@@ -245,10 +244,11 @@ body.theme-video
 /* ────────────────────────────────────────────── */
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] .AvatarWName_inCollLabel__sGwbo {
-  position: absolute;
-  bottom: 48px;
-  left: 16px;
+  div[class*="CollCard_card"]
+  [class*="AvatarWName_inCollLabel"] {
+  position: absolute !important;
+  bottom: 48px !important;
+  left: 16px !important;
   display: flex;
   align-items: center;
   gap: 8px;

@@ -3,7 +3,8 @@
 import React, { useState, useContext, useEffect } from "react";
 import apiClient from "../../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun, FaAngry } from "react-icons/fa";
+import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun, } from "react-icons/fa";
+import { IoLogoAngular } from "react-icons/io";
 import { IoIosSearch } from "react-icons/io";
 import styles from "./Header.module.css";
 import { AuthContext } from "../../AuthProvider";
@@ -193,13 +194,11 @@ function Header() {
         </button>
         {/* 관리자 아이콘 */}
         {isLoggedIn && role === "ADMIN" && (
-        <button
+        <IoLogoAngular
           className={styles.iconButton}
           onClick={goAdmin}
           aria-label="관리자 페이지로 이동"
-        >
-          <FaAngry />
-        </button>
+        />
       )}
         <FaUserCircle
           className={styles.iconButton}

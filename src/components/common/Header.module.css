@@ -50,6 +50,7 @@
   max-width: 500px;
   box-sizing: border-box;
   justify-content: space-between;
+  
 }
 
 /* 내부 요소 공통 */
@@ -75,6 +76,8 @@
   border-radius: 0;
   /* placeholder 세로 가운데 정렬 보정 */
   line-height: 40px;
+  border: none !important;
+  background: none !important;
 }
 
 /* select 전용 */
@@ -93,11 +96,17 @@
 .searchBox .searchButton {
   opacity: 1 !important;
   visibility: visible !important;
-  background: transparent;   /* 호버 때만 보였다면 배경이 흰색으로 바뀌는 설정이 있을 수도 있으니 확실히 투명 처리 */
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.searchInput:focus,
+.searchInput:focus-visible,
+.searchBox:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* 아이콘 컬러도 명시 */
@@ -108,7 +117,7 @@
 /* 포커스 아웃라인 제거 */
 .searchBox input:focus,
 .searchBox select:focus {
-  outline: none;
+  outline: none !important;
 }
 
 /* 오른쪽 아이콘 구역 */
@@ -183,9 +192,11 @@
   color: inherit;
   font-size: 20px;
   cursor: pointer;
-  margin-left: 12px;
   display: inline-flex;
   align-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
 }
 
 .iconButton {
@@ -193,9 +204,4 @@
   height: 24px;
   cursor: pointer;
   /* 기존 컬러나 필터가 SVG 전용이면, 이미지는 기본 컬러 그대로 렌더링 됩니다 */
-}
-
-/* 이미지 아이콘이 좀 더 부드럽게 보이도록 */
-.iconButton[src*="admin.png"] {
-  object-fit: contain;
 }
