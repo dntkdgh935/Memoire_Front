@@ -3,7 +3,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import apiClient from "../../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun, } from "react-icons/fa";
+import { FaThLarge, FaUserCircle, FaBell, FaMoon, FaSun } from "react-icons/fa";
 import { IoLogoAngular } from "react-icons/io";
 import { IoIosSearch } from "react-icons/io";
 import styles from "./Header.module.css";
@@ -53,16 +53,6 @@ function Header() {
     setShowNotifications(!showNotifications);
   };
 
-  // useEffect(() => {
-  //   if (searchType === "tag") {
-  //     setSearchKeyword((prev) => {
-  //       // 이미 #로 시작하면 그대로 두고, 아니면 # 추가
-  //       return prev.startsWith("#") ? prev : `#${prev}`;
-  //     });
-  //   }
-  // }, [searchType]);
-
-  // 팔로우 요청 승인
   const handleFollowRequestApproval = (requesterid, targetid) => {
     // DB 에 입력
     console.log("🍑 팔로우 승인 진행 시작");
@@ -92,24 +82,27 @@ function Header() {
     // TODO: 검색 키워드 관련 조건 있으면 추가
 
     // 검색 처리 로직 여기에 추가
-
-    try {
-      if (searchType == "collection") {
-        navigate(
-          `library/searchCollection?query=${searchKeyword}&type=${searchType}`
-        );
-      } else if (searchType == "user") {
-        navigate(
-          `library/searchUser?query=${searchKeyword}&type=${searchType}`
-        );
-      } else if (searchType == "tag") {
-        //TODO: 오류시 수정
-        navigate(
-          `library/searchCollection?query=${searchKeyword}&type=${searchType}`
-        );
+    if (!isLoggedIn) {
+      alert("로그이 후 검색 가능합니다.");
+    } else {
+      try {
+        if (searchType == "collection") {
+          navigate(
+            `library/searchCollection?query=${searchKeyword}&type=${searchType}`
+          );
+        } else if (searchType == "user") {
+          navigate(
+            `library/searchUser?query=${searchKeyword}&type=${searchType}`
+          );
+        } else if (searchType == "tag") {
+          //TODO: 오류시 수정
+          navigate(
+            `library/searchCollection?query=${searchKeyword}&type=${searchType}`
+          );
+        }
+      } catch (error) {
+        console.error("검색 요청 실패 : ", error);
       }
-    } catch (error) {
-      console.error("검색 요청 실패 : ", error);
     }
   };
 
@@ -194,12 +187,12 @@ function Header() {
         </button>
         {/* 관리자 아이콘 */}
         {isLoggedIn && role === "ADMIN" && (
-        <IoLogoAngular
-          className={styles.iconButton}
-          onClick={goAdmin}
-          aria-label="관리자 페이지로 이동"
-        />
-      )}
+          <IoLogoAngular
+            className={styles.iconButton}
+            onClick={goAdmin}
+            aria-label="관리자 페이지로 이동"
+          />
+        )}
         <FaUserCircle
           className={styles.iconButton}
           onClick={handleUserIconClick}

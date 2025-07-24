@@ -146,14 +146,18 @@ function LibCollDetailView() {
       //로그인 유저일 경우의, 디테일 확인할 컬렉션 정보와 메모리 가져오기
       if (currentUserid != null) {
         try {
-          const res = await axios.get(
-            `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
+          // const res = await axios.get(
+          //   `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
+          // );
+          const res = await secureApiRequest(
+            `/api/library/collection/${id}/${currentUserid}`,
+            {
+              method: "GET",
+            }
           );
+
           console.log("컬렉션 태그 확인해!!!" + res.data);
           setCollection(res.data);
-          // // 컬렉션에 속한 메모리 리스트 불러오기
-          // console.log("** id는: " + collection.collectionid);
-          //console.log(collection);
           await fetchMemoryList(res.data.collectionid); // 컬렉션에서 collectionId를 받아 메모리 리스트 불러오기
         } catch (err) {
           console.error("🚨 컬렉션 정보 불러오기 실패", err);
@@ -167,7 +171,7 @@ function LibCollDetailView() {
       //비로그인 유저일 경우디테일 확인할 컬렉션 정보와 메모리 가져오기
       else {
         try {
-          const res = await axios.get(
+          const res = await apiClient.get(
             `http://localhost:8080/api/library/collection/${id}`
           );
           setCollection(res.data);
@@ -190,7 +194,7 @@ function LibCollDetailView() {
   // 2. coll 내부의 메모리 리스트 불러오기 함수
   const fetchMemoryList = async (collectionid) => {
     try {
-      const res = await axios.get(
+      const res = await apiClient.get(
         `http://localhost:8080/api/library/collection/memories/${collectionid}`
       );
       setMemoryList(res.data);
@@ -210,7 +214,7 @@ function LibCollDetailView() {
     setSelectedMemoryId(memoryid); // ✅ 스타일에 바로 반영됨
 
     try {
-      const res = await axios.get(
+      const res = await apiClient.get(
         `http://localhost:8080/api/library/memory/${memoryid}` // 메모리 아이디로 메모리 상세 요청
       );
       setSelectedMemory(res.data); // 응답 데이터를 selectedMemory에 저장
@@ -237,14 +241,30 @@ function LibCollDetailView() {
       const isBookmarked =
         actionType === "userbookmark" ? !collection.userbookmark : undefined;
 
+      // if (actionType === "userlike") {
+      //   await axios.post(
+      //     `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
+      //   );
+      // }
+      // if (actionType === "userbookmark") {
+      //   await axios.post(
+      //     `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+      //   );
+      // }
       if (actionType === "userlike") {
-        await axios.post(
-          `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
+        await secureApiRequest(
+          `/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`,
+          {
+            method: "POST",
+          }
         );
       }
       if (actionType === "userbookmark") {
-        await axios.post(
-          `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
+        await secureApiRequest(
+          `/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
+          {
+            method: "POST",
+          }
         );
       }
 
