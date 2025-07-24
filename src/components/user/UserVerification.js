@@ -4,8 +4,14 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 import apiClient from "../../utils/axios";
 import styles from "./UserVerification.module.css"; // CSS 모듈 임포트
 
-function UserVerification({ phone, setPhone, onVerificationComplete }) {
-  const [displayedCode, setDisplayedCode] = useState(""); // ✅ 발급받은 인증번호를 저장할 새로운 상태
+// ✅ checkType prop 추가: 'signup' (기본값) 또는 'find'
+function UserVerification({
+  phone,
+  setPhone,
+  onVerificationComplete,
+  checkType = "signup",
+}) {
+  const [displayedCode, setDisplayedCode] = useState(""); // 발급받은 인증번호를 저장할 새로운 상태
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -55,7 +61,7 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
     setPhone(rawValue);
     setIsCodeSent(false);
     setIsVerified(false);
-    setDisplayedCode(""); // ✅ 표시할 인증번호 초기화
+    setDisplayedCode(""); // 표시할 인증번호 초기화
     setMessage({ text: "", type: "" });
     if (timerInterval) {
       clearInterval(timerInterval);
@@ -86,29 +92,32 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
     showMessage("");
 
     try {
-      // ✅ 1. 전화번호로 유저 존재 여부 확인
-      const checkUserResponse = await apiClient.get(`/user/check-phone`, {
-        params: { phone: phone },
-      });
+      // ✅ checkType에 따라 전화번호 존재 여부 확인 로직 변경
+      if (checkType === "signup") {
+        const checkUserResponse = await apiClient.get(`/user/check-phone`, {
+          params: { phone: phone },
+        });
 
-      if (checkUserResponse.data.exists) {
-        // 유저가 이미 존재하면 알림 메시지 표시 후 중단
-        showMessage(
-          "이미 가입된 휴대폰 번호입니다. 다른 번호를 사용해주세요.",
-          "error"
-        );
-        setIsLoading(false);
-        return;
+        if (checkUserResponse.data.exists) {
+          showMessage(
+            "이미 가입된 휴대폰 번호입니다. 다른 번호를 사용해주세요.",
+            "error"
+          );
+          setIsLoading(false);
+          return;
+        }
       }
+      // 'find' 타입인 경우에는 전화번호 존재 여부를 여기서 확인하지 않습니다.
+      // 상위 컴포넌트(FindId, FindPwd)에서 전체 사용자 존재 여부를 판단합니다.
 
-      // ✅ 2. 유저가 존재하지 않으면 인증번호 발급 절차 진행
+      // 인증번호 발급 절차 진행
       const response = await apiClient.post(`${API_BASE_URL}/generate-code`, {
         phone: phone,
       });
       const data = response.data;
 
       if (data.verificationCode) {
-        setDisplayedCode(data.verificationCode); // ✅ 발급받은 인증번호를 저장
+        setDisplayedCode(data.verificationCode); // 발급받은 인증번호를 저장
         showMessage(
           `이 번호를 복사하여 <span class="${styles.highlightText}">kdong1230@naver.com</span>(으)로 MMS 문자 메시지를 보내주세요. ` +
             `<br><span class="${styles.boldHighlight}">MMS 내용에는 반드시 인증번호만 포함</span>되어야 합니다.` +
@@ -126,7 +135,6 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
       }
     } catch (error) {
       console.error("인증번호 생성 또는 유저 확인 오류:", error);
-      // 서버 응답에 따라 구체적인 오류 메시지를 표시할 수 있음
       const errorMessage =
         error.response?.data?.message ||
         "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
@@ -158,7 +166,7 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
     try {
       const response = await apiClient.post(`${API_BASE_URL}/verify-code`, {
         phone: phone,
-        verificationCode: displayedCode, // ✅ displayedCode 사용
+        verificationCode: displayedCode, // displayedCode 사용
       });
       const data = response.data;
 
@@ -284,7 +292,7 @@ function UserVerification({ phone, setPhone, onVerificationComplete }) {
             className={`${styles.actionButton} ${isLoading ? styles.loading : ""}`}
             disabled={
               isLoading ||
-              displayedCode.length !== 4 || // ✅ displayedCode 사용
+              displayedCode.length !== 4 || // displayedCode 사용
               isVerified ||
               remainingTime <= 0
             }

@@ -12,20 +12,22 @@ function Signup() {
   const [formData, setFormData] = useState({
     loginId: "",
     password: "",
-    confirmPwd: "",
+    confirmPwd: "", // 비밀번호 확인 필드는 여전히 필요 (CheckPwd 컴포넌트에서 사용)
     name: "",
     birthday: "",
     nickname: "",
-    role: "USER",
+    role: "USER", // 권한은 'USER'로 고정
     phone: "",
+    loginType: "original", // loginType 필드 추가 및 기본값 설정
   });
-  const [isIdAvailable, setIsIdAvailable] = useState(null);
+  const [isIdAvailable, setIsIdAvailable] = useState(null); // null: 검사 전, true: 사용 가능, false: 중복
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordScore, setPasswordScore] = useState(0);
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false); // ✅ 휴대폰 인증 상태 추가
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false); // 휴대폰 인증 상태 추가
 
   const navigate = useNavigate();
 
+  // loginId가 변경될 때마다 isIdAvailable 상태를 초기화하여 재검사를 유도
   useEffect(() => {
     setIsIdAvailable(null);
   }, [formData.loginId]);
@@ -45,6 +47,7 @@ function Signup() {
         setIsIdAvailable(true);
         alert("사용 가능한 아이디입니다.");
       } else {
+        // response.data === "duplicated"
         setIsIdAvailable(false);
         alert("이미 사용중인 아이디입니다. 아이디를 다시 작성하세요.");
       }
@@ -55,13 +58,14 @@ function Signup() {
   };
 
   const validate = () => {
-    if (!isIdAvailable) {
-      // 아이디 중복 확인 필수
+    // 아이디 중복검사 상태 확인
+    if (isIdAvailable === null) {
+      // 아이디 중복검사 버튼을 누르지 않았거나, 아직 응답이 오지 않은 경우
       alert("아이디 중복검사를 필수로 하여야 합니다.");
       return false;
     }
-    if (!isIdAvailable === true) {
-      // 아이디 중복 확인 결과가 사용 가능이어야 함
+    if (isIdAvailable === false) {
+      // 아이디 중복검사 결과가 'duplicated'인 경우
       alert("사용 가능한 아이디가 아닙니다. 아이디를 다시 확인하세요.");
       return false;
     }
@@ -74,7 +78,7 @@ function Signup() {
       return false;
     }
     if (!isPhoneVerified) {
-      // ✅ 휴대폰 인증 여부 확인
+      // 휴대폰 인증 여부 확인
       alert("휴대폰 인증을 완료해주세요.");
       return false;
     }
@@ -109,7 +113,7 @@ function Signup() {
     setFormData({ ...formData, birthday: date });
   };
 
-  // ✅ UserVerification에서 호출될 인증 완료 콜백 함수
+  // UserVerification에서 호출될 인증 완료 콜백 함수
   const handlePhoneVerificationComplete = (verified) => {
     setIsPhoneVerified(verified);
   };
@@ -119,11 +123,14 @@ function Signup() {
 
     // 모든 유효성 검사를 여기서 수행
     if (!validate()) {
-      return;
+      return; // 유효성 검사 실패 시 함수 종료
     }
 
     try {
-      const response = await apiClient.post("/user/signup", formData);
+      // confirmPwd는 백엔드로 보내지 않으므로 전송 전에 제거
+      const { confirmPwd, ...dataToSend } = formData;
+
+      const response = await apiClient.post("/user/signup", dataToSend);
 
       if (response.status === 200) {
         alert("회원가입이 완료되었습니다.");
@@ -134,13 +141,6 @@ function Signup() {
       // 백엔드에서 특정 오류 메시지를 보낸다면 파싱하여 표시 가능
       alert("회원 가입에 실패했습니다. 다시 시도해 주세요");
     }
-  };
-
-  const [showPermissions, setShowPermissions] = useState(false);
-
-  const handleSelectPermission = (permission) => {
-    setFormData((prev) => ({ ...prev, role: permission }));
-    setShowPermissions(false);
   };
 
   return (
@@ -168,11 +168,11 @@ function Signup() {
             </button>
           </div>
 
-          {/* ✅ UserVerification 컴포넌트 사용 */}
           <UserVerification
             phone={formData.phone}
             setPhone={(val) => setFormData({ ...formData, phone: val })}
-            onVerificationComplete={handlePhoneVerificationComplete} // 콜백 함수 전달
+            onVerificationComplete={handlePhoneVerificationComplete}
+            checkType="signup"
           />
 
           <CheckPwd
@@ -221,35 +221,6 @@ function Signup() {
               maxLength={8}
             />
           </div>
-
-          {showPermissions && (
-            <div className={styles.permissionSlide}>
-              <div
-                className={styles.permissionOption}
-                onClick={() => handleSelectPermission("USER")}
-              >
-                USER
-              </div>
-              <div
-                className={styles.permissionOption}
-                onClick={() => handleSelectPermission("ADMIN")}
-              >
-                ADMIN
-              </div>
-              <div
-                className={styles.permissionOption}
-                onClick={() => handleSelectPermission("BAD")}
-              >
-                BAD
-              </div>
-              <div
-                className={styles.permissionOption}
-                onClick={() => handleSelectPermission("EXIT")}
-              >
-                EXIT
-              </div>
-            </div>
-          )}
 
           <button type="submit" className={styles.loginButton}>
             회원가입

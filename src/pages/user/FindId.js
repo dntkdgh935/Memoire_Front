@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/axios";
 import { AuthContext } from "../../AuthProvider"; // AuthContext는 현재 사용되지 않지만, 기존 코드에 있었으므로 유지합니다.
@@ -128,6 +128,7 @@ function FindId() {
               phone={formData.phone}
               setPhone={(val) => setFormData({ ...formData, phone: val })}
               onVerificationComplete={handlePhoneVerificationComplete} // 인증 완료 콜백 함수 전달
+              checkType="find"
             />
           </div>
           {/* 아이디 찾기 제출 버튼 */}
