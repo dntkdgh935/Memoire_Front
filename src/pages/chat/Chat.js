@@ -138,10 +138,6 @@ function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleInvite = () => {
-    setShowInviteModal(true);
-  };
-
   const handleInviteComplete = () => {
     setShowInviteModal(false);
   };

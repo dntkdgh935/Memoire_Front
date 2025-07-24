@@ -112,7 +112,7 @@ function LibCollCard({
           onMemoryClick={onMemoryClick}
           selectedMemoryId={selectedMemoryId}
         />
-        {isLoggedIn && (role === "ADMIN" || userid === coll.authorid) && (
+        {isLoggedIn && userid === coll.authorid && (
           <div className={styles.memoryItem} onClick={handleAddMemoryClick}>
             +
           </div>
