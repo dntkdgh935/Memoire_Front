@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
-import apiClient from "../../utils/axios";
 import ProfileCard from "../../components/archive/ProfileCard";
 import FollowingFollower from "../../components/archive/FollowingFollower";
 import CollGrid from "../../components/common/CollGrid";
 import PageHeader from "../../components/common/PageHeader";
+import Modal from "../../components/common/Modal";
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,8 @@ function ArchiveMain() {
 
   const [collections, setCollections] = useState([]);
   const [activeTab, setActiveTab] = useState("myColl");
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
   const navigate = useNavigate();
 
@@ -154,6 +156,64 @@ function ArchiveMain() {
     navigate("/archive/newcoll");
   };
 
+  const handleBlockedUsersClick = async () => {
+    try {
+      const response = await secureApiRequest(
+        `/archive/blocked?userid=${userid}`,
+        {
+          method: "GET",
+        }
+      );
+      setBlockedUsers(response.data);
+      setShowBlockedModal(true);
+    } catch (error) {
+      console.error("차단 유저 목록을 불러오는 데 실패했습니다:", error);
+    }
+  };
+
+  const handleUnblock = async (blockedUserId) => {
+    if (!window.confirm("정말로 이 유저를 차단 해제하시겠습니까?")) return;
+    try {
+      const formData = new FormData();
+      formData.append("userid", userid);
+      formData.append("blockedUserId", blockedUserId);
+      await secureApiRequest("/archive/unblock", {
+        method: "POST",
+        body: formData,
+      });
+
+      setBlockedUsers((prev) =>
+        prev.map((user) =>
+          user.targetid === blockedUserId ? { ...user, status: "-1" } : user
+        )
+      );
+    } catch (error) {
+      console.error("차단 해제 실패:", error);
+    }
+  };
+
+  const handleFollow = async (targetid) => {
+    if (!window.confirm("정말로 이 유저에게 팔로우 요청을 하시겠습니까?"))
+      return;
+    try {
+      const formData = new FormData();
+      formData.append("userid", userid);
+      formData.append("targetid", targetid);
+      await secureApiRequest("/archive/followRequest", {
+        method: "POST",
+        body: formData,
+      });
+
+      setBlockedUsers((prev) =>
+        prev.map((user) =>
+          user.targetid === targetid ? { ...user, status: "0" } : user
+        )
+      );
+    } catch (error) {
+      console.error("팔로우 요청 실패:", error);
+    }
+  };
+
   return (
     <>
       <PageHeader pagename={`내 아카이브`} />
@@ -161,6 +221,12 @@ function ArchiveMain() {
         <div className={styles.sidebar}>
           <ProfileCard />
           <FollowingFollower />
+          <button
+            className={styles.blockedUsersButton}
+            onClick={handleBlockedUsersClick}
+          >
+            차단한 유저
+          </button>
         </div>
         <div className={styles.content}>
           <div className={styles.tabsRow}>
@@ -192,6 +258,49 @@ function ArchiveMain() {
           />
         </div>
       </div>
+      {showBlockedModal && (
+        <Modal onClose={() => setShowBlockedModal(false)}>
+          <h2>차단한 유저 목록</h2>
+          {blockedUsers.length === 0 ? (
+            <p>차단한 유저가 없습니다.</p>
+          ) : (
+            <table className={styles.blockedTable}>
+              <thead>
+                <tr>
+                  <th>닉네임</th>
+                  <th>차단 해제</th>
+                </tr>
+              </thead>
+              <tbody>
+                {blockedUsers.map((user, i) => (
+                  <tr key={i}>
+                    <td>{user.userid}</td>
+                    <td>
+                      {user.status === "2" ? (
+                        <button
+                          className={styles.unblockButton}
+                          onClick={() => handleUnblock(user.targetid)}
+                        >
+                          차단 해제
+                        </button>
+                      ) : user.status === "-1" ? (
+                        <button
+                          className={styles.unblockButton}
+                          onClick={() => handleFollow(user.targetid)}
+                        >
+                          팔로우 요청
+                        </button>
+                      ) : (
+                        <span>팔로우 요청 대기중</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Modal>
+      )}
     </>
   );
 }
