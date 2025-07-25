@@ -1,60 +1,90 @@
 /* src/pages/admin/AdminMain.module.css */
 
+:root {
+  --bg-light: #faf9f7;
+  --bg-card: #ffffff;
+  --border: #e0ddd9;
+  --text-primary: #4d3b30;
+  --text-secondary: #7d6a5e;
+  --accent: #a17c59;
+  --shadow: rgba(0, 0, 0, 0.05);
+}
+
 .container {
-  padding: 20px;
-  max-width: 1200px;
+  padding: 2rem;
+  max-width: 1400px;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
+  font-family: "Pretendard", sans-serif;
+  background: var(--bg-light);
 }
 
+/* 상단 통계 박스 그리드 */
 .topStatsRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
+/* 통계 카드 */
 .statBox {
-  flex: 1;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
+.statBox:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px var(--shadow);
+}
 .clickableBox {
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
+/* 통계 제목 */
 .statTitle {
-  font-size: 24px;
-  margin: 0 0 10px 0;
-  color: #333;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
 }
 
+/* 설명 텍스트 */
 .statText {
-  font-size: 14px;
-  color: #666;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
+/* 하단 차트 + 리스트 그리드 */
 .bottomChartsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
 }
 
+/* 차트/리스트 박스 */
 .chartBox {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px var(--shadow);
 }
 
+/* 차트 & 리스트 제목 */
 .chartTitle {
-  font-size: 18px;
-  margin: 0 0 15px 0;
-  color: #333;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+/* 반응형 보조 */
+@media (max-width: 600px) {
+  .topStatsRow,
+  .bottomChartsGrid {
+    grid-template-columns: 1fr;
+  }
 }

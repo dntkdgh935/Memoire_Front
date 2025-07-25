@@ -13,14 +13,14 @@ import archiveDe  from "../../assets/images/archive_de.svg";
 import atelierAct from "../../assets/images/atelier_act.svg";
 import atelierDe  from "../../assets/images/atelier_de.svg";
 import chatAct    from "../../assets/images/chat_dark.png";
-import chatDe     from "../../assets/images/chat_de.png";
+import chatDe from "../../assets/images/chat_de.png";
 
 // 비디오 모드용 다크 아이콘
 import libDark      from "../../assets/images/lib_dark.svg";
 import archiveDark  from "../../assets/images/archive_dark.svg";
 import atelierDark  from "../../assets/images/atelier_dark.png";
 import chatDark     from "../../assets/images/chat_dark.png";
-import tarotDark    from "../../assets/images/tarot_dark.png"; // 타로는 다크 아이콘만
+import tarotDark from "../../assets/images/tarot_dark.png"; // 타로는 다크 아이콘만
 
 function Sidebar() {
   const navigate = useNavigate();
