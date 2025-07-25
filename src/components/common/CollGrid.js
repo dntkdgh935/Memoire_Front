@@ -4,7 +4,7 @@ import Masonry from "react-masonry-css";
 import CollCard from "./CollCard";
 import styles from "./CollGrid.module.css";
 
-function CollGrid({ colls, onActionChange, onCollClick }) {
+function CollGrid({ colls, onLikeChange, onBookmarkChange, onCollClick }) {
   const breakpointColumnsObj = {
     default: 4,
     1200: 3,
@@ -25,7 +25,8 @@ function CollGrid({ colls, onActionChange, onCollClick }) {
           <CollCard
             key={`${coll.collectionid}-${index}`} // ✅ 고유 key
             collection={coll}
-            onActionChange={onActionChange}
+            onLikeChange={onLikeChange}
+            onBookmarkChange={onBookmarkChange}
             onCollClick={onCollClick}
           />
         ))}

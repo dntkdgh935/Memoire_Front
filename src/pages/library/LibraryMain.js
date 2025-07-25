@@ -131,56 +131,57 @@ function LibraryMain() {
     fetchTags();
   }, []);
 
-  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
-  const handleActionChange = async (collectionId, actionType) => {
+  const handleLikeChange = async (updatedColl) => {
     if (isLoggedIn) {
       // Spring에 DB 변경 요청
-      const isLiked =
-        actionType === "userlike"
-          ? !recColls.find((coll) => coll.collectionid === collectionId)
-              .userlike
-          : undefined;
-      const isBookmarked =
-        actionType === "userbookmark"
-          ? !recColls.find((coll) => coll.collectionid === collectionId)
-              .userbookmark
-          : undefined;
+      await secureApiRequest(
+        `/api/library/togglelike?userid=${userid}&collectionId=${updatedColl.collectionid}&isLiked=${updatedColl.userlike}`,
+        { method: "POST" }
+      );
 
-      if (actionType === "userlike") {
-        await secureApiRequest(
-          `/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-      if (actionType === "userbookmark") {
-        await secureApiRequest(
-          `/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-
+      // UI 상태 변경 (setSearchedColls)
       setRecColls((prevState) =>
         prevState.map((coll) => {
-          if (coll.collectionid !== collectionId) return coll;
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userlike = !updated.userlike;
+            updated.likeCount = updated.userlike
+              ? updated.likeCount + 1 // 좋아요가 true이면 카운트 증가
+              : updated.likeCount - 1; // 좋아요가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
+        })
+      );
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
+  };
 
-          const updated = {
-            ...coll,
-            [actionType]: !coll[actionType],
-            [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-              coll[actionType] === true
-                ? coll[
-                    actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                  ] - 1
-                : coll[
-                    actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                  ] + 1,
-          };
+  const handleBookmarkChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglebm?userid=${userid}&collectionId=${updatedColl.collectionid}&isBookmarked=${updatedColl.userbookmark}`,
+        { method: "POST" }
+      );
 
-          return updated;
+      // UI 상태 변경 (setSearchedColls)
+      setRecColls((prevState) =>
+        prevState.map((coll) => {
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userbookmark = !updated.userbookmark; // 토글됨
+            updated.bookmarkCount = updated.userbookmark
+              ? updated.bookmarkCount + 1 // 토글 후 북마크가 true이면 카운트 증가
+              : updated.bookmarkCount - 1; // 토글 후 북마크가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
         })
       );
     } else {
@@ -236,7 +237,8 @@ function LibraryMain() {
       ) : (
         <CollGrid
           colls={recColls}
-          onActionChange={handleActionChange}
+          onLikeChange={handleLikeChange}
+          onBookmarkChange={handleBookmarkChange}
           onCollClick={handleCollClick}
           ref={scrollContainerRef}
         />

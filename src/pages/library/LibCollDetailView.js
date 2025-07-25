@@ -79,18 +79,58 @@ function LibCollDetailView() {
     }
   };
 
+  const handleLikeChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglelike?userid=${userid}&collectionId=${updatedColl.collectionid}&isLiked=${updatedColl.userlike}`,
+        { method: "POST" }
+      );
+      // UI 상태 변경
+      // 단일 컬렉션을 업데이트할 때
+      setCollection((coll) => {
+        const updated = { ...coll }; // 기존 컬렉션 객체 복사
+        updated.userlike = !updated.userlike; // 좋아요 상태 반전
+        updated.likeCount = updated.userlike
+          ? updated.likeCount + 1 // 좋아요가 true이면 카운트 증가
+          : updated.likeCount - 1; // 좋아요가 false이면 카운트 감소
+        return updated; // 업데이트된 객체 반환
+      });
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
+  };
+
+  const handleBookmarkChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglebm?userid=${userid}&collectionId=${updatedColl.collectionid}&isBookmarked=${updatedColl.userbookmark}`,
+        { method: "POST" }
+      );
+
+      // UI 상태 변경 (setSearchedColls)
+      // UI 상태 변경
+      // 단일 컬렉션을 업데이트할 때
+      setCollection((coll) => {
+        const updated = { ...coll }; // 기존 컬렉션 객체 복사
+        updated.userbookmark = !updated.userbookmark; // 좋아요 상태 반전
+        updated.bookmarkCount = updated.userbookmark
+          ? updated.bookmarkCount + 1 // 좋아요가 true이면 카운트 증가
+          : updated.bookmarkCount - 1; // 좋아요가 false이면 카운트 감소
+        return updated; // 업데이트된 객체 반환
+      });
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
+  };
+
   //컬렉션 fetch되면, 좋아요한 유저와 북마크한 유저를 불러옴
   useEffect(() => {
     const fetchLikedUsers = async () => {
       if (!collection || !collection.collectionid || !userid) return;
 
       try {
-        // const res = await apiClient.get("/api/library/whoLiked", {
-        //   params: {
-        //     collectionid: collection.collectionid,
-        //     userid: userid,
-        //   },
-        // });
         const res = await secureApiRequest("/api/library/whoLiked", {
           method: "GET",
           params: {
@@ -114,12 +154,6 @@ function LibCollDetailView() {
       if (!collection || !collection.collectionid || !userid) return;
 
       try {
-        // const res = await apiClient.get("/api/library/whoBookmarked", {
-        //   params: {
-        //     collectionid: collection.collectionid,
-        //     userid: userid,
-        //   },
-        // });
         const res = await secureApiRequest("/api/library/whoBookmarked", {
           method: "GET",
           params: {
@@ -146,9 +180,6 @@ function LibCollDetailView() {
       //로그인 유저일 경우의, 디테일 확인할 컬렉션 정보와 메모리 가져오기
       if (currentUserid != null) {
         try {
-          // const res = await axios.get(
-          //   `http://localhost:8080/api/library/collection/${id}/${currentUserid}`
-          // );
           const res = await secureApiRequest(
             `/api/library/collection/${id}/${currentUserid}`,
             {
@@ -232,65 +263,7 @@ function LibCollDetailView() {
     return <div>로딩 중...</div>;
   }
 
-  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
-  const handleActionChange = async (collectionId, actionType) => {
-    if (isLoggedIn) {
-      // Spring에 DB 변경 요청
-      const isLiked =
-        actionType === "userlike" ? !collection.userlike : undefined;
-      const isBookmarked =
-        actionType === "userbookmark" ? !collection.userbookmark : undefined;
-
-      // if (actionType === "userlike") {
-      //   await axios.post(
-      //     `http://localhost:8080/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`
-      //   );
-      // }
-      // if (actionType === "userbookmark") {
-      //   await axios.post(
-      //     `http://localhost:8080/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`
-      //   );
-      // }
-      if (actionType === "userlike") {
-        await secureApiRequest(
-          `/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-      if (actionType === "userbookmark") {
-        await secureApiRequest(
-          `/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-
-      //UI 상태 변경
-      setCollection((prev) => {
-        if (!prev) return prev;
-
-        const updated = {
-          ...prev,
-          [actionType]: !prev[actionType], // userlike 또는 userbookmark 토글
-          [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-            prev[actionType] === true
-              ? prev[
-                  actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                ] - 1
-              : prev[
-                  actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                ] + 1,
-        };
-
-        return updated;
-      });
-    } else {
-      alert("로그인 후 사용 가능합니다.");
-    }
-  };
+  //
 
   return (
     <>
@@ -301,7 +274,8 @@ function LibCollDetailView() {
             coll={collection}
             memoryList={memoryList}
             onMemoryClick={handleMemoryClick}
-            onActionChange={handleActionChange}
+            onLikeChange={handleLikeChange}
+            onBookmarkChange={handleBookmarkChange}
             selectedMemoryId={selectedMemoryId}
             onOpenLilkedUsers={handleOpenLilkedUsers}
             onOpenBookmarkedUsers={handleOpenBookmarkedUsers}

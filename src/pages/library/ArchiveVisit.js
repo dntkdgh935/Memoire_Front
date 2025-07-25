@@ -15,7 +15,11 @@ function ArchiveVisit() {
   const { userid: ownerid } = useParams();
 
   const [ownerNickname, setOwnerNickname] = useState("정보없음");
-  const { userid: myid, secureApiRequest } = useContext(AuthContext);
+  const {
+    isLoggedIn,
+    userid: myid,
+    secureApiRequest,
+  } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // 방문한 아카이브 소유자 정보
@@ -281,70 +285,61 @@ function ArchiveVisit() {
   };
 
   // 컬렉션 좋아요/ 북마크 클릭시 처리
-  const handleActionChange = async (collectionId, actionType) => {
-    const targetList = activeTab === "myColl" ? collections : bookmarks;
-    const setTargetList =
-      activeTab === "myColl" ? setCollections : setBookmarks;
-
-    const targetItem = targetList.find(
-      (coll) => coll.collectionid === collectionId
-    );
-    if (!targetItem) return;
-
-    const isLiked =
-      actionType === "userlike" ? !targetItem.userlike : undefined;
-    const isBookmarked =
-      actionType === "userbookmark" ? !targetItem.userbookmark : undefined;
-
-    //TODO: secureApiReuqest 로 추후 변경(현재 변경시 에러남)
-    try {
-      if (actionType === "userlike") {
-        // await apiClient.post(`/api/library/togglelike`, null, {
-        //   params: { userid: myid, collectionId, isLiked },
-        // });
-        await secureApiRequest(
-          `/api/library/togglelike?userid=${myid}&collectionId=${collectionId}&isLiked=${isLiked}`,
-          {
-            method: "POST",
-          }
-        );
-      } else if (actionType === "userbookmark") {
-        // await apiClient.post(`/api/library/togglebm`, null, {
-        //   params: { userid: myid, collectionId, isBookmarked },
-        // });
-        await secureApiRequest(
-          `/api/library/togglebm?userid=${myid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-
-      // 상태 업데이트
-      setTargetList((prevState) =>
-        prevState.map((coll) =>
-          coll.collectionid === collectionId
-            ? {
-                ...coll,
-                [actionType]: !coll[actionType],
-                [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-                  coll[actionType]
-                    ? coll[
-                        actionType === "userlike"
-                          ? "likeCount"
-                          : "bookmarkCount"
-                      ] - 1
-                    : coll[
-                        actionType === "userlike"
-                          ? "likeCount"
-                          : "bookmarkCount"
-                      ] + 1,
-              }
-            : coll
-        )
+  const handleLikeChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglelike?userid=${myid}&collectionId=${updatedColl.collectionid}&isLiked=${updatedColl.userlike}`,
+        { method: "POST" }
       );
-    } catch (error) {
-      console.error("상태 변경 중 오류 발생:", error);
+
+      // UI 상태 변경 (setSearchedColls)
+      setCollections((prevState) =>
+        prevState.map((coll) => {
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userlike = !updated.userlike;
+            updated.likeCount = updated.userlike
+              ? updated.likeCount + 1 // 좋아요가 true이면 카운트 증가
+              : updated.likeCount - 1; // 좋아요가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
+        })
+      );
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
+  };
+
+  const handleBookmarkChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglebm?userid=${myid}&collectionId=${updatedColl.collectionid}&isBookmarked=${updatedColl.userbookmark}`,
+        { method: "POST" }
+      );
+
+      // UI 상태 변경 (setSearchedColls)
+      setCollections((prevState) =>
+        prevState.map((coll) => {
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userbookmark = !updated.userbookmark; // 토글됨
+            updated.bookmarkCount = updated.userbookmark
+              ? updated.bookmarkCount + 1 // 토글 후 북마크가 true이면 카운트 증가
+              : updated.bookmarkCount - 1; // 토글 후 북마크가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
+        })
+      );
+    } else {
+      alert("로그인 후 사용 가능합니다.");
     }
   };
 
@@ -382,7 +377,8 @@ function ArchiveVisit() {
           </div>
           <CollGrid
             colls={activeTab == "myColl" ? collections : bookmarks}
-            onActionChange={handleActionChange}
+            onBookmarkChange={handleBookmarkChange}
+            onLikeChange={handleLikeChange}
             onCollClick={handleCollClick}
           />
         </div>

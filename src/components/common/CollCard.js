@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./CollCard.module.css";
 import LibCollLabel from "../library/LibCollLabel";
 
-function CollCard({ collection, onActionChange, onCollClick }) {
+function CollCard({ collection, onLikeChange, onBookmarkChange, onCollClick }) {
   const cover = collection.thumbnailPath; // collection에서 동적으로 이미지/ 비디오 경로 받기
   // console.log(cover);
   const isImage = collection.thumbType == "image";
@@ -42,7 +42,11 @@ function CollCard({ collection, onActionChange, onCollClick }) {
         // <span>메모리 없음</span>
       )}
 
-      <LibCollLabel coll={collection} onActionChange={onActionChange} />
+      <LibCollLabel
+        coll={collection}
+        onLikeChange={onLikeChange}
+        onBookmarkChange={onBookmarkChange}
+      />
     </div>
   );
 }
