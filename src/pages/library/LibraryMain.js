@@ -206,10 +206,9 @@ function LibraryMain() {
       },
       //{ threshold: 1.0 } ***********안되면 쿰백 **************
       {
-        threshold: 1.0, // 컨테이너의 끝에 완전히 도달했을 때만 감지
+        threshold: 0.5, // 컨테이너의 끝에 완전히 도달했을 때만 감지
       }
     );
-
     observer.observe(loaderRef.current);
 
     return () => {
@@ -232,23 +231,17 @@ function LibraryMain() {
         onTagSelect={setSelectedTag}
         savedTags={topTags}
       />
-      <div
-        ref={scrollContainerRef}
-        style={{
-          height: "80vh",
-          overflowY: "auto",
-        }}
-      >
-        {(recColls && recColls.length === 0) || !recColls ? (
-          <p>컬렉션이 없습니다.</p> // recColls가 빈 배열일 경우 메시지 표시
-        ) : (
-          <CollGrid
-            colls={recColls}
-            onActionChange={handleActionChange}
-            onCollClick={handleCollClick}
-          />
-        )}
-      </div>
+
+      {(recColls && recColls.length === 0) || !recColls ? (
+        <p>컬렉션이 없습니다.</p> // recColls가 빈 배열일 경우 메시지 표시
+      ) : (
+        <CollGrid
+          colls={recColls}
+          onActionChange={handleActionChange}
+          onCollClick={handleCollClick}
+          ref={scrollContainerRef}
+        />
+      )}
       <div ref={loaderRef} style={{ height: "40px" }} />
     </>
   );
