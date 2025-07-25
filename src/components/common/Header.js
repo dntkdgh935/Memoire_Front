@@ -28,7 +28,7 @@ function Header() {
   };
 
   useEffect(() => {
-    if (userid) {
+    if (isLoggedIn && userid) {
       // 팔로우 요청 목록 가져오기
       apiClient
         .get(`/api/library/followreqs?userid=${userid}`)
@@ -75,11 +75,17 @@ function Header() {
         console.error("팔로우 요청 승인 실패", error);
       });
   };
+  const MAX_SEARCH_LENGTH = 20;
 
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
     console.log(`검색 실행: 타입=${searchType}, 키워드=${searchKeyword}`);
     // TODO: 검색 키워드 관련 조건 있으면 추가
+
+    if (searchKeyword.length > MAX_SEARCH_LENGTH) {
+      alert(`검색어는 ${MAX_SEARCH_LENGTH}자 이내로 입력해주세요.`);
+      return;
+    }
 
     // 검색 처리 로직 여기에 추가
     if (!isLoggedIn) {
@@ -135,7 +141,7 @@ function Header() {
   return (
     <header className={styles.header}>
       {/* 왼쪽: 로고  */}
-      <div className={styles.leftSection}>
+      <div className={styles.leftSection} onClick={() => navigate("/")}>
         <FaThLarge className={styles.logoIcon} />
         <span className={styles.logoText}>MÉMOIRE</span>
       </div>
@@ -198,12 +204,15 @@ function Header() {
           onClick={handleUserIconClick}
         />
         {/* 팔로우 요청 배지 */}
-        <div className={styles.bellWrapper} onClick={handleBellClick}>
-          <FaBell className={styles.iconButton} />
-          {hasNotifications && (
-            <div className={styles.notificationBadge}>!</div>
-          )}
-        </div>
+        {isLoggedIn && (
+          <div className={styles.bellWrapper} onClick={handleBellClick}>
+            <FaBell className={styles.iconButton} />
+            {hasNotifications && (
+              <div className={styles.notificationBadge}>!</div>
+            )}
+          </div>
+        )}
+
         {/* 알림 드롭다운 */}
         {showNotifications && (
           <NotificationDropdown

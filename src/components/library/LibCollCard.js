@@ -78,7 +78,6 @@ function LibCollCard({
           }}
         />
 
-        <div className={styles.userName}>{coll.authorid}</div>
         <div className={styles.collectionDate}>{coll.createdDate}</div>
       </div>
 
