@@ -20,7 +20,7 @@ export default function ImageToImageMain() {
   useEffect(() => {
     if (isLoggedIn === false) {
       alert("로그인을 하세요!");
-      navigate("/");
+      navigate("/user/login");
       return;
     }
   }, [isLoggedIn, navigate]);
