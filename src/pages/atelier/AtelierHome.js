@@ -1,5 +1,5 @@
 // src/pages/atelier/AtelierHome.js
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AtelierHome.module.css";
 import PageHeader from "../../components/common/PageHeader";
@@ -16,6 +16,14 @@ import atelierIntroVideo from "../../assets/videos/atelier_intro.mp4";
 function AtelierHome() {
   const { isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/user/login");
+      return;
+    }
+  }, [isLoggedIn, navigate]);
 
   if (!isLoggedIn) {
     navigate("/");
@@ -69,8 +77,8 @@ function AtelierHome() {
           />
           <p className={styles.introText}>
             Atelier는 여러분의 소중한 기억을 다양한 형태로 재탄생시키는
-            공간입니다. <br/> 텍스트부터 이미지, 영상까지 AI와 함께 새로운 감성으로
-            그려보세요.
+            공간입니다. <br /> 텍스트부터 이미지, 영상까지 AI와 함께 새로운
+            감성으로 그려보세요.
           </p>
         </div>
 
