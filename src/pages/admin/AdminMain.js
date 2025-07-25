@@ -35,7 +35,6 @@ const AdminMain = () => {
           console.log(usersResponse.data);
           setTotalUsers(usersResponse.data);
 
-
           const reportedResponse = await secureApiRequest(
             "/admin/reportedPosts",
             {
@@ -54,10 +53,8 @@ const AdminMain = () => {
   }, [isLoggedIn, role, navigate, secureApiRequest]); // 권한이 없으면 렌더링하지 않음
 
   if (!isLoggedIn || role !== "ADMIN") {
-
     return <>해당 페이지에 접속할 권한이 없습니다.</>;
   }
-
 
   const handleUserClick = () => {
     navigate("/admin/users");
@@ -86,12 +83,12 @@ const AdminMain = () => {
           onClick={handleReportClick}
           className={`${styles.statBox} ${styles.clickableBox}`}
         >
-
           <h2 className={styles.statTitle}>
-            신고된 메모리 수:{" "}
-            {reportedPosts !== null ? `${reportedPosts}개` : "..."}
+            신고 수: {reportedPosts !== null ? `${reportedPosts}개` : "..."}
           </h2>
-          <p className={styles.statText}>클릭하여 신고된 게시물 목록으로 이동</p>
+          <p className={styles.statText}>
+            클릭하여 신고된 게시물 목록으로 이동
+          </p>
         </div>
       </div>
       {/* 하단 그래프 및 목록 영역 */}
