@@ -19,7 +19,8 @@ const MyInfo = () => {
     secureApiRequest,
     setAuthInfo,
     logoutAndRedirect,
-  } = context || {}; // clearAuthInfo 대신 logoutAndRedirect 사용
+    loginType, // loginType을 AuthContext에서 가져옵니다.
+  } = context || {};
 
   const [formData, setFormData] = useState({
     nickname: "",
@@ -43,6 +44,15 @@ const MyInfo = () => {
   const [success, setSuccess] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // loginType이 "original"이 아닐 경우 비밀번호 및 얼굴 ID 기능을 비활성화
+  const isOriginalLogin = loginType === "original";
+
+  // ⭐️⭐️⭐️ 추가된 디버깅용 console.log ⭐️⭐️⭐️
+  console.log("MyInfo Render - Raw context:", context);
+  console.log("MyInfo Render - loginType from context:", loginType);
+  console.log("MyInfo Render - isOriginalLogin calculated:", isOriginalLogin);
+  // ⭐️⭐️⭐️ 여기까지 ⭐️⭐️⭐️
 
   useEffect(() => {
     if (isLoggedIn === null || isLoggedIn === undefined) {
@@ -71,6 +81,11 @@ const MyInfo = () => {
 
         console.log("MyInfo - Parsed User Data (from .data):", userData);
 
+        console.log(
+          "MyInfo - 받아온 profileImagePath:",
+          userData.profileImagePath
+        );
+
         const { tempPwd } = location.state || {};
         console.log("Received tempPwd from location state:", tempPwd);
 
@@ -80,7 +95,8 @@ const MyInfo = () => {
           phone: userData.phone || "",
           birthday: userData.birthday || "",
           statusMessage: userData.statusMessage || "",
-          prevPwd: tempPwd || "", // 임시 비밀번호가 있으면 현재 비밀번호 필드에 채움
+          profileImagePath: userData.profileImagePath || "",
+          prevPwd: tempPwd || "",
           password: "",
           confirmPwd: "",
         }));
@@ -101,7 +117,30 @@ const MyInfo = () => {
     if (isLoggedIn && userid) {
       loadUserData();
     }
-  }, [isLoggedIn, userid, navigate, secureApiRequest, location.state]);
+    // ⭐️⭐️⭐️ loginType을 의존성 배열에 추가하여 변화 감지 ⭐️⭐️⭐️
+    console.log(
+      "MyInfo initial load useEffect - current loginType:",
+      loginType
+    );
+  }, [
+    isLoggedIn,
+    userid,
+    navigate,
+    secureApiRequest,
+    location.state,
+    loginType,
+  ]);
+
+  // ⭐️⭐️⭐️ loginType 변화 감지용 useEffect 추가 ⭐️⭐️⭐️
+  useEffect(() => {
+    console.log("MyInfo: loginType has changed to", loginType);
+    if (loginType === "original") {
+      console.log(
+        "MyInfo: loginType is now 'original'. Password fields and Face ID button should be visible/enabled."
+      );
+    }
+  }, [loginType]);
+  // ⭐️⭐️⭐️ 여기까지 ⭐️⭐️⭐️
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -141,8 +180,10 @@ const MyInfo = () => {
     }
 
     // 비밀번호 변경 시도 여부 판단 (prevPwd, password, confirmPwd 중 하나라도 입력되었는지)
+    // loginType이 "original"이 아닐 경우 비밀번호 변경 시도를 막습니다.
     const isPasswordChangeAttempted =
-      formData.prevPwd || formData.password || formData.confirmPwd;
+      isOriginalLogin &&
+      (formData.prevPwd || formData.password || formData.confirmPwd);
     let passwordChangeSuccessful = false; // 비밀번호 변경 성공 여부 추적
 
     // 프로필 이미지 업로드 처리 (비밀번호 변경보다 먼저 처리하여 경로를 확보)
@@ -330,6 +371,9 @@ const MyInfo = () => {
       setError("사용자 ID를 찾을 수 없습니다. 로그인 후 다시 시도해주세요.");
     }
   };
+  const handleNavigateToExit = () => {
+    navigate("/user/exit");
+  };
 
   if (isLoading) {
     return (
@@ -342,7 +386,10 @@ const MyInfo = () => {
   if (!isLoggedIn) {
     return null;
   }
-
+  console.log(
+    "MyInfo -> ProfileUploader에 전달할 경로:",
+    formData.profileImagePath
+  );
   return (
     <div className={styles.container}>
       <h2>내 정보 수정</h2>
@@ -415,31 +462,33 @@ const MyInfo = () => {
           />
         </div>
 
-        {/* 비밀번호 변경 필드는 항상 렌더링 */}
-        <>
-          <div className={styles.inputGroup} aria-label="비밀번호 변경">
-            <label htmlFor="prevPwd">현재 비밀번호</label>
-            <input
-              type="password"
-              id="prevPwd"
-              name="prevPwd"
-              value={formData.prevPwd}
-              onChange={handleInputChange}
-              placeholder="현재 비밀번호 (비밀번호 변경 시 필수)"
-              maxLength={16}
-              disabled={isUpdating}
-            />
-          </div>
+        {/* 비밀번호 변경 필드는 loginType이 "original"일 때만 렌더링 */}
+        {isOriginalLogin && (
+          <>
+            <div className={styles.inputGroup} aria-label="비밀번호 변경">
+              <label htmlFor="prevPwd">현재 비밀번호</label>
+              <input
+                type="password"
+                id="prevPwd"
+                name="prevPwd"
+                value={formData.prevPwd}
+                onChange={handleInputChange}
+                placeholder="현재 비밀번호 (비밀번호 변경 시 필수)"
+                maxLength={16}
+                disabled={isUpdating || !isOriginalLogin}
+              />
+            </div>
 
-          <CheckPwd
-            password={formData.password}
-            confirmPwd={formData.confirmPwd}
-            onChange={handleInputChange}
-            onValidationChange={handleValidationChange}
-            onPasswordStrengthChange={handlePasswordStrengthChange}
-            disabled={isUpdating}
-          />
-        </>
+            <CheckPwd
+              password={formData.password}
+              confirmPwd={formData.confirmPwd}
+              onChange={handleInputChange}
+              onValidationChange={handleValidationChange}
+              onPasswordStrengthChange={handlePasswordStrengthChange}
+              disabled={isUpdating || !isOriginalLogin}
+            />
+          </>
+        )}
 
         <button
           type="submit"
@@ -453,10 +502,20 @@ const MyInfo = () => {
       <button
         onClick={handleNavigateToFaceRegister}
         className={styles.faceIdButton}
-        disabled={isUpdating || !userid}
+        // 얼굴 ID 등록/수정 버튼도 loginType이 "original"일 때만 활성화
+        disabled={isUpdating || !userid || !isOriginalLogin}
       >
         얼굴 ID 등록/수정
       </button>
+      <div className={styles.deleteLink}>
+        <button
+          type="button"
+          className={styles.deleteLinkText}
+          onClick={handleNavigateToExit}
+        >
+          탈퇴하기
+        </button>
+      </div>
     </div>
   );
 };

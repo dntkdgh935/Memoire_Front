@@ -16,6 +16,9 @@ function FaceLogin() {
   const [isFaceDetectedOnScreen, setIsFaceDetectedOnScreen] = useState(false);
   const [webcamDetectionScore, setWebcamDetectionScore] = useState(0);
 
+  // ✅ userId를 입력받기 위한 새로운 상태 추가
+  const [userIdInput, setUserIdInput] = useState("");
+
   const context = useContext(AuthContext);
   const { updateTokens } = context || {};
 
@@ -41,6 +44,12 @@ function FaceLogin() {
       return;
     }
 
+    // ✅ userId 입력 여부 확인
+    if (!userIdInput) {
+      setMessage("사용자 ID를 입력해주세요.");
+      return;
+    }
+
     if (!webcamRef.current || !webcamRef.current.isFaceDetected()) {
       setMessage("로그인을 시도하기 전에 얼굴을 웹캠 중앙에 맞춰주세요.");
       return;
@@ -59,7 +68,11 @@ function FaceLogin() {
 
       const formData = new FormData();
       formData.append("file", imageBlob, "face_login.jpg");
+      // ✅ 입력받은 userId를 FormData에 추가
+      formData.append("userId", userIdInput);
 
+      // 백엔드 엔드포인트는 `user/face-login`으로 유지하고,
+      // 백엔드에서 formData.get("userId")로 userId를 받을 것으로 가정합니다.
       const apiResponse = await apiClient.post(`/user/face-login`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -80,11 +93,11 @@ function FaceLogin() {
       );
       if (error.response?.status === 401) {
         setMessage(
-          "얼굴 인식에 실패했거나 일치하는 사용자가 없습니다. 다시 시도해주세요."
+          "얼굴 인식에 실패했거나 입력한 사용자 ID와 일치하는 얼굴이 아닙니다. 다시 시도해주세요."
         );
       } else if (error.response?.status === 404) {
         setMessage(
-          "얼굴 임베딩을 찾을 수 없습니다. 등록된 얼굴이 있는지 확인해주세요."
+          "입력한 사용자 ID에 해당하는 얼굴 임베딩을 찾을 수 없습니다. 등록된 얼굴이 있는지 확인해주세요."
         );
       }
     } finally {
@@ -97,8 +110,22 @@ function FaceLogin() {
       <div className={styles.card}>
         <h1 className={styles.title}>Face ID 로그인</h1>
         <p className={styles.description}>
-          웹캠을 통해 얼굴을 인식하여 로그인합니다.
+          웹캠을 통해 얼굴을 인식하고 사용자 ID를 입력하여 로그인합니다.
         </p>
+
+        {/* ✅ 사용자 ID 입력 필드 추가 */}
+        <div className={styles.inputGroup}>
+          <label htmlFor="userId">사용자 ID</label>
+          <input
+            type="text"
+            id="userId"
+            value={userIdInput}
+            onChange={(e) => setUserIdInput(e.target.value)}
+            placeholder="사용자 ID를 입력하세요"
+            className={styles.inputField}
+            disabled={isLoading}
+          />
+        </div>
 
         <WebcamFaceDetector
           ref={webcamRef}
@@ -112,7 +139,8 @@ function FaceLogin() {
           <button
             onClick={handleFaceLogin}
             className={styles.loginButton}
-            disabled={isLoading || !isFaceDetectedOnScreen}
+            // ✅ userIdInput이 비어있으면 버튼 비활성화
+            disabled={isLoading || !isFaceDetectedOnScreen || !userIdInput}
           >
             {isLoading ? "로그인 중..." : "Face ID로 로그인"}
           </button>

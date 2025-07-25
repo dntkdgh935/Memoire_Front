@@ -23,7 +23,7 @@ function AdminTopLikesCollectionList() {
       setError(null);
       try {
         const response = await secureApiRequest(
-          `/admin/top-likes-collections?limit=10`
+          `/admin/top-likes-collections?limit=3`
         );
         setTopCollections(response.data);
       } catch (err) {

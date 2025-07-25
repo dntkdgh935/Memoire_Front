@@ -4,31 +4,47 @@ import apiClient from "../../utils/axios";
 import { AuthContext } from "../../AuthProvider";
 import styles from "./Login.module.css";
 
+// 1. 로그인 타입 상수 정의 (별도 파일로 분리하는 것이 더 좋음)
+const LOGIN_TYPE = {
+  NORMAL: "normal",
+  NAVER: "naver",
+  GOOGLE: "google",
+  KAKAO: "kakao",
+  FACE_ID: "faceId",
+};
+
 function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 진행 중 상태
-  const [autoLogin, setAutoLogin] = useState(false); // 체크박스 상태로 변경
-  const [isSocialLoginProcessing, setIsSocialLoginProcessing] = useState(false); // 소셜 로그인 진행 중 상태
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [autoLogin, setAutoLogin] = useState(false);
+  const [isSocialLoginProcessing, setIsSocialLoginProcessing] = useState(false);
+  const [lastLoginType, setLastLoginType] = useState(null); // ✅ 마지막 로그인 방식 상태
   const location = useLocation();
 
   const { updateTokens } = useContext(AuthContext);
 
   useEffect(() => {
-    // FindId 페이지에서 전달받은 아이디가 있는지 확인하고, 있다면 loginId 상태에 설정
+    // FindId 페이지에서 전달받은 아이디 처리
     if (location.state && location.state.foundId) {
       const foundId = location.state.foundId;
       console.log("전달받은 아이디:", foundId);
-      setLoginId(foundId); // 전달받은 아이디로 loginId 상태를 업데이트
-      // 전달받은 아이디는 한 번 사용 후 state를 초기화하여 URL에 남지 않도록 할 수 있습니다.
-      // navigate(location.pathname, { replace: true, state: {} });
+      setLoginId(foundId);
     }
 
-    // 기존 자동 로그인 처리 로직
+    // 기존 자동 로그인 처리 로직 (로그인 완료된 상태라면 메인으로 이동)
     const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) navigate("/");
-  }, [navigate, location.state?.foundId]); // location.state 대신 location.state?.foundId를 의존성 배열에 추가
+    if (accessToken) {
+      navigate("/");
+    }
+
+    // ✅ 로컬 스토리지에서 마지막 로그인 방식 불러오기
+    const storedLoginType = localStorage.getItem("lastLoginType");
+    if (storedLoginType) {
+      setLastLoginType(storedLoginType);
+    }
+  }, [navigate, location.state?.foundId]);
 
   const base64DecodeUnicode = (base64Url) => {
     try {
@@ -73,12 +89,13 @@ function Login({ onLoginSuccess }) {
         autoLoginFlag: autoLogin ? "Y" : "N",
       });
 
-      const { accessToken, refreshToken } = response.data; // userId, role, autoLoginFlag는 AuthProvider에서 처리
-      // const tokenPayload = base64DecodeUnicode(accessToken.split(".")[1]); // AuthProvider에서 처리
+      const { accessToken, refreshToken } = response.data;
 
       updateTokens(accessToken, refreshToken);
+      // ✅ 일반 로그인 성공 시 lastLoginType 저장
+      localStorage.setItem("lastLoginType", LOGIN_TYPE.NORMAL);
       if (onLoginSuccess) onLoginSuccess();
-      navigate("/"); // 로그인 성공 시 메인 페이지로 이동
+      navigate("/");
     } catch (error) {
       console.error("로그인 실패 : ", error);
       if (error.response) {
@@ -93,19 +110,23 @@ function Login({ onLoginSuccess }) {
     }
   };
 
-  // ✅ 소셜 로그인 핸들러 추가
+  // ✅ 소셜 로그인 핸들러 수정: 로그인 방식 저장 로직 추가
   const handleSocialLogin = async (socialType) => {
     if (isSocialLoginProcessing) return;
 
     setIsSocialLoginProcessing(true);
     try {
       const response = await apiClient.post("/user/social", { socialType });
-      const { authorizationUrl } = response.data; // 백엔드에서 받은 인가 URL
+      const { authorizationUrl } = response.data;
 
       if (authorizationUrl) {
-        // ✅ authorizationUrl이 이제 'http://localhost:8080/oauth2/authorization/naver' 와 같은
-        //    절대 경로이므로, 브라우저가 올바르게 리다이렉션합니다.
         console.log(`Redirecting to: ${authorizationUrl}`);
+        // ✅ 소셜 로그인 시작 전 lastLoginType 저장 (선호되는 방식)
+        // 백엔드에서 소셜 로그인 성공 후 리다이렉트될 때, 이 값을 활용하여
+        // 로그인 성공 처리 부분에서 토큰과 함께 다시 lastLoginType을 저장하는 것이 더 견고합니다.
+        // 여기서는 임시로 저장하며, 실제 성공 시 다시 업데이트한다고 가정합니다.
+        localStorage.setItem("lastLoginType", socialType); // socialType 자체가 상수와 일치한다고 가정
+
         window.location.href = authorizationUrl;
       } else {
         alert("소셜 로그인 URL을 가져오는 데 실패했습니다.");
@@ -120,6 +141,8 @@ function Login({ onLoginSuccess }) {
       } else {
         alert(`소셜 로그인 (${socialType}) 시작 중 알 수 없는 오류 발생.`);
       }
+      // 실패 시 저장했던 lastLoginType 제거 또는 초기화
+      localStorage.removeItem("lastLoginType");
     } finally {
       setIsSocialLoginProcessing(false);
     }
@@ -127,23 +150,52 @@ function Login({ onLoginSuccess }) {
 
   // ✅ Face ID 로그인 페이지로 이동하는 핸들러 추가
   const handleFaceLoginNavigation = () => {
-    navigate("/user/face-login"); // 새로운 얼굴 로그인 페이지 경로
+    // ✅ Face ID 로그인 페이지로 이동 시 lastLoginType 저장 (실제 로그인 성공은 해당 페이지에서 처리)
+    localStorage.setItem("lastLoginType", LOGIN_TYPE.FACE_ID);
+    navigate("/user/face-login");
   };
+
+  // ✅ 마지막 로그인 방식 텍스트를 반환하는 헬퍼 함수
+  const getLastLoginTypeText = () => {
+    switch (lastLoginType) {
+      case LOGIN_TYPE.NORMAL:
+        return "일반 로그인";
+      case LOGIN_TYPE.NAVER:
+        return "네이버 로그인";
+      case LOGIN_TYPE.GOOGLE:
+        return "구글 로그인";
+      case LOGIN_TYPE.KAKAO:
+        return "카카오 로그인";
+      case LOGIN_TYPE.FACE_ID:
+        return "Face ID 로그인";
+      default:
+        return null;
+    }
+  };
+
+  const lastLoginMessage = getLastLoginTypeText();
 
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
         <h2 className={styles.title}>로그인</h2>
+        {/* ✅ 마지막 로그인 방식 표시 */}
+        {lastLoginMessage && (
+          <p className={styles.lastLoginMessage}>
+            마지막 로그인 방식: <strong>{lastLoginMessage}</strong>
+          </p>
+        )}
         <form className={styles.form}>
           <div className={styles.inputGroup}>
             <input
               className={styles.input}
               type="text"
-              value={loginId} // loginId 상태와 바인딩
+              value={loginId}
               onChange={(e) => setLoginId(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="아이디"
               aria-label="User ID"
+              maxlength="12"
             />
           </div>
           <div className={styles.inputGroup}>
@@ -155,6 +207,7 @@ function Login({ onLoginSuccess }) {
               onKeyDown={handleKeyDown}
               placeholder="비밀번호"
               aria-label="Password"
+              maxlength="16"
             />
           </div>
           <div className={styles.checkboxGroup}>
@@ -171,16 +224,16 @@ function Login({ onLoginSuccess }) {
           <button
             className={styles.loginButton}
             onClick={handleLogin}
-            disabled={isLoggedIn || isSocialLoginProcessing} // 소셜 로그인 중에도 비활성화
+            disabled={isLoggedIn || isSocialLoginProcessing}
             type="button"
           >
             {isLoggedIn ? "로그인 중..." : "로그인"}
           </button>
           <button
             className={styles.faceIdButton}
-            onClick={handleFaceLoginNavigation} // ✅ Face ID 버튼에 클릭 핸들러 추가
+            onClick={handleFaceLoginNavigation}
             type="button"
-            disabled={isLoggedIn || isSocialLoginProcessing} // 소셜 로그인 중에도 비활성화
+            disabled={isLoggedIn || isSocialLoginProcessing}
           >
             Face ID
           </button>
@@ -189,7 +242,7 @@ function Login({ onLoginSuccess }) {
           <button
             className={styles.socialButton}
             aria-label="Login with Naver"
-            onClick={() => handleSocialLogin("naver")} // ✅ 네이버 소셜 로그인
+            onClick={() => handleSocialLogin(LOGIN_TYPE.NAVER)} // ✅ 상수 사용
             disabled={isLoggedIn || isSocialLoginProcessing}
           >
             <span className={styles.naverIcon}></span>
@@ -197,7 +250,7 @@ function Login({ onLoginSuccess }) {
           <button
             className={styles.socialButton}
             aria-label="Login with Google"
-            onClick={() => handleSocialLogin("google")} // ✅ 구글 소셜 로그인
+            onClick={() => handleSocialLogin(LOGIN_TYPE.GOOGLE)} // ✅ 상수 사용
             disabled={isLoggedIn || isSocialLoginProcessing}
           >
             <span className={styles.googleIcon}></span>
@@ -205,7 +258,7 @@ function Login({ onLoginSuccess }) {
           <button
             className={styles.socialButton}
             aria-label="Login with Kakao"
-            onClick={() => handleSocialLogin("kakao")} // ✅ 카카오 소셜 로그인
+            onClick={() => handleSocialLogin(LOGIN_TYPE.KAKAO)} // ✅ 상수 사용
             disabled={isLoggedIn || isSocialLoginProcessing}
           >
             <span className={styles.kakaoIcon}></span>

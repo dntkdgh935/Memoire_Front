@@ -65,7 +65,7 @@ function CheckPwd({
           type="password"
           name="password"
           className={styles.input}
-          placeholder="새 비밀번호"
+          placeholder="비밀번호"
           value={password}
           onChange={onChange}
           maxLength={16}
@@ -87,7 +87,7 @@ function CheckPwd({
           type="password"
           name="confirmPwd"
           className={styles.input}
-          placeholder="새 비밀번호 확인"
+          placeholder="비밀번호 확인"
           value={confirmPwd}
           onChange={onChange}
           maxLength={16}
