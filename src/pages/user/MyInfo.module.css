@@ -1,3 +1,4 @@
+/*src/pages/user/MyIng*/
 .container {
   max-width: 460px;
   margin: 40px auto;
@@ -118,4 +119,17 @@ input[type="password"]:focus {
 .faceIdButton:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+.deleteLink {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.deleteLinkText {
+  font-size: 14px;
+  color: #d9534f;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
 }

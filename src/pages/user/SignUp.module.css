@@ -1,4 +1,3 @@
-/* src/pages/user/SignUp.module.css */
 .container {
   display: flex;
   justify-content: center;
@@ -13,7 +12,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  max-width: 440px; /* UserVerification 기준 */
   text-align: center;
   border: 1px solid #e0dcd7;
 }
@@ -31,9 +30,15 @@
   gap: 20px;
 }
 
-/* 기존 inputGroup (다른 입력 필드에 적용) */
-.inputGroup {
+/* 입력 필드 스타일 통일 */
+.inputGroup,
+.idInputGroup {
   display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inputGroup {
   flex-direction: column;
   text-align: left;
 }
@@ -45,9 +50,9 @@
   border-radius: 8px;
   background-color: #fffdfb;
   transition: border-color 0.3s ease;
-  width: 100%;
+  width: 100%; /* UserVerification 내부 input과 동일 */
+  height: 48px; /* 동일한 높이 */
   box-sizing: border-box;
-  height: 48px;
 }
 
 .input:focus {
@@ -56,13 +61,9 @@
   box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
 }
 
-/* 아이디 입력 및 중복 확인 버튼 그룹 스타일 */
+/* ID 입력 + 중복 확인 버튼 조합 스타일 */
 .idInputGroup {
-  display: flex;
-  align-items: flex-start;
   width: 100%;
-  box-sizing: border-box;
-  text-align: left;
 }
 
 .idInputGroup .input {
@@ -73,7 +74,6 @@
 .idCheckButton {
   width: 120px;
   height: 48px;
-  padding: 0 12px;
   font-size: 14px;
   font-weight: 500;
   color: #fff;
@@ -83,11 +83,9 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   white-space: nowrap;
-  min-width: fit-content;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
 }
 
 .idCheckButton:hover:not(:disabled) {
@@ -99,7 +97,63 @@
   cursor: not-allowed;
 }
 
-/* 기존 스타일 유지 (나머지 부분) */
+/* 휴대폰 인증 컴포넌트가 전체 너비 맞추도록 하는 래퍼 */
+.userVerificationWrapper {
+  width: 100%;
+}
+
+/* 비밀번호 필드 내부 CheckPwd 컴포넌트 input은 기존 스타일 input 적용됨 */
+
+/* 이름, 생년월일, 닉네임 입력 */
+/* DatePicker 관련 스타일을 더 명확하게 지정 */
+.inputGroup .react-datepicker-wrapper {
+  width: 100%;
+  display: block;
+}
+
+.inputGroup .react-datepicker-wrapper .react-datepicker__input-container {
+  width: 100%;
+  display: block;
+}
+
+/* DatePicker 내부에 렌더링되는 실제 input 요소에 스타일 적용 */
+.inputGroup .react-datepicker-wrapper .react-datepicker__input-container input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fffdfb;
+  transition: border-color 0.3s ease;
+  width: 100% !important; /* 너비를 100%로 강제 적용 */
+  height: 48px !important; /* 높이를 48px로 강제 적용 */
+  box-sizing: border-box !important; /* box-sizing을 border-box로 강제 적용 */
+}
+
+/* 회원가입 버튼 */
+.loginButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  height: 48px;
+}
+
+.loginButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.loginButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 체크박스 (해당 부분 유지) */
 .checkboxGroup {
   display: flex;
   justify-content: flex-start;
@@ -122,27 +176,7 @@
   accent-color: #5b4534;
 }
 
-.loginButton {
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #fff;
-  background-color: #5b4534;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.loginButton:hover:not(:disabled) {
-  background-color: #4a3728;
-}
-
-.loginButton:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
+/* 이미 존재하는 ID 안내 링크 스타일 */
 .signUpLink {
   margin-top: 16px;
 }
