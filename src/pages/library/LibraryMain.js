@@ -40,7 +40,9 @@ function LibraryMain() {
   const fetchCollections4Anon = async () => {
     console.log("fetchCollections4Anon 수행중");
     try {
-      const res = await apiClient.get(`/api/library/discover/${selectedTag}`);
+      const res = await apiClient.get(
+        `/api/library/discover/guest/${selectedTag}`
+      );
       console.log("받은 데이터");
       console.log(res.data);
       setRecColls(res.data);
@@ -107,8 +109,8 @@ function LibraryMain() {
 
   useEffect(() => {
     // page가 0일 때 recColls4LoginUser 호출
-    if (page === 0) {
-      recColls4LoginUser(); // 1페이지로 리셋한 후, 재호출
+    if (page === 0 && isLoggedIn && selectedTag == "추천") {
+      recColls4LoginUser(); // 재호출
     }
   }, [page]); // page가 변경될 때마다 호출
 

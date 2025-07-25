@@ -172,7 +172,7 @@ function LibCollDetailView() {
       else {
         try {
           const res = await apiClient.get(
-            `http://localhost:8080/api/library/collection/${id}`
+            `http://localhost:8080/api/library/collection/guest/${id}`
           );
           setCollection(res.data);
           await fetchMemoryList(res.data.collectionid);
