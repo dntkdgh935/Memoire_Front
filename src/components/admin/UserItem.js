@@ -1,13 +1,39 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
+import { useNavigate } from "react-router-dom";
 import default_profile from "../../assets/images/default_profile.jpg";
 import styles from "./UserItem.module.css";
 
 function UserItem({ user, onUpdateUser }) {
   const { userid, secureApiRequest } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const handleMessageClick = () => {
-    alert("메세지 기능은 아직 구현되지 않았습니다.");
+  const handleMessageClick = async () => {
+    try {
+      const formData = new FormData();
+      console.log("채팅방 생성 요청: ", user.userId);
+      formData.append("user", user.userId);
+      const chatroomid = await secureApiRequest(`/chat/admin/check`, {
+        method: "POST",
+        body: formData,
+      });
+      console.log(chatroomid.data);
+      if (chatroomid.data === null || chatroomid.data === "") {
+        formData.append("user", userid);
+        const newChatroomInfo = await secureApiRequest("/chat/admin/new", {
+          method: "POST",
+          body: formData,
+        });
+        console.log(newChatroomInfo.data);
+        navigate(`/chat/room/${newChatroomInfo.data}`);
+      } else {
+        navigate(`/chat/room/${chatroomid.data}`);
+      }
+    } catch (error) {
+      console.error("채팅방 생성 실패:", error);
+      alert("채팅방 생성에 실패했습니다.");
+      return;
+    }
   };
 
   const handleBanClick = async () => {

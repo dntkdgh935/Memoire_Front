@@ -1,12 +1,16 @@
 /* ────────────────────────────────────────────── */
 /* 0) reset: 모든 요소를 border-box로 (padding 포함) */
 /* ────────────────────────────────────────────── */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   font-family: "Pretendard", sans-serif;
+  overflow-y: hidden;
 }
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 /* ────────────────────────────────────────────── */
@@ -79,7 +83,7 @@ body.theme-video .main-area {
 }
 body.theme-video .header {
   height: 50px;
-  background-color: rgba(255,255,255,0.2) !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
   border-bottom: none !important;
   display: flex;
   align-items: center;
@@ -96,13 +100,15 @@ body.theme-video .page-content {
 /* 배경 비디오 */
 body.theme-video .backgroundVideo {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
   z-index: -999;
   pointer-events: none;
   opacity: 1;
-  filter: brightness(1.0) contrast(1.0);
+  filter: brightness(1) contrast(1);
 }
 
 /* CSS Module 해시 클래스 전역 오버라이드 */
@@ -111,7 +117,7 @@ body.theme-video div[class*="Sidebar_sidebar"] {
   border-right: none !important;
 }
 body.theme-video header[class*="Header_header"] {
-  background-color: rgba(255,255,255,0.2) !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
   border-bottom: none !important;
 }
 body.theme-video div[class*="PageHeader_pageHeader"] {
@@ -137,9 +143,7 @@ body.theme-video header[class*="Header_header"] svg {
   stroke: #fff !important;
 }
 
-body.theme-video 
-  header[class*="Header_header"] 
-  span[class*="Header_logoText"] {
+body.theme-video header[class*="Header_header"] span[class*="Header_logoText"] {
   color: #fff !important;
 }
 
@@ -193,13 +197,12 @@ body.theme-video
   border-radius: 4px !important;
 
   /* 기본 빈 책 표지(이미 spine 포함된 3:4 이미지) */
-  background: url("./assets/images/book-cover.png")
-    center/cover no-repeat !important;
+  background: url("./assets/images/book-cover.png") center/cover no-repeat !important;
 
   /* 책 표지 그림자 */
   box-shadow:
-    inset -4px 0 2px rgba(0,0,0,0.2),
-    0 4px 12px rgba(0,0,0,0.3) !important;
+    inset -4px 0 2px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.3) !important;
 
   color: transparent !important;
 }
@@ -227,7 +230,8 @@ body.theme-video
 /* ────────────────────────────────────────────── */
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] h3 {
+  div[class*="CollCard_card"]
+  h3 {
   position: absolute;
   top: 30%;
   left: 50%;
@@ -236,7 +240,7 @@ body.theme-video
   font-size: 1.1rem !important;
   line-height: 1.2;
   color: white !important;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -262,7 +266,8 @@ body.theme-video
 }
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] img[class*="AvatarWName_avatarSmall"] {
+  div[class*="CollCard_card"]
+  img[class*="AvatarWName_avatarSmall"] {
   width: 24px;
   height: 24px;
   margin-left: 15px;
@@ -271,11 +276,12 @@ body.theme-video
 }
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] span[class*="AvatarWName_usernameSmall"] {
+  div[class*="CollCard_card"]
+  span[class*="AvatarWName_usernameSmall"] {
   color: white !important;
   font-size: 0.9rem;
   font-weight: 500;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 /* ────────────────────────────────────────────── */
@@ -283,14 +289,15 @@ body.theme-video
 /* ────────────────────────────────────────────── */
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] p {
+  div[class*="CollCard_card"]
+  p {
   position: absolute;
   bottom: 24px;
   left: 16px;
   margin: 0;
   margin-left: 15px;
   font-size: 0.9rem !important;
-  color: rgba(255,255,255,0.85) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   pointer-events: none;
   z-index: 1;
 }
@@ -300,10 +307,12 @@ body.theme-video
 /* ────────────────────────────────────────────── */
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] img[class*="CollCard_image"],
+  div[class*="CollCard_card"]
+  img[class*="CollCard_image"],
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
-  div[class*="CollCard_card"] div[class*="LibCollLabel_actionButtons"] {
+  div[class*="CollCard_card"]
+  div[class*="LibCollLabel_actionButtons"] {
   display: none !important;
 }
 

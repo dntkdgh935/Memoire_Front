@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
-import apiClient from "../../utils/axios";
 import ProfileCard from "../../components/archive/ProfileCard";
 import FollowingFollower from "../../components/archive/FollowingFollower";
 import CollGrid from "../../components/common/CollGrid";
 import PageHeader from "../../components/common/PageHeader";
+import Modal from "../../components/common/Modal";
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,8 @@ function ArchiveMain() {
 
   const [collections, setCollections] = useState([]);
   const [activeTab, setActiveTab] = useState("myColl");
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
   const navigate = useNavigate();
 
@@ -81,65 +83,124 @@ function ArchiveMain() {
     }
   };
 
-  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
-  const handleActionChange = async (collectionId, actionType) => {
+  // // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
+  // const handleActionChange = async (collectionId, actionType) => {
+  //   if (isLoggedIn) {
+  //     // Spring에 DB 변경 요청
+  //     const isLiked =
+  //       actionType === "userlike"
+  //         ? !collections.find((coll) => coll.collectionid === collectionId)
+  //             .userlike
+  //         : undefined;
+  //     const isBookmarked =
+  //       actionType === "userbookmark"
+  //         ? !collections.find((coll) => coll.collectionid === collectionId)
+  //             .userbookmark
+  //         : undefined;
+
+  //     try {
+  //       const formData = new FormData();
+  //       formData.append("userid", userid);
+  //       formData.append("collectionId", collectionId);
+  //       if (actionType === "userlike") {
+  //         formData.append("isLiked", isLiked);
+  //         await secureApiRequest("/api/library/togglelike", {
+  //           method: "POST",
+  //           body: formData,
+  //         });
+  //       } else if (actionType === "userbookmark") {
+  //         formData.append("isBookmarked", isBookmarked);
+  //         await secureApiRequest("/api/library/togglebm", {
+  //           method: "POST",
+  //           body: formData,
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error("Error performing action:", error);
+  //     }
+
+  //     // UI 상태 변경
+  //     setCollections((prevState) =>
+  //       prevState.map((coll) =>
+  //         coll.collectionid === collectionId
+  //           ? {
+  //               ...coll,
+  //               [actionType]: !coll[actionType], // 상태 토글
+  //               // 좋아요/북마크 카운트 업데이트
+  //               [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
+  //                 coll[actionType] === true
+  //                   ? coll[
+  //                       actionType === "userlike"
+  //                         ? "likeCount"
+  //                         : "bookmarkCount"
+  //                     ] - 1
+  //                   : coll[
+  //                       actionType === "userlike"
+  //                         ? "likeCount"
+  //                         : "bookmarkCount"
+  //                     ] + 1,
+  //             }
+  //           : coll
+  //       )
+  //     );
+  //   } else {
+  //     alert("로그인 후 사용 가능합니다.");
+  //   }
+  // };
+
+  // 컬렉션 좋아요/ 북마크 클릭시 처리
+  const handleLikeChange = async (updatedColl) => {
     if (isLoggedIn) {
       // Spring에 DB 변경 요청
-      const isLiked =
-        actionType === "userlike"
-          ? !collections.find((coll) => coll.collectionid === collectionId)
-              .userlike
-          : undefined;
-      const isBookmarked =
-        actionType === "userbookmark"
-          ? !collections.find((coll) => coll.collectionid === collectionId)
-              .userbookmark
-          : undefined;
+      await secureApiRequest(
+        `/api/library/togglelike?userid=${userid}&collectionId=${updatedColl.collectionid}&isLiked=${updatedColl.userlike}`,
+        { method: "POST" }
+      );
 
-      try {
-        const formData = new FormData();
-        formData.append("userid", userid);
-        formData.append("collectionId", collectionId);
-        if (actionType === "userlike") {
-          formData.append("isLiked", isLiked);
-          await secureApiRequest("/api/library/togglelike", {
-            method: "POST",
-            body: formData,
-          });
-        } else if (actionType === "userbookmark") {
-          formData.append("isBookmarked", isBookmarked);
-          await secureApiRequest("/api/library/togglebm", {
-            method: "POST",
-            body: formData,
-          });
-        }
-      } catch (error) {
-        console.error("Error performing action:", error);
-      }
-
-      // UI 상태 변경
+      // UI 상태 변경 (setSearchedColls)
       setCollections((prevState) =>
-        prevState.map((coll) =>
-          coll.collectionid === collectionId
-            ? {
-                ...coll,
-                [actionType]: !coll[actionType], // 상태 토글
-                // 좋아요/북마크 카운트 업데이트
-                [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-                  coll[actionType] === true
-                    ? coll[
-                        actionType === "userlike"
-                          ? "likeCount"
-                          : "bookmarkCount"
-                      ] - 1
-                    : coll[
-                        actionType === "userlike"
-                          ? "likeCount"
-                          : "bookmarkCount"
-                      ] + 1,
-              }
-            : coll
-        )
+        prevState.map((coll) => {
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userlike = !updated.userlike;
+            updated.likeCount = updated.userlike
+              ? updated.likeCount + 1 // 좋아요가 true이면 카운트 증가
+              : updated.likeCount - 1; // 좋아요가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
+        })
+      );
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
+  };
+
+  const handleBookmarkChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglebm?userid=${userid}&collectionId=${updatedColl.collectionid}&isBookmarked=${updatedColl.userbookmark}`,
+        { method: "POST" }
+      );
+
+      // UI 상태 변경 (setSearchedColls)
+      setCollections((prevState) =>
+        prevState.map((coll) => {
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userbookmark = !updated.userbookmark; // 토글됨
+            updated.bookmarkCount = updated.userbookmark
+              ? updated.bookmarkCount + 1 // 토글 후 북마크가 true이면 카운트 증가
+              : updated.bookmarkCount - 1; // 토글 후 북마크가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
+        })
       );
     } else {
       alert("로그인 후 사용 가능합니다.");
@@ -154,6 +215,64 @@ function ArchiveMain() {
     navigate("/archive/newcoll");
   };
 
+  const handleBlockedUsersClick = async () => {
+    try {
+      const response = await secureApiRequest(
+        `/archive/blocked?userid=${userid}`,
+        {
+          method: "GET",
+        }
+      );
+      setBlockedUsers(response.data);
+      setShowBlockedModal(true);
+    } catch (error) {
+      console.error("차단 유저 목록을 불러오는 데 실패했습니다:", error);
+    }
+  };
+
+  const handleUnblock = async (blockedUserId) => {
+    if (!window.confirm("정말로 이 유저를 차단 해제하시겠습니까?")) return;
+    try {
+      const formData = new FormData();
+      formData.append("userid", userid);
+      formData.append("blockedUserId", blockedUserId);
+      await secureApiRequest("/archive/unblock", {
+        method: "POST",
+        body: formData,
+      });
+
+      setBlockedUsers((prev) =>
+        prev.map((user) =>
+          user.targetid === blockedUserId ? { ...user, status: "-1" } : user
+        )
+      );
+    } catch (error) {
+      console.error("차단 해제 실패:", error);
+    }
+  };
+
+  const handleFollow = async (targetid) => {
+    if (!window.confirm("정말로 이 유저에게 팔로우 요청을 하시겠습니까?"))
+      return;
+    try {
+      const formData = new FormData();
+      formData.append("userid", userid);
+      formData.append("targetid", targetid);
+      await secureApiRequest("/archive/followRequest", {
+        method: "POST",
+        body: formData,
+      });
+
+      setBlockedUsers((prev) =>
+        prev.map((user) =>
+          user.targetid === targetid ? { ...user, status: "0" } : user
+        )
+      );
+    } catch (error) {
+      console.error("팔로우 요청 실패:", error);
+    }
+  };
+
   return (
     <>
       <PageHeader pagename={`내 아카이브`} />
@@ -161,6 +280,12 @@ function ArchiveMain() {
         <div className={styles.sidebar}>
           <ProfileCard />
           <FollowingFollower />
+          <button
+            className={styles.blockedUsersButton}
+            onClick={handleBlockedUsersClick}
+          >
+            차단한 유저
+          </button>
         </div>
         <div className={styles.content}>
           <div className={styles.tabsRow}>
@@ -187,11 +312,55 @@ function ArchiveMain() {
           </div>
           <CollGrid
             colls={collections}
-            onActionChange={handleActionChange}
+            onBookmarkChange={handleBookmarkChange}
+            onLikeChange={handleLikeChange}
             onCollClick={handleCollClick}
           />
         </div>
       </div>
+      {showBlockedModal && (
+        <Modal onClose={() => setShowBlockedModal(false)}>
+          <h2>차단한 유저 목록</h2>
+          {blockedUsers.length === 0 ? (
+            <p>차단한 유저가 없습니다.</p>
+          ) : (
+            <table className={styles.blockedTable}>
+              <thead>
+                <tr>
+                  <th>닉네임</th>
+                  <th>차단 해제</th>
+                </tr>
+              </thead>
+              <tbody>
+                {blockedUsers.map((user, i) => (
+                  <tr key={i}>
+                    <td>{user.userid}</td>
+                    <td>
+                      {user.status === "2" ? (
+                        <button
+                          className={styles.unblockButton}
+                          onClick={() => handleUnblock(user.targetid)}
+                        >
+                          차단 해제
+                        </button>
+                      ) : user.status === "-1" ? (
+                        <button
+                          className={styles.unblockButton}
+                          onClick={() => handleFollow(user.targetid)}
+                        >
+                          팔로우 요청
+                        </button>
+                      ) : (
+                        <span>팔로우 요청 대기중</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Modal>
+      )}
     </>
   );
 }

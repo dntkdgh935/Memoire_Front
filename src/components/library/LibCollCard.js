@@ -7,22 +7,18 @@ import MemoryList from "../../components/common/MemoryList";
 import CollActionBtn from "../../components/common/CollActionBtn";
 import AvatarWName from "../common/AvatarWName";
 import { useNavigate } from "react-router-dom";
+import ActionBtn_bm from "../common/ActionBtn_bm";
+import ActionBtn_like from "../common/ActionBtn_like";
 
-/*<LibCollCard
-        coll={collection}
-        memoryList={memoryList}
-        onMemoryClick={handleMemoryClick}
-        onActionChange={handleActionChange}
-        selectedMemory={selectedMemory}
-      /> */
 function LibCollCard({
   coll,
   memoryList,
   onMemoryClick,
-  onActionChange,
   selectedMemoryId,
   onOpenLilkedUsers,
   onOpenBookmarkedUsers,
+  onBookmarkChange,
+  onLikeChange,
 }) {
   const { isLoggedIn, userid, role, secureApiRequest } =
     useContext(AuthContext);
@@ -94,17 +90,8 @@ function LibCollCard({
         ))}
       </div>
       <div className={styles.cardFooter}>
-        <CollActionBtn
-          btnType="like"
-          coll={coll}
-          onActionChange={onActionChange}
-        />
-
-        <CollActionBtn
-          btnType="bookmark"
-          coll={coll}
-          onActionChange={onActionChange}
-        />
+        <ActionBtn_like coll={coll} onLikeChange={onLikeChange} />
+        <ActionBtn_bm coll={coll} onBookmarkChange={onBookmarkChange} />
       </div>
       {/**로그인 상태이고, 자기의 컬렉션일 때만 보이는 부분 */}
       {isLoggedIn && userid === coll.authorid && (

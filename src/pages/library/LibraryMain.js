@@ -32,17 +32,17 @@ function LibraryMain() {
       console.log("받은 데이터");
       console.log(res.data);
       setRecColls(res.data);
-      return res.data;
     } catch (err) {
       console.error("요청중 실패");
-      return [];
     }
   };
 
   const fetchCollections4Anon = async () => {
     console.log("fetchCollections4Anon 수행중");
     try {
-      const res = await apiClient.get(`/api/library/discover/${selectedTag}`);
+      const res = await apiClient.get(
+        `/api/library/discover/guest/${selectedTag}`
+      );
       console.log("받은 데이터");
       console.log(res.data);
       setRecColls(res.data);
@@ -65,24 +65,16 @@ function LibraryMain() {
       });
       console.log("받은 데이터");
       console.log(res.data.content);
-      //누적: rec4Anon에도 적용할 것
-      setRecColls((prev) => [...prev, ...res.data.content]);
-      return res.data;
-    } catch (err) {
-      console.error("요청중 실패");
-      return [];
-    }
-  };
 
-  const recColls4Anon = async () => {
-    console.log("recColls4Anon 수행중");
-    try {
-      const res = await apiClient.get(`/api/library/recommend/guest`, {
-        params: { page },
-      });
-      console.log("받은 데이터");
-      console.log(res.data.content);
-      setRecColls(res.data.content);
+      if (res.data.content.length == 0) {
+        // <== 지금 부모 프로세스를 다시 수행하게 하도록
+        console.log("하나도 못받음");
+        alert("모든 컬렉션이 추천되었습니다. 처음부터 다시 추천됩니다");
+        setPage(0);
+        return;
+      }
+
+      setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
       console.error("요청중 실패");
@@ -115,6 +107,13 @@ function LibraryMain() {
     }
   }, [selectedTag, userid, isLoggedIn]);
 
+  useEffect(() => {
+    // page가 0일 때 recColls4LoginUser 호출
+    if (page === 0 && isLoggedIn && selectedTag == "추천") {
+      recColls4LoginUser(); // 재호출
+    }
+  }, [page]); // page가 변경될 때마다 호출
+
   // top tag들 가져오기
   useEffect(() => {
     const fetchTags = async () => {
@@ -132,56 +131,57 @@ function LibraryMain() {
     fetchTags();
   }, []);
 
-  // 좋아요/ 북마크 DB 변경 + 상태 변경 함수
-  const handleActionChange = async (collectionId, actionType) => {
+  const handleLikeChange = async (updatedColl) => {
     if (isLoggedIn) {
       // Spring에 DB 변경 요청
-      const isLiked =
-        actionType === "userlike"
-          ? !recColls.find((coll) => coll.collectionid === collectionId)
-              .userlike
-          : undefined;
-      const isBookmarked =
-        actionType === "userbookmark"
-          ? !recColls.find((coll) => coll.collectionid === collectionId)
-              .userbookmark
-          : undefined;
+      await secureApiRequest(
+        `/api/library/togglelike?userid=${userid}&collectionId=${updatedColl.collectionid}&isLiked=${updatedColl.userlike}`,
+        { method: "POST" }
+      );
 
-      if (actionType === "userlike") {
-        await secureApiRequest(
-          `/api/library/togglelike?userid=${userid}&collectionId=${collectionId}&isLiked=${isLiked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-      if (actionType === "userbookmark") {
-        await secureApiRequest(
-          `/api/library/togglebm?userid=${userid}&collectionId=${collectionId}&isBookmarked=${isBookmarked}`,
-          {
-            method: "POST",
-          }
-        );
-      }
-
+      // UI 상태 변경 (setSearchedColls)
       setRecColls((prevState) =>
         prevState.map((coll) => {
-          if (coll.collectionid !== collectionId) return coll;
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userlike = !updated.userlike;
+            updated.likeCount = updated.userlike
+              ? updated.likeCount + 1 // 좋아요가 true이면 카운트 증가
+              : updated.likeCount - 1; // 좋아요가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
+        })
+      );
+    } else {
+      alert("로그인 후 사용 가능합니다.");
+    }
+  };
 
-          const updated = {
-            ...coll,
-            [actionType]: !coll[actionType],
-            [actionType === "userlike" ? "likeCount" : "bookmarkCount"]:
-              coll[actionType] === true
-                ? coll[
-                    actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                  ] - 1
-                : coll[
-                    actionType === "userlike" ? "likeCount" : "bookmarkCount"
-                  ] + 1,
-          };
+  const handleBookmarkChange = async (updatedColl) => {
+    if (isLoggedIn) {
+      // Spring에 DB 변경 요청
+      await secureApiRequest(
+        `/api/library/togglebm?userid=${userid}&collectionId=${updatedColl.collectionid}&isBookmarked=${updatedColl.userbookmark}`,
+        { method: "POST" }
+      );
 
-          return updated;
+      // UI 상태 변경 (setSearchedColls)
+      setRecColls((prevState) =>
+        prevState.map((coll) => {
+          //변경 신청된 coll을 찾아 updated coll로 대체
+          if (coll.collectionid === updatedColl.collectionid) {
+            // 새로운 객체로 기존 coll을 복사
+            const updated = { ...coll };
+            updated.userbookmark = !updated.userbookmark; // 토글됨
+            updated.bookmarkCount = updated.userbookmark
+              ? updated.bookmarkCount + 1 // 토글 후 북마크가 true이면 카운트 증가
+              : updated.bookmarkCount - 1; // 토글 후 북마크가 false이면 카운트 감소
+            return updated;
+          }
+          return coll; // 조건에 맞지 않으면 그대로 반환
         })
       );
     } else {
@@ -206,10 +206,9 @@ function LibraryMain() {
       },
       //{ threshold: 1.0 } ***********안되면 쿰백 **************
       {
-        threshold: 1.0, // 컨테이너의 끝에 완전히 도달했을 때만 감지
+        threshold: 0.5, // 컨테이너의 끝에 완전히 도달했을 때만 감지
       }
     );
-
     observer.observe(loaderRef.current);
 
     return () => {
@@ -232,23 +231,18 @@ function LibraryMain() {
         onTagSelect={setSelectedTag}
         savedTags={topTags}
       />
-      <div
-        ref={scrollContainerRef}
-        style={{
-          height: "80vh",
-          overflowY: "auto",
-        }}
-      >
-        {(recColls && recColls.length === 0) || !recColls ? (
-          <p>컬렉션이 없습니다.</p> // recColls가 빈 배열일 경우 메시지 표시
-        ) : (
-          <CollGrid
-            colls={recColls}
-            onActionChange={handleActionChange}
-            onCollClick={handleCollClick}
-          />
-        )}
-      </div>
+
+      {(recColls && recColls.length === 0) || !recColls ? (
+        <p>컬렉션이 없습니다.</p> // recColls가 빈 배열일 경우 메시지 표시
+      ) : (
+        <CollGrid
+          colls={recColls}
+          onLikeChange={handleLikeChange}
+          onBookmarkChange={handleBookmarkChange}
+          onCollClick={handleCollClick}
+          ref={scrollContainerRef}
+        />
+      )}
       <div ref={loaderRef} style={{ height: "40px" }} />
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./SettingPanel.module.css";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
@@ -19,6 +19,14 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
   const [videoPrompt, setVideoPrompt] = useState("");
   const [videoLoading, setVideoLoading] = useState(false);
   const [videoError, setVideoError] = useState(null);
+
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (ttsGenerated) {
+      audioRef.current?.load();
+    }
+  }, [ttsUrl]);
 
   useEffect(() => {
     if (useLipSync) setTtsEnabled(true);
@@ -48,8 +56,9 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error((await res.text()) || "TTS 생성 실패");
-      const url = await res.text();
-      setTtsUrl(url);
+      const data = await res.json();
+      console.log("data: ", data);
+      setTtsUrl(`http://localhost:8000${data.audio_url}`);
       setTtsGenerated(true);
     } catch (e) {
       setTtsError(e.message);
@@ -214,23 +223,17 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
             </button>
             {/* 미리듣기 버튼 */}
             {ttsGenerated && (
-              <button
-                className={styles.secondaryBtn}
-                onClick={handleGenerateTts}
-                disabled={ttsLoading || !ttsScript}
-              >
-                {ttsLoading ? "미리듣기 중..." : "미리듣기"}
-              </button>
+              <div className={styles.field}>
+                <audio ref={audioRef} src={ttsUrl} controls />
+                <button
+                  className={styles.generateBtn}
+                  onClick={() => audioRef.current?.play()}
+                >
+                  미리듣기
+                </button>
+              </div>
             )}
           </div>
-
-          {/* 오디오 플레이어 */}
-          {ttsUrl && (
-            <div className={styles.field}>
-              <audio controls src={ttsUrl} />
-              {ttsError && <p className={styles.errorText}>{ttsError}</p>}
-            </div>
-          )}
         </>
       )}
 
@@ -238,27 +241,41 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
       {(ttsGenerated || !ttsEnabled) && (
         <>
           <hr />
-          <div className={styles.field}>
-            <label>영상 프롬프트</label>
-            <input
-              type="text"
-              className={styles.input}
-              placeholder="예: 따뜻한 카페 안에서의 장면"
-              value={videoPrompt}
-              onChange={(e) => setVideoPrompt(e.target.value)}
-            />
-          </div>
+          {useLipSync ? (
+            <div className={styles.footer}>
+              <button
+                className={styles.generateBtn}
+                onClick={handleGenerateVideo}
+                disabled={videoLoading}
+              >
+                {videoLoading ? "영상 생성중..." : "영상 생성"}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className={styles.field}>
+                <label>영상 프롬프트</label>
+                <input
+                  type="text"
+                  className={styles.input}
+                  placeholder="예: 따뜻한 카페 안에서의 장면"
+                  value={videoPrompt}
+                  onChange={(e) => setVideoPrompt(e.target.value)}
+                />
+              </div>
 
-          {videoError && <p className={styles.errorText}>{videoError}</p>}
-          <div className={styles.footer}>
-            <button
-              className={styles.generateBtn}
-              onClick={handleGenerateVideo}
-              disabled={videoLoading || !videoPrompt}
-            >
-              {videoLoading ? "영상 생성중..." : "영상 생성"}
-            </button>
-          </div>
+              {videoError && <p className={styles.errorText}>{videoError}</p>}
+              <div className={styles.footer}>
+                <button
+                  className={styles.generateBtn}
+                  onClick={handleGenerateVideo}
+                  disabled={videoLoading || !videoPrompt}
+                >
+                  {videoLoading ? "영상 생성중..." : "영상 생성"}
+                </button>
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
