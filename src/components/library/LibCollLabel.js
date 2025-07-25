@@ -17,7 +17,7 @@ function LibCollLabel({ coll, onBookmarkChange, onLikeChange }) {
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.label}>
+      <div className={styles.labelOverlay}>
         <AvatarWName
           type="inCollLabel"
           user={{

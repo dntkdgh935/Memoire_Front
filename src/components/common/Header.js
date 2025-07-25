@@ -75,11 +75,17 @@ function Header() {
         console.error("팔로우 요청 승인 실패", error);
       });
   };
+  const MAX_SEARCH_LENGTH = 20;
 
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
     console.log(`검색 실행: 타입=${searchType}, 키워드=${searchKeyword}`);
     // TODO: 검색 키워드 관련 조건 있으면 추가
+
+    if (searchKeyword.length > MAX_SEARCH_LENGTH) {
+      alert(`검색어는 ${MAX_SEARCH_LENGTH}자 이내로 입력해주세요.`);
+      return;
+    }
 
     // 검색 처리 로직 여기에 추가
     if (!isLoggedIn) {
