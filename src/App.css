@@ -59,8 +59,10 @@ body:not(.theme-video) .page-content {
 
 /* 레이아웃 */
 body.theme-video .app-container {
-  display: flex;
-  height: 100vh;
+  display: flex !important;
+  flex-direction: row !important;
+  height: auto !important;
+  min-height: 100vh;
 }
 body.theme-video .sidebar {
   width: 60px;
@@ -70,11 +72,14 @@ body.theme-video .sidebar {
   flex-direction: column;
   align-items: center;
   padding-top: 10px;
+  flex-shrink: 0;
 }
 body.theme-video .main-area {
-  flex: 1;
+  flex: 1 !important;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
 }
 body.theme-video .header {
   height: 50px;
@@ -88,8 +93,8 @@ body.theme-video .header {
 body.theme-video .page-content {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
-  background-color: rgba(255, 255, 255, 0.2);
+  overflow-y: visible !important;
+  background-color: rgba(255,255,255,0.2);
 }
 
 /* 배경 비디오 */

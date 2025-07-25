@@ -19,6 +19,7 @@
   height: 500px;         /* 필요에 따라 높이 조정 */
   margin-bottom: 40px;
   overflow: hidden;
+  border: 1px solid #e5ded7;
   border-radius: 12px;    /* 모서리 라운드 (선택) */
 }
 
