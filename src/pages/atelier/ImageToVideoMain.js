@@ -91,12 +91,11 @@ export default function ImageToVideoMain() {
           <SettingPanel
             selectedMemory={selectedMemory}
             onGenerate={(dto) => {
-              console.log("imagetoimagemain got dto", dto);
-              const video = `http://localhost:8080/upload_files/memory_video/${dto.filename}`;
+              console.log("imageToVideomain got dto", dto);
               setResult({
                 status: "success",
                 resultDto: dto,
-                videoUrl: video,
+                videoUrl: dto.videoUrl,
               });
             }}
           />

@@ -4,6 +4,7 @@ import styles from "./SettingPanel.module.css";
 export default function SettingPanel({ selectedMemory, onGenerate }) {
   //립싱크 모델 사용 여부 설정
   const [useLipSync, setUseLipSync] = useState(false);
+  const [voiceGender, setVoiceGender] = useState("female");
 
   // TTS 설정
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -36,7 +37,11 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
     setTtsError(null);
 
     try {
-      const payload = { script: ttsScript, speech: ttsSpeech };
+      const payload = {
+        script: ttsScript,
+        speech: ttsSpeech,
+        gender: voiceGender,
+      };
       const res = await fetch("/atelier/video/generate-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -146,6 +151,30 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
 
       {ttsEnabled && (
         <>
+          {/* 1) 음성 선택 UI */}
+          <div className={styles.voiceSelection}>
+            <label>
+              <input
+                type="radio"
+                name="voiceGender"
+                value="female"
+                checked={voiceGender === "female"}
+                onChange={() => setVoiceGender("female")}
+              />
+              여성 목소리
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="voiceGender"
+                value="male"
+                checked={voiceGender === "male"}
+                onChange={() => setVoiceGender("male")}
+              />
+              남성 목소리
+            </label>
+          </div>
+
           {/* 스크립트 */}
           <div className={styles.field}>
             <label>TTS 스크립트</label>
