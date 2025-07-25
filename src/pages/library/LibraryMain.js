@@ -111,18 +111,7 @@ function LibraryMain() {
 
     //비로그인시
     else {
-      switch (selectedTag) {
-        case "추천":
-          recColls4Anon();
-          break;
-        case "팔로잉":
-          alert("로그인 후 사용 가능합니다.");
-          setSelectedTag("전체");
-          break;
-        default: //"기타 태그"
-          fetchCollections4Anon();
-          break;
-      }
+      fetchCollections4Anon();
     }
   }, [selectedTag, userid, isLoggedIn]);
 
@@ -130,7 +119,7 @@ function LibraryMain() {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const res = await axios.get(
+        const res = await apiClient.get(
           "http://localhost:8080/api/library/top5tags"
         );
         console.log("📦 tags:", res.data);
@@ -215,7 +204,10 @@ function LibraryMain() {
           setPage((prev) => prev + 1);
         }
       },
-      { threshold: 1.0 }
+      //{ threshold: 1.0 } ***********안되면 쿰백 **************
+      {
+        threshold: 1.0, // 컨테이너의 끝에 완전히 도달했을 때만 감지
+      }
     );
 
     observer.observe(loaderRef.current);
@@ -247,11 +239,15 @@ function LibraryMain() {
           overflowY: "auto",
         }}
       >
-        <CollGrid
-          colls={recColls}
-          onActionChange={handleActionChange}
-          onCollClick={handleCollClick}
-        />
+        {(recColls && recColls.length === 0) || !recColls ? (
+          <p>컬렉션이 없습니다.</p> // recColls가 빈 배열일 경우 메시지 표시
+        ) : (
+          <CollGrid
+            colls={recColls}
+            onActionChange={handleActionChange}
+            onCollClick={handleCollClick}
+          />
+        )}
       </div>
       <div ref={loaderRef} style={{ height: "40px" }} />
     </>

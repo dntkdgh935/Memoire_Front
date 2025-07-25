@@ -42,13 +42,19 @@ function SearchUserResult() {
           return; // 기본값을 처리하지 않음
       }
 
-      await apiClient.post(`api/library/toggleFollow`, null, {
-        params: {
-          userid: userid,
-          targetid: targetid,
-          nextRel: nextStatus,
-        },
-      });
+      // await apiClient.post(`api/library/toggleFollow`, null, {
+      //   params: {
+      //     userid: userid,
+      //     targetid: targetid,
+      //     nextRel: nextStatus,
+      //   },
+      // });
+      await secureApiRequest(
+        `/api/library/toggleFollow?userid=${userid}&targetid=${targetid}&nextRel=${nextStatus}`,
+        {
+          method: "POST",
+        }
+      );
       // ⭐️ searchedUsers 배열에서 해당 유저의 relStatus 값만 바꿔줌
       setSearchedUsers((prevUsers) =>
         prevUsers.map((user) =>
