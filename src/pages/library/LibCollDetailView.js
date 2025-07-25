@@ -13,6 +13,14 @@ import Modal from "../../components/common/Modal";
 import default_profile from "../../assets/images/default_profile.jpg";
 
 function LibCollDetailView() {
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+  });
+
   const { id } = useParams(); // URL 파라미터로 컬렉션 ID를 받음
   const navigate = useNavigate();
 

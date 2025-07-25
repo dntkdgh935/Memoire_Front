@@ -28,7 +28,7 @@ function Header() {
   };
 
   useEffect(() => {
-    if (userid) {
+    if (isLoggedIn && userid) {
       // 팔로우 요청 목록 가져오기
       apiClient
         .get(`/api/library/followreqs?userid=${userid}`)
@@ -135,7 +135,7 @@ function Header() {
   return (
     <header className={styles.header}>
       {/* 왼쪽: 로고  */}
-      <div className={styles.leftSection}>
+      <div className={styles.leftSection} onClick={() => navigate("/")}>
         <FaThLarge className={styles.logoIcon} />
         <span className={styles.logoText}>MÉMOIRE</span>
       </div>
@@ -198,12 +198,15 @@ function Header() {
           onClick={handleUserIconClick}
         />
         {/* 팔로우 요청 배지 */}
-        <div className={styles.bellWrapper} onClick={handleBellClick}>
-          <FaBell className={styles.iconButton} />
-          {hasNotifications && (
-            <div className={styles.notificationBadge}>!</div>
-          )}
-        </div>
+        {isLoggedIn && (
+          <div className={styles.bellWrapper} onClick={handleBellClick}>
+            <FaBell className={styles.iconButton} />
+            {hasNotifications && (
+              <div className={styles.notificationBadge}>!</div>
+            )}
+          </div>
+        )}
+
         {/* 알림 드롭다운 */}
         {showNotifications && (
           <NotificationDropdown
