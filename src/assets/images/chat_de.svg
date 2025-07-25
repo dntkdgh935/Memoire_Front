@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <filter id="tint">
+      <!-- 목표 색상으로 배경 채우기 -->
+      <feFlood flood-color="#5C4B3B" result="color"></feFlood>
+      <!-- 원본 알파(투명도)만 남기기 -->
+      <feComposite in="color" in2="SourceAlpha" operator="in" result="tinted"></feComposite>
+      <!-- 원본 컬러(형태) 위에 덮어쓰기 -->
+      <feComposite in="tinted" in2="SourceGraphic" operator="over"></feComposite>
+    </filter>
+  </defs>
+
+  <!-- 원본 이미지에 필터 적용 -->
+  <image href="icons8-잡담-64.png" width="64" height="64" filter="url(#tint)"></image>
+</svg>

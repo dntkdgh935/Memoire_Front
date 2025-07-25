@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../../ThemeContext";
 import styles from "./Sidebar.module.css";
 
-// 기존 아이콘들…
+// 아이콘 이미지 import
 import libAct     from "../../assets/images/lib_act.svg";
 import libDe      from "../../assets/images/lib_de.svg";
 import archiveAct from "../../assets/images/archive_act.svg";
@@ -13,14 +13,18 @@ import archiveDe  from "../../assets/images/archive_de.svg";
 import atelierAct from "../../assets/images/atelier_act.svg";
 import atelierDe  from "../../assets/images/atelier_de.svg";
 import chatAct    from "../../assets/images/chat_dark.png";
-import chatDe from "../../assets/images/chat_de.png";
+import chatDe     from "../../assets/images/chat_de.png";
 
-// 비디오 모드용 다크 아이콘
+// 다크 모드용 아이콘
 import libDark      from "../../assets/images/lib_dark.svg";
 import archiveDark  from "../../assets/images/archive_dark.svg";
 import atelierDark  from "../../assets/images/atelier_dark.png";
 import chatDark     from "../../assets/images/chat_dark.png";
-import tarotDark from "../../assets/images/tarot_dark.png"; // 타로는 다크 아이콘만
+import tarotDark    from "../../assets/images/tarot_dark.png";
+
+// 추가된 타로 일반 모드 아이콘
+import tarotAct     from "../../assets/images/tarot_act.png";
+import tarotDe      from "../../assets/images/tarot_de.png";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -72,15 +76,13 @@ function Sidebar() {
         />
       </div>
 
-      {/* AI 타로 (비디오 모드에서만 표시) */}
-      {useVideo && (
-        <div
-          className={`${styles.menuWrapper} ${isActive("/tarot") ? styles.active : ""}`}
-          onClick={() => navigate("/tarot")}
-        >
-          <img src={tarotDark} alt="Tarot" />
-        </div>
-      )}
+      {/* AI 타로 */}
+      <div
+        className={`${styles.menuWrapper} ${isActive("/tarot") ? styles.active : ""}`}
+        onClick={() => navigate("/tarot")}
+      >
+        <img src={chooseIcon("/tarot", tarotAct, tarotDe, tarotDark)} alt="Tarot" />
+      </div>
     </div>
   );
 }

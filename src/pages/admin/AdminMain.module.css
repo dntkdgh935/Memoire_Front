@@ -11,6 +11,11 @@
 }
 
 .container {
+  /* 2열 그리드로 전체 카드 6개 배치 */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
@@ -18,61 +23,52 @@
   background: var(--bg-light);
 }
 
-/* 상단 통계 박스 그리드 */
-.topStatsRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-/* 통계 카드 */
-.statBox {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 8px var(--shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.statBox:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px var(--shadow);
-}
-.clickableBox {
-  cursor: pointer;
-}
-
-/* 통계 제목 */
-.statTitle {
-  font-size: 1.5rem;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-}
-
-/* 설명 텍스트 */
-.statText {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-/* 하단 차트 + 리스트 그리드 */
+/* 래퍼 요소를 풀어서 container 그리드의 직접 자식으로 취급 */
+.topStatsRow,
 .bottomChartsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+  display: contents;
 }
 
-/* 차트/리스트 박스 */
+/* 모든 카드 요소 공통 */
+.statBox,
 .chartBox {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 4px 8px var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  position: relative;
 }
 
-/* 차트 & 리스트 제목 */
+/* 클릭 가능한 카드만 포인터 커서 */
+.clickableBox {
+  cursor: pointer;
+}
+
+/* 호버한 카드만 강조, 나머지 반투명 */
+.container:hover > *:not(:hover) {
+  opacity: 0.4;
+}
+.container > *:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 16px var(--shadow);
+  opacity: 1;
+  z-index: 1;
+}
+
+/* 통계 제목/텍스트 */
+.statTitle {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+.statText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* 차트/리스트 제목 */
 .chartTitle {
   font-size: 1.25rem;
   color: var(--text-primary);
@@ -81,10 +77,9 @@
   padding-bottom: 0.5rem;
 }
 
-/* 반응형 보조 */
+/* 반응형: 600px 미만에서 1열 */
 @media (max-width: 600px) {
-  .topStatsRow,
-  .bottomChartsGrid {
+  .container {
     grid-template-columns: 1fr;
   }
 }

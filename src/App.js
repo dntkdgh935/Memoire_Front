@@ -1,4 +1,4 @@
-// src/App.js
+// App.js
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -9,31 +9,32 @@ import { AuthProvider } from "./AuthProvider";
 import { ThemeProvider, useTheme } from "./ThemeContext";
 
 import "./App.css";
-
-// color system import
 import "./assets/styles/variables-light.css";
 import "./assets/styles/variables-dark.css";
 
-// 전체 배경 비디오 import (MP4)
-import backgroundLibVideoMp4 from "./assets/videos/library_loop.mp4";
+import backgroundImage from "./assets/images/library_4k_background2.png"; // 4K 이미지 경로 (직접 넣어둔 이미지로 변경)
 
 function InnerApp() {
-  const { useVideo } = useTheme();
+  const { useVideo } = useTheme(); // 기존 테마 상태 유지 (true일 경우 배경 출력)
 
   return (
     <>
-      {/* 비디오 테마일 때만 렌더 */}
       {useVideo && (
-        <video
+        <div
           className="backgroundVideo"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        >
-          <source src={backgroundLibVideoMp4} type="video/mp4" />
-        </video>
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: -1,
+          }}
+        />
       )}
 
       <div className="app-container">
