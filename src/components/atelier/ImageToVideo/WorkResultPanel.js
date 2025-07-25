@@ -18,9 +18,10 @@ function WorkResultPanel({
 
   useEffect(() => {
     if (result?.videoUrl) {
-      setVideoUrl(`http://localhost:8080/upload_files/${result.videoUrl}`);
+      const Url = `http://localhost:8080/upload_files${result.videoUrl}`;
+      console.log("videoUrl: ", videoUrl);
+      setVideoUrl(Url);
       setError(null);
-      console.log("rawVideoUrl :", videoUrl);
     }
   }, [result?.videoUrl]);
 
