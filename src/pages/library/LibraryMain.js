@@ -32,10 +32,8 @@ function LibraryMain() {
       console.log("받은 데이터");
       console.log(res.data);
       setRecColls(res.data);
-      return res.data;
     } catch (err) {
       console.error("요청중 실패");
-      return [];
     }
   };
 
@@ -65,24 +63,16 @@ function LibraryMain() {
       });
       console.log("받은 데이터");
       console.log(res.data.content);
-      //누적: rec4Anon에도 적용할 것
-      setRecColls((prev) => [...prev, ...res.data.content]);
-      return res.data;
-    } catch (err) {
-      console.error("요청중 실패");
-      return [];
-    }
-  };
 
-  const recColls4Anon = async () => {
-    console.log("recColls4Anon 수행중");
-    try {
-      const res = await apiClient.get(`/api/library/recommend/guest`, {
-        params: { page },
-      });
-      console.log("받은 데이터");
-      console.log(res.data.content);
-      setRecColls(res.data.content);
+      if (res.data.content.length == 0) {
+        // <== 지금 부모 프로세스를 다시 수행하게 하도록
+        console.log("하나도 못받음");
+        alert("모든 컬렉션이 추천되었습니다. 처음부터 다시 추천됩니다");
+        setPage(0);
+        return;
+      }
+
+      setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
       console.error("요청중 실패");
@@ -114,6 +104,13 @@ function LibraryMain() {
       fetchCollections4Anon();
     }
   }, [selectedTag, userid, isLoggedIn]);
+
+  useEffect(() => {
+    // page가 0일 때 recColls4LoginUser 호출
+    if (page === 0) {
+      recColls4LoginUser(); // 1페이지로 리셋한 후, 재호출
+    }
+  }, [page]); // page가 변경될 때마다 호출
 
   // top tag들 가져오기
   useEffect(() => {
