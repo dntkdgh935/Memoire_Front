@@ -12,7 +12,7 @@ import PageHeader from "../../components/common/PageHeader";
 function LibraryMain() {
   const navigate = useNavigate();
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
-  const [selectedTag, setSelectedTag] = useState("전체");
+  const [selectedTag, setSelectedTag] = useState("");
   const [topTags, setTopTags] = useState([]);
   const [recColls, setRecColls] = useState([]);
   const loaderRef = useRef(null);
@@ -69,6 +69,7 @@ function LibraryMain() {
   // 비로그인 유저 - page에 대해 요청/ 못받을 경우, 0으로 페이지 변경, 받을 때까지 loading정보 가짐
   const fetchCollections4Anon = async () => {
     if (isLoading) return;
+    if (selectedTag === "") return;
     setIsLoading(true); // 🚩 요청 시작
     console.log("fetchCollections4Anon 수행중, page: " + page);
     try {
