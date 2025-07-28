@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TarotDrawManual from "./TarotDrawManual";
 import TarotDrawResult from "./TarotDrawResult";
+import PageHeader from "../../components/common/PageHeader"; // ✅ 추가
 import styles from "./TarotPage.module.css";
 
 export default function TarotPage() {
@@ -24,6 +25,7 @@ export default function TarotPage() {
 
   return (
     <div className={styles.container}>
+      <PageHeader pagename="타로 리딩" /> {/* ✅ 추가 */}
       <h1 className={styles.header}>AI 타로 리딩</h1>
 
       <div className={styles.controls}>
