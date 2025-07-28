@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import styles from "./SettingPanel.module.css";
+import { AuthContext } from "../../../AuthProvider";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
   //립싱크 모델 사용 여부 설정
   const [useLipSync, setUseLipSync] = useState(false);
   const [voiceGender, setVoiceGender] = useState("female");
+  const { secureApiRequest } = useContext(AuthContext);
 
   // TTS 설정
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -23,6 +25,19 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
   const audioRef = useRef(null);
 
   useEffect(() => {
+    setUseLipSync(false);
+    setTtsEnabled(false);
+    setVoiceGender("female");
+    setTtsScript("");
+    setTtsSpeech("");
+    setTtsUrl("");
+    setTtsGenerated(false);
+    setTtsError(null);
+    setVideoPrompt("");
+    setVideoError(null);
+  }, [selectedMemory]);
+
+  useEffect(() => {
     if (ttsGenerated) {
       audioRef.current?.load();
     }
@@ -36,10 +51,6 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
     return <p className={styles.placeholder}>왼쪽에서 메모리를 선택해주세요</p>;
   }
 
-  const handleTtsToggle = (val) => {
-    if (!useLipSync) setTtsEnabled(val);
-  };
-
   const handleGenerateTts = async () => {
     setTtsLoading(true);
     setTtsError(null);
@@ -50,18 +61,31 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         speech: ttsSpeech,
         gender: voiceGender,
       };
-      const res = await fetch("/atelier/video/generate-tts", {
+      console.log("payload: ", payload);
+
+      const res = await secureApiRequest("/atelier/video/generate-tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error((await res.text()) || "TTS 생성 실패");
-      const data = await res.json();
-      console.log("data: ", data);
+
+      if (res.status === 413) {
+        alert("⚠️ 생성된 결과가 너무 커서 저장할 수 없습니다.");
+        return;
+      }
+
+      if (res.status !== 200) {
+        const errorText = res.data?.message || "TTS 생성 실패";
+        throw new Error(errorText);
+      }
+
+      const data = res.data;
+      console.log("TTS 생성 결과:", data);
       setTtsUrl(`http://localhost:8000${data.audio_url}`);
       setTtsGenerated(true);
     } catch (e) {
-      setTtsError(e.message);
+      console.error("TTS 생성 오류:", e);
+      setTtsError(e.message || "TTS 생성 중 알 수 없는 오류");
     } finally {
       setTtsLoading(false);
     }
@@ -70,6 +94,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
   const handleGenerateVideo = async () => {
     setVideoLoading(true);
     setVideoError(null);
+
     console.log("selectedMemory : ", selectedMemory);
     const imageUrl = `http://localhost:8080/upload_files/memory_img/${selectedMemory.filename}`;
 
@@ -80,18 +105,30 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         ttsUrl: ttsEnabled ? ttsUrl : undefined,
         lipSyncEnabled: useLipSync,
       };
+
       console.log("payload ▶", payload);
 
-      const resp = await fetch("/atelier/video/generate-video", {
+      const res = await secureApiRequest("/atelier/video/generate-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!resp.ok) throw new Error((await resp.text()) || "영상 생성 실패");
-      const dto = await resp.json();
+
+      if (res.status === 413) {
+        alert("⚠️ 생성된 결과가 너무 커서 저장할 수 없습니다.");
+        return;
+      }
+
+      if (res.status !== 200) {
+        const errorText = res.data?.message || "영상 생성 실패";
+        throw new Error(errorText);
+      }
+
+      const dto = res.data;
       onGenerate(dto);
     } catch (err) {
-      setVideoError(err.message);
+      console.error("영상 생성 오류:", err);
+      setVideoError(err.message || "영상 생성 중 알 수 없는 오류");
     } finally {
       setVideoLoading(false);
     }
@@ -144,14 +181,14 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         <div className={styles.optionButtons}>
           <button
             className={!ttsEnabled ? styles.optionActive : styles.option}
-            onClick={() => handleTtsToggle(false)}
+            onClick={() => setTtsEnabled(false)}
             disabled={useLipSync}
           >
             TTS 사용 안 함
           </button>
           <button
             className={ttsEnabled ? styles.optionActive : styles.option}
-            onClick={() => handleTtsToggle(true)}
+            onClick={() => setTtsEnabled(true)}
           >
             TTS 사용
           </button>
