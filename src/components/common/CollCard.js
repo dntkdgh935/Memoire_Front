@@ -42,7 +42,11 @@ function CollCard({ collection, onLikeChange, onBookmarkChange, onCollClick }) {
         // <span>메모리 없음</span>
       )}
       <div className={styles.darkOverlay}></div>
-      <div className={styles.labelOverlay} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={styles.labelOverlay}
+        onClick={(e) => e.stopPropagation()}
+        style={{ backgroundColor: collection.color + "26" }}
+      >
         <LibCollLabel
           coll={collection}
           onLikeChange={onLikeChange}
