@@ -89,7 +89,7 @@ function Header() {
 
     // 검색 처리 로직 여기에 추가
     if (!isLoggedIn) {
-      alert("로그이 후 검색 가능합니다.");
+      alert("로그인 후 검색 가능합니다.");
     } else {
       try {
         if (searchType == "collection") {

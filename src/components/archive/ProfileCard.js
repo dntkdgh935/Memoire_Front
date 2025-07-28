@@ -3,9 +3,12 @@ import { AuthContext } from "../../AuthProvider";
 import default_profile from "../../assets/images/default_profile.jpg";
 import styles from "./ProfileCard.module.css";
 
+import { useNavigate } from "react-router-dom";
 function ProfileCard() {
-  const { userid, secureApiRequest, profileImagePath, nickname, loginId } =
+  const { userid, secureApiRequest, profileImagePath, nickname } =
     useContext(AuthContext);
+
+  const navigate = useNavigate();
 
   const [user, setUser] = useState({
     loginId: "",
@@ -97,7 +100,7 @@ function ProfileCard() {
   }, [userid, secureApiRequest]);
 
   const handleEditProfile = () => {
-    alert("프로필 수정 기능이 실행됩니다!");
+    navigate("/user/myinfo");
   };
 
   const handleStatusClick = () => {

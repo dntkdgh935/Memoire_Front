@@ -72,6 +72,11 @@
   cursor: pointer;
 }
 
+.adminSpan {
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
 .messagebtn {
   margin-left: auto;
   background-color: #e1e1e1;
