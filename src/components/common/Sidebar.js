@@ -10,8 +10,8 @@ import libAct     from "../../assets/images/lib_act.svg";
 import libDe      from "../../assets/images/lib_de.svg";
 import archiveAct from "../../assets/images/archive_act.svg";
 import archiveDe  from "../../assets/images/archive_de.svg";
-import atelierAct from "../../assets/images/atelier_act.svg";
-import atelierDe  from "../../assets/images/atelier_de.svg";
+import atelierAct from "../../assets/images/atelier_dark.png";
+import atelierDe  from "../../assets/images/atelier_de.png";
 import chatAct    from "../../assets/images/chat_dark.png";
 import chatDe     from "../../assets/images/chat_de.png";
 
@@ -23,7 +23,7 @@ import chatDark     from "../../assets/images/chat_dark.png";
 import tarotDark    from "../../assets/images/tarot_dark.png";
 
 // 추가된 타로 일반 모드 아이콘
-import tarotAct     from "../../assets/images/tarot_act.png";
+import tarotAct     from "../../assets/images/tarot_dark.png";
 import tarotDe      from "../../assets/images/tarot_de.png";
 
 function Sidebar() {

@@ -24,6 +24,14 @@
   color: #5e4b3c;
 }
 
+.logoImage {
+  width: 28px;
+  height: 28px;
+  margin-right: 0px;
+  margin-bottom: 5px;
+  object-fit: contain;
+}
+
 .logoText {
   font-size: 22px;
   font-weight: bold;
