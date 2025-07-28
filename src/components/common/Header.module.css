@@ -15,6 +15,7 @@
   align-items: center;
   font-weight: 600;
   font-size: 20px;
+  cursor: pointer;
 }
 
 .logoIcon {
@@ -50,7 +51,6 @@
   max-width: 500px;
   box-sizing: border-box;
   justify-content: space-between;
-  
 }
 
 /* 내부 요소 공통 */
@@ -59,7 +59,7 @@
 .searchBox button {
   height: 100%;
   border: none;
-  background: transparent;    /* 투명 배경 */
+  background: transparent; /* 투명 배경 */
   padding: 0 8px;
   box-sizing: border-box;
   display: flex;
@@ -111,7 +111,7 @@
 
 /* 아이콘 컬러도 명시 */
 .searchBox .searchButton svg {
-  color: #5e4b3c;  /* 기존 검색창 텍스트 컬러와 동일 */
+  color: #5e4b3c; /* 기존 검색창 텍스트 컬러와 동일 */
 }
 
 /* 포커스 아웃라인 제거 */
