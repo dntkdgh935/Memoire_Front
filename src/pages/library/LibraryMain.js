@@ -143,20 +143,20 @@ function LibraryMain() {
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
-  }, [selectedTag]);
+  }, [selectedTag, recColls]);
 
-  //TODO: fetch후에도 추가 요청 가능한 경우 진행하도록 코드 추가 (현재 0->2로 가는 문제)
-  useEffect(() => {
-    if (!isLoading && loaderRef.current) {
-      const rect = loaderRef.current.getBoundingClientRect();
-      const isVisible = rect.top < window.innerHeight;
+  // //TODO: fetch후에도 추가 요청 가능한 경우 진행하도록 코드 추가 (현재 0->2로 가는 문제)
+  // useEffect(() => {
+  //   if (!isLoading && loaderRef.current) {
+  //     const rect = loaderRef.current.getBoundingClientRect();
+  //     const isVisible = rect.top < window.innerHeight;
 
-      if (isVisible) {
-        console.log("🔥 fetch 후에도 loader가 보이므로 page 추가 요청");
-        setPage((prev) => prev + 1);
-      }
-    }
-  }, [recColls]);
+  //     if (isVisible) {
+  //       console.log("🔥 fetch 후에도 loader가 보이므로 page 추가 요청");
+  //       setPage((prev) => prev + 1);
+  //     }
+  //   }
+  // }, [recColls]);
 
   const handleLikeChange = async (updatedColl) => {
     if (isLoggedIn) {
