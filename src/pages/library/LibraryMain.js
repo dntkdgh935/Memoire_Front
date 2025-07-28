@@ -51,7 +51,7 @@ function LibraryMain() {
       if (res.data.content.length == 0) {
         // <== 지금 부모 프로세스를 다시 수행하게 하도록
         console.log("하나도 못받음");
-        alert("모든 컬렉션이 추천되었습니다. 처음부터 다시 추천됩니다");
+
         setPage(0);
         setIsRep(true);
         return;
@@ -81,7 +81,7 @@ function LibraryMain() {
       if (res.data.content.length == 0) {
         // <== 지금 부모 프로세스를 다시 수행하게 하도록
         console.log("하나도 못받음");
-        alert("모든 컬렉션이 추천되었습니다. 처음부터 다시 추천됩니다");
+
         setPage(0);
         return;
       }
@@ -94,43 +94,59 @@ function LibraryMain() {
     }
   };
 
-  // 1. 탭 클릭 지정 완료시, coll및 page 0으로 초기화하고 첫 추천
+  // 1. 탭 클릭 지정 완료시, coll및 page 0으로 초기화
+  // 하고 첫 추천(X)
   useEffect(() => {
     //로그인시
     setIsRep(false);
-    if (isLoggedIn) {
-      setRecColls([]); // 💥 추천 결과 초기화
-      setPage(0); // 💥 페이지 초기화
+    setRecColls([]); // 💥 추천 결과 초기화
+    setPage(0); // 💥 페이지 초기화
+    // if (isLoggedIn) {
+    //   setRecColls([]); // 💥 추천 결과 초기화
+    //   setPage(0); // 💥 페이지 초기화
 
-      switch (selectedTag) {
-        case "추천":
-          recColls4LoginUser();
-          console.log(recColls);
-          break;
-        default: //팔로잉, 기타 태그 처리
-          console.log("선택 탭에 따라 처리:" + selectedTag);
-          fetchCollections4LoginUser();
-          break;
-      }
-    }
-    //비로그인시
-    else {
-      setRecColls([]); // 💥 추천 결과 초기화
-      setPage(0); // 💥 페이지 초기화
-      fetchCollections4Anon();
-    }
+    //   switch (selectedTag) {
+    //     case "추천":
+    //       recColls4LoginUser();
+    //       console.log(recColls);
+    //       break;
+    //     default: //팔로잉, 기타 태그 처리
+    //       console.log("선택 탭에 따라 처리:" + selectedTag);
+    //       fetchCollections4LoginUser();
+    //       break;
+    //   }
+    // }
+    // //비로그인시
+    // else {
+    //   setRecColls([]); // 💥 추천 결과 초기화
+    //   setPage(0); // 💥 페이지 초기화
+    // }
   }, [selectedTag, userid, isLoggedIn]);
 
-  //page ==0로 다시 변한 경우(무한추천용) 호출
+  //페이지 변화 => 다음 페이지 요청 (-1~0도)
   useEffect(() => {
-    if (!isRep) return; // 첫 호출은 이미 되었을 것이므로 다시 추천 x
-
-    if (page === 0 && isLoggedIn && selectedTag == "추천") {
+    //로그인+추천
+    if (selectedTag === "추천" && isLoggedIn) {
+      //&& page !== 0) {
       recColls4LoginUser();
-    } else if (page === 0 && !isLoggedIn) {
+    }
+    //로그인 + 기타
+    //비로그인
+    else if (!isLoggedIn) {
       fetchCollections4Anon();
     }
-  }, [page, isRep]);
+  }, [page]);
+
+  // //page ==0로 다시 변한 경우(무한추천용) 호출
+  // useEffect(() => {
+  //   if (!isRep) return; // 첫 호출은 이미 되었을 것이므로 다시 추천 x
+
+  //   if (page === 0 && isLoggedIn && selectedTag == "추천") {
+  //     recColls4LoginUser();
+  //   } else if (page === 0 && !isLoggedIn) {
+  //     fetchCollections4Anon();
+  //   }
+  // }, [page, isRep]);
 
   // top tag들 가져오기
   useEffect(() => {
@@ -211,7 +227,7 @@ function LibraryMain() {
     navigate(`detail/${collectionId}`);
   };
 
-  //페이지 하단 감지해 페이지 증가(setPage)
+  //페이지 하단 감지 => 감지해 페이지 증가(setPage)
   useEffect(() => {
     // if (!loaderRef.current || selectedTag !== "추천") return;
     if (!loaderRef.current) return;
@@ -234,19 +250,6 @@ function LibraryMain() {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
   }, [selectedTag]);
-
-  //페이지 증가시 더 불러오기
-  useEffect(() => {
-    //로그인+추천
-    if (selectedTag === "추천" && isLoggedIn && page !== 0) {
-      recColls4LoginUser();
-    }
-    //로그인 + 기타
-    //비로그인
-    else if (!isLoggedIn && page !== 0) {
-      fetchCollections4Anon();
-    }
-  }, [page]);
 
   //TODO: 페이지별로 PageHeader 넣기
   return (
