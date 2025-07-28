@@ -12,13 +12,18 @@ import PageHeader from "../../components/common/PageHeader";
 function LibraryMain() {
   const navigate = useNavigate();
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
-  const [selectedTag, setSelectedTag] = useState("추천");
+  const [selectedTag, setSelectedTag] = useState(null);
   const [topTags, setTopTags] = useState([]);
   const [recColls, setRecColls] = useState([]);
   const loaderRef = useRef(null);
   const scrollContainerRef = useRef(null); // CollGrid 내부 스크롤 영역
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
+  useEffect(() => {
+    if (selectedTag === null) {
+      setSelectedTag("추천"); // 최초 진입 시만 실행
+    }
+  }, []);
 
   const recColls4LoginUser = async () => {
     if (isLoading) return;
@@ -78,6 +83,13 @@ function LibraryMain() {
 
   //1. 탭 변경시 setPage(-1)
   useEffect(() => {
+    // // ********************************
+    // if (isFirstRender.current && selectedTag === "추천") {
+    //   isFirstRender.current = false;
+    //   return; // ❌ 초기 렌더링 시 불필요한 초기화 막기
+    // }
+    // // ********************************
+
     console.log("탭 선택: " + selectedTag);
     setRecColls([]);
     setPage(-1); // 탭이 변경되었음을 표현.
