@@ -393,8 +393,6 @@ const MyInfo = () => {
   return (
     <div className={styles.container}>
       <h2>내 정보 수정</h2>
-      {error && <p className={styles.error}>{error}</p>}
-      {success && <p className={styles.success}>{success}</p>}
 
       <div className={styles.profileUploaderSection}>
         <ProfileUploader
@@ -489,6 +487,8 @@ const MyInfo = () => {
             />
           </>
         )}
+        {error && <p className={styles.error}>{error}</p>}
+        {success && <p className={styles.success}>{success}</p>}
 
         <button
           type="submit"

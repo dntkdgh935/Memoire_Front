@@ -18,23 +18,22 @@ const WebcamFaceDetector = forwardRef(
       minConfidence = 0.7,
       width = 640,
       height = 480,
+      startWebcam = false,
     },
     ref
   ) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const animationFrameId = useRef(null);
-    const mediaStreamRef = useRef(null); // MediaStream 객체를 저장할 useRef
+    const mediaStreamRef = useRef(null);
 
     const [isWebcamActive, setIsWebcamActive] = useState(false);
     const [isModelsLoaded, setIsModelsLoaded] = useState(false);
     const [faceDetectedInFrame, setFaceDetectedInFrame] = useState(false);
     const [currentDetectionScore, setCurrentDetectionScore] = useState(0);
 
-    const faceDetectedRef = useRef(false); // 이전 얼굴 감지 상태 저장
+    const faceDetectedRef = useRef(false);
 
-    // 1. 웹캠 스트림 중지 함수 (useCallback으로 메모이제이션)
-    // 이 함수는 내부에서 호출될 수도 있고, useImperativeHandle을 통해 외부에서도 호출될 수 있습니다.
     const stopWebcamStream = useCallback(() => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
@@ -44,7 +43,6 @@ const WebcamFaceDetector = forwardRef(
         console.log("웹캠 스트림의 트랙 중지 시도...");
         mediaStreamRef.current.getTracks().forEach((track) => {
           if (track.readyState === "live") {
-            // live 상태인 트랙만 중지
             track.stop();
             console.log(`트랙 중지됨: ${track.kind}`);
           } else {
@@ -53,20 +51,19 @@ const WebcamFaceDetector = forwardRef(
             );
           }
         });
-        mediaStreamRef.current = null; // 스트림 참조 해제
+        mediaStreamRef.current = null;
       }
       if (videoRef.current) {
-        videoRef.current.srcObject = null; // video 요소의 srcObject 해제
+        videoRef.current.srcObject = null;
       }
       setIsWebcamActive(false);
       setFaceDetectedInFrame(false);
       setCurrentDetectionScore(0);
-      if (onDetectionScoreUpdate) onDetectionScoreUpdate(0); // Score 초기화 콜백
-      if (onNoFaceDetected) onNoFaceDetected(); // 얼굴 없음 콜백
+      if (onDetectionScoreUpdate) onDetectionScoreUpdate(0);
+      if (onNoFaceDetected) onNoFaceDetected();
       console.log("웹캠 스트림 중지.");
     }, [onDetectionScoreUpdate, onNoFaceDetected]);
 
-    // 부모 컴포넌트에서 호출할 수 있는 메서드 노출
     useImperativeHandle(ref, () => ({
       captureFrame: async () => {
         if (
@@ -102,10 +99,10 @@ const WebcamFaceDetector = forwardRef(
       },
       isFaceDetected: () => faceDetectedRef.current,
       getDetectionScore: () => currentDetectionScore,
-      stopWebcam: stopWebcamStream, // ✅ 외부에서 호출 가능하도록 stopWebcamStream 노출
+      stopWebcam: stopWebcamStream,
+      // Removed: getFaceEmbedding as it's not used by FaceLogin anymore
     }));
 
-    // 2. 모델 로드 (최초 한 번만 실행)
     useEffect(() => {
       const loadModels = async () => {
         const MODEL_URL =
@@ -113,6 +110,7 @@ const WebcamFaceDetector = forwardRef(
         try {
           await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
           await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+          // Removed: await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
           setIsModelsLoaded(true);
           console.log("Face-API.js 모델 로드 완료.");
         } catch (error) {
@@ -125,16 +123,17 @@ const WebcamFaceDetector = forwardRef(
       loadModels();
     }, []);
 
-    // 3. 웹캠 스트림 시작 함수 (클릭 시 호출)
-    const startWebcamStream = useCallback(async () => {
+    const _startWebcamStream = useCallback(async () => {
       if (!isModelsLoaded) {
-        alert(
-          "얼굴 인식 모델이 아직 로드되지 않았습니다. 잠시만 기다려주세요."
-        );
+        console.log("모델이 로드되지 않아 웹캠 시작 지연.");
         return;
       }
       if (isWebcamActive) {
         console.log("웹캠이 이미 활성 상태입니다.");
+        return;
+      }
+      if (!videoRef.current) {
+        console.log("videoRef.current가 아직 준비되지 않아 웹캠 시작 지연.");
         return;
       }
 
@@ -142,33 +141,30 @@ const WebcamFaceDetector = forwardRef(
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
-        mediaStreamRef.current = stream; // 스트림 객체를 useRef에 저장
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.onloadedmetadata = () => {
-            if (videoRef.current && canvasRef.current) {
-              canvasRef.current.width = videoRef.current.videoWidth;
-              canvasRef.current.height = videoRef.current.videoHeight;
-              canvasRef.current.style.width =
-                videoRef.current.clientWidth + "px";
-              canvasRef.current.style.height =
-                videoRef.current.clientHeight + "px";
-            }
-            videoRef.current
-              .play()
-              .then(() => {
-                setIsWebcamActive(true);
-                console.log("웹캠 스트림 재생 시작.");
-              })
-              .catch((playErr) => {
-                console.error("웹캠 비디오 재생 실패:", playErr);
-                setIsWebcamActive(false);
-              });
-          };
-        }
+        mediaStreamRef.current = stream;
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current && canvasRef.current) {
+            canvasRef.current.width = videoRef.current.videoWidth;
+            canvasRef.current.height = videoRef.current.videoHeight;
+            canvasRef.current.style.width = videoRef.current.clientWidth + "px";
+            canvasRef.current.style.height =
+              videoRef.current.clientHeight + "px";
+          }
+          videoRef.current
+            .play()
+            .then(() => {
+              setIsWebcamActive(true);
+              console.log("웹캠 스트림 재생 시작.");
+            })
+            .catch((playErr) => {
+              console.error("웹캠 비디오 재생 실패:", playErr);
+              setIsWebcamActive(false);
+            });
+        };
       } catch (err) {
         console.error("웹캠 접근 오류:", err);
-        setIsWebcamActive(false); // 에러 발생 시 비활성화 상태로
+        setIsWebcamActive(false);
         if (
           err.name === "NotAllowedError" ||
           err.name === "PermissionDeniedError"
@@ -185,15 +181,27 @@ const WebcamFaceDetector = forwardRef(
       }
     }, [isModelsLoaded, isWebcamActive]);
 
-    // 컴포넌트 언마운트 시 웹캠 정리
+    useEffect(() => {
+      if (startWebcam && isModelsLoaded && !isWebcamActive) {
+        _startWebcamStream();
+      } else if (!startWebcam && isWebcamActive) {
+        stopWebcamStream();
+      }
+    }, [
+      startWebcam,
+      isModelsLoaded,
+      isWebcamActive,
+      _startWebcamStream,
+      stopWebcamStream,
+    ]);
+
     useEffect(() => {
       return () => {
         console.log("WebcamFaceDetector 컴포넌트 언마운트. 웹캠 정리 호출.");
-        stopWebcamStream(); // 컴포넌트 언마운트 시 웹캠 정리 호출
+        stopWebcamStream();
       };
     }, [stopWebcamStream]);
 
-    // 4. 얼굴 감지 로직 (isWebcamActive가 true일 때만 동작)
     useEffect(() => {
       if (!isWebcamActive || !isModelsLoaded) {
         setCurrentDetectionScore(0);
@@ -201,20 +209,17 @@ const WebcamFaceDetector = forwardRef(
         faceDetectedRef.current = false;
         if (onDetectionScoreUpdate) onDetectionScoreUpdate(0);
         if (onNoFaceDetected) onNoFaceDetected();
-        // 만약 StrictMode로 인해 여기서 바로 return되면,
-        // cleanup이 이미 일어났을 수 있으므로 추가적인 stop 호출은 필요 없음
         return;
       }
 
       console.log("얼굴 감지 useEffect 시작.");
       const detectFace = async () => {
-        // 비디오 요소 상태 검증 강화
         if (
           !videoRef.current ||
           !canvasRef.current ||
           videoRef.current.paused ||
           videoRef.current.ended ||
-          videoRef.current.readyState < 3 // HAVE_FUTURE_DATA 또는 HAVE_ENOUGH_DATA
+          videoRef.current.readyState < 3
         ) {
           if (faceDetectedRef.current) {
             setFaceDetectedInFrame(false);
@@ -280,6 +285,7 @@ const WebcamFaceDetector = forwardRef(
             new faceapi.TinyFaceDetectorOptions()
           )
           .withFaceLandmarks();
+        // Removed: .withFaceDescriptor(); // 임베딩 추출 불필요
 
         const resizedDetections = detectionsWithLandmarks
           ? faceapi.resizeResults(detectionsWithLandmarks, displaySize)
@@ -342,23 +348,27 @@ const WebcamFaceDetector = forwardRef(
       minConfidence,
     ]);
 
-    // 클릭 가능한 오버레이 표시
     const renderOverlay = () => {
       if (!isModelsLoaded) {
-        return <div className={styles.overlay}>얼굴 인식 모델 로드 중...</div>;
+        return <div className={styles.overlay}>얼굴 인식 모델 로드 중...</div>; // 메시지 변경
       }
-      if (!isWebcamActive) {
+      if (!isWebcamActive && !startWebcam) {
         return (
-          <div
-            className={styles.overlay + " " + styles.clickableOverlay}
-            onClick={startWebcamStream}
-          >
-            웹캠을 활성화하려면 클릭하세요.
-            <div className={styles.cameraIcon}></div> {/* 카메라 아이콘 추가 */}
+          <div className={styles.overlay}>
+            아이디를 입력하면 웹캠이 활성화됩니다.
+            <div className={styles.cameraIcon}></div>
           </div>
         );
       }
-      return null; // 웹캠 활성 시 오버레이 없음
+      if (!isWebcamActive && startWebcam && isModelsLoaded) {
+        return (
+          <div className={styles.overlay}>
+            웹캠 활성화 중...
+            <div className={styles.spinner}></div>
+          </div>
+        );
+      }
+      return null;
     };
 
     return (
@@ -377,7 +387,7 @@ const WebcamFaceDetector = forwardRef(
           className={styles.canvas}
           style={{ pointerEvents: "none" }}
         />
-        {renderOverlay()} {/* 오버레이 렌더링 */}
+        {renderOverlay()}
         {isWebcamActive && isModelsLoaded && (
           <div className={styles.accuracyBadge}>
             정확도: {currentDetectionScore.toFixed(2)}
