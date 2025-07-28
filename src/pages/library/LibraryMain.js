@@ -17,6 +17,8 @@ function LibraryMain() {
   const [recColls, setRecColls] = useState([]);
   const loaderRef = useRef(null);
   const scrollContainerRef = useRef(null); // CollGrid 내부 스크롤 영역
+  // const hasFetchedInitial = useRef(false);
+  const [isRep, setIsRep] = useState(false);
 
   const [page, setPage] = useState(0);
 
@@ -38,14 +40,23 @@ function LibraryMain() {
   };
 
   const fetchCollections4Anon = async () => {
-    console.log("fetchCollections4Anon 수행중");
+    console.log("fetchCollections4Anon 수행중, page: " + page);
+    console.log("isRep:" + isRep);
     try {
       const res = await apiClient.get(
-        `/api/library/discover/guest/${selectedTag}`
+        `/api/library/discover/guest/${selectedTag}?page=${page}`
       );
       console.log("받은 데이터");
       console.log(res.data);
-      setRecColls(res.data);
+      if (res.data.content.length == 0) {
+        // <== 지금 부모 프로세스를 다시 수행하게 하도록
+        console.log("하나도 못받음");
+
+        setPage(0);
+        setIsRep(true);
+        return;
+      }
+      setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
       console.error("요청중 실패");
@@ -59,6 +70,7 @@ function LibraryMain() {
       // const res = await apiClient.get(`/api/library/recommend/${userid}`, {
       //   params: { page },
       // });
+      console.log("출력 페이지:" + page);
       const res = await secureApiRequest(`/api/library/recommend/${userid}`, {
         method: "GET",
         params: { page },
@@ -69,7 +81,7 @@ function LibraryMain() {
       if (res.data.content.length == 0) {
         // <== 지금 부모 프로세스를 다시 수행하게 하도록
         console.log("하나도 못받음");
-        alert("모든 컬렉션이 추천되었습니다. 처음부터 다시 추천됩니다");
+
         setPage(0);
         return;
       }
@@ -82,37 +94,59 @@ function LibraryMain() {
     }
   };
 
-  // 탭 클릭 지정 완료시 수행
+  // 1. 탭 클릭 지정 완료시, coll및 page 0으로 초기화
+  // 하고 첫 추천(X)
   useEffect(() => {
     //로그인시
-    if (isLoggedIn) {
-      setRecColls([]); // 💥 추천 결과 초기화
-      setPage(0); // 💥 페이지 초기화
+    setIsRep(false);
+    setRecColls([]); // 💥 추천 결과 초기화
+    setPage(0); // 💥 페이지 초기화
+    // if (isLoggedIn) {
+    //   setRecColls([]); // 💥 추천 결과 초기화
+    //   setPage(0); // 💥 페이지 초기화
 
-      switch (selectedTag) {
-        case "추천":
-          recColls4LoginUser();
-          console.log(recColls);
-          break;
-        default: //팔로잉, 기타 태그 처리
-          console.log("선택 탭에 따라 처리:" + selectedTag);
-          fetchCollections4LoginUser();
-          break;
-      }
-    }
-
-    //비로그인시
-    else {
-      fetchCollections4Anon();
-    }
+    //   switch (selectedTag) {
+    //     case "추천":
+    //       recColls4LoginUser();
+    //       console.log(recColls);
+    //       break;
+    //     default: //팔로잉, 기타 태그 처리
+    //       console.log("선택 탭에 따라 처리:" + selectedTag);
+    //       fetchCollections4LoginUser();
+    //       break;
+    //   }
+    // }
+    // //비로그인시
+    // else {
+    //   setRecColls([]); // 💥 추천 결과 초기화
+    //   setPage(0); // 💥 페이지 초기화
+    // }
   }, [selectedTag, userid, isLoggedIn]);
 
+  //페이지 변화 => 다음 페이지 요청 (-1~0도)
   useEffect(() => {
-    // page가 0일 때 recColls4LoginUser 호출
-    if (page === 0 && isLoggedIn && selectedTag == "추천") {
-      recColls4LoginUser(); // 재호출
+    //로그인+추천
+    if (selectedTag === "추천" && isLoggedIn) {
+      //&& page !== 0) {
+      recColls4LoginUser();
     }
-  }, [page]); // page가 변경될 때마다 호출
+    //로그인 + 기타
+    //비로그인
+    else if (!isLoggedIn) {
+      fetchCollections4Anon();
+    }
+  }, [page]);
+
+  // //page ==0로 다시 변한 경우(무한추천용) 호출
+  // useEffect(() => {
+  //   if (!isRep) return; // 첫 호출은 이미 되었을 것이므로 다시 추천 x
+
+  //   if (page === 0 && isLoggedIn && selectedTag == "추천") {
+  //     recColls4LoginUser();
+  //   } else if (page === 0 && !isLoggedIn) {
+  //     fetchCollections4Anon();
+  //   }
+  // }, [page, isRep]);
 
   // top tag들 가져오기
   useEffect(() => {
@@ -193,18 +227,19 @@ function LibraryMain() {
     navigate(`detail/${collectionId}`);
   };
 
-  //페이지 하단 감지해 페이지 증가(setPage)
+  //페이지 하단 감지 => 감지해 페이지 증가(setPage)
   useEffect(() => {
-    if (!loaderRef.current || selectedTag !== "추천") return;
+    // if (!loaderRef.current || selectedTag !== "추천") return;
+    if (!loaderRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          console.log("⏬ 하단 도달 → 다음 페이지 요청");
+          console.log("⏬ 하단 도달 → setPage to:");
+          console.log(page + 1);
           setPage((prev) => prev + 1);
         }
       },
-      //{ threshold: 1.0 } ***********안되면 쿰백 **************
       {
         threshold: 0.5, // 컨테이너의 끝에 완전히 도달했을 때만 감지
       }
@@ -215,12 +250,6 @@ function LibraryMain() {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
   }, [selectedTag]);
-
-  useEffect(() => {
-    if (selectedTag === "추천" && isLoggedIn && page !== 0) {
-      recColls4LoginUser();
-    }
-  }, [page]);
 
   //TODO: 페이지별로 PageHeader 넣기
   return (
