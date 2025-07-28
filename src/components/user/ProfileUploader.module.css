@@ -38,7 +38,7 @@
 }
 
 .fileName {
-  font-size: 13px;
+  font-size: 14px;
   color: #5c4b3b;
   margin-top: 4px;
   word-break: break-all;
@@ -61,4 +61,29 @@
 .uploadButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.infoMessage,
+.safeMessage,
+.unsafeMessage {
+  font-size: 14px; /* 원하는 글자 크기로 조절 */
+  color: #5c4b3b; /* 글자 색상 (기존과 동일) */
+  text-align: center;
+}
+
+/* 개별 메시지 스타일 (필요에 따라 폰트 크기 조정) */
+.safeMessage {
+  color: #28a745; /* 녹색 */
+  font-weight: 500;
+  font-size: 14px; /* 안전 메시지만 더 크게 하려면 여기에서 조절 */
+}
+
+.unsafeMessage {
+  color: #dc3545; /* 빨간색 */
+  font-weight: 500;
+  font-size: 14px; /* 유해 메시지만 더 크게 하려면 여기에서 조절 */
+}
+
+.title {
+  font-size: 20px; /* "프로필 이미지 변경" 제목 크기 */
+  color: #5c4b3b;
 }
