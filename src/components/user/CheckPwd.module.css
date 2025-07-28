@@ -24,7 +24,7 @@
   position: relative;
   /* margin-bottom은 상위 컴포넌트에서 제어하는 것이 더 유연할 수 있습니다. */
   /* 여기서는 원래 코드에 있었으므로 유지합니다. */
-  margin-bottom: 20px; /* 인풋 그룹 간 간격 조정 */
+  margin-bottom: 10px; /* 인풋 그룹 간 간격 조정 */
 }
 
 /* 메시지 래퍼 스타일 */
