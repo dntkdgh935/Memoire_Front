@@ -12,9 +12,9 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const { secureApiRequest, userid } = useContext(AuthContext);
 
   useEffect(() => {
-      setStyle("");
-      setPrompt("");
-    }, [selectedMemory]);
+    setStyle("");
+    setPrompt("");
+  }, [selectedMemory]);
 
   const handleGenerate = () => {
     if (!selectedMemory) return;
@@ -51,6 +51,10 @@ function SettingPanel({ selectedMemory, onGenerate }) {
       });
   };
 
+  const handleNavigateToImage = () => {
+    navigate("/atelier/text2image");
+  };
+
   return (
     <div className={styles.settingPanel}>
       {selectedMemory ? (
@@ -79,6 +83,9 @@ function SettingPanel({ selectedMemory, onGenerate }) {
             <label>메모리 변환 옵션</label>
             <div className={styles.optionButtons}>
               <button className={styles.optionActive}>AI 텍스트 변환</button>
+              <button className={styles.option} onClick={handleNavigateToImage}>
+                AI 이미지 변환
+              </button>
             </div>
           </div>
 
