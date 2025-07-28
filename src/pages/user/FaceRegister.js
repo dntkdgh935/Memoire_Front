@@ -1,21 +1,24 @@
-import React, { useRef, useEffect, useState, useContext } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+} from "react"; // useCallback 추가
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { AuthContext } from "../../AuthProvider"; // AuthContext 임포트 확인
+import { AuthContext } from "../../AuthProvider";
 import WebcamFaceDetector from "../../components/user/WebcamFaceDetector";
-import styles from "./FaceRegister.module.css"; // CSS 모듈 import
+import styles from "./FaceRegister.module.css";
 
 function FaceRegister() {
   const webcamRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // AuthContext에서 userid와 nickname을 가져옵니다.
   const context = useContext(AuthContext);
-  const { userid, nickname, secureApiRequest } = context || {}; // userid와 nickname 구조 분해 할당
+  const { userid, nickname, secureApiRequest } = context || {};
 
-  // userId를 location.state에서 가져오거나, AuthContext의 userid를 사용 (fallback)
-  // MyInfo에서 state로 넘겨주므로 location.state?.userId를 우선 사용합니다.
   const currentUserId = location.state?.userId || userid;
 
   const [message, setMessage] = useState("");
@@ -23,24 +26,35 @@ function FaceRegister() {
   const [isFaceDetectedOnScreen, setIsFaceDetectedOnScreen] = useState(false);
   const [webcamDetectionScore, setWebcamDetectionScore] = useState(0);
 
-  const handleFaceDetected = (score) => {
-    setMessage(
-      "얼굴이 감지되었습니다. '현재 얼굴로 등록하기' 버튼을 눌러주세요."
-    );
-    setIsFaceDetectedOnScreen(true);
-  };
+  const REQUIRED_FACE_SCORE_FOR_REGISTER = 0.9; // 등록을 위한 최소 얼굴 정확도
 
-  const handleNoFaceDetected = () => {
+  // 콜백 함수들을 useCallback으로 감싸서 최적화
+  const handleFaceDetected = useCallback((score) => {
+    setIsFaceDetectedOnScreen(true);
+    // 메시지는 handleDetectionScoreUpdate에서 업데이트될 것
+  }, []);
+
+  const handleNoFaceDetected = useCallback(() => {
     setMessage("얼굴을 찾을 수 없습니다. 얼굴을 웹캠 중앙에 맞춰주세요.");
     setIsFaceDetectedOnScreen(false);
-  };
+  }, []);
 
-  const handleDetectionScoreUpdate = (score) => {
+  const handleDetectionScoreUpdate = useCallback((score) => {
     setWebcamDetectionScore(score);
-  };
+    if (score >= REQUIRED_FACE_SCORE_FOR_REGISTER) {
+      setMessage(
+        `높은 정확도 (${score.toFixed(2)})로 얼굴이 감지되었습니다! "현재 얼굴로 등록하기" 버튼을 눌러주세요.`
+      );
+    } else if (score > 0) {
+      setMessage(
+        `얼굴 감지 정확도: ${score.toFixed(2)} (최소 ${REQUIRED_FACE_SCORE_FOR_REGISTER.toFixed(2)} 이상 권장)`
+      );
+    } else {
+      setMessage("얼굴을 찾을 수 없습니다. 얼굴을 웹캠 중앙에 맞춰주세요.");
+    }
+  }, []);
 
   useEffect(() => {
-    // userId가 state로 넘어오지 않았거나 유효하지 않은 경우 처리
     if (
       !currentUserId ||
       currentUserId === "undefined" ||
@@ -51,7 +65,15 @@ function FaceRegister() {
     } else {
       setMessage("웹캠을 활성화하고 얼굴을 정면으로 보여주세요.");
     }
-  }, [currentUserId, navigate]); // 의존성 배열에 currentUserId 추가
+
+    // 컴포넌트 언마운트 시 웹캠을 끄도록 정리 함수 추가
+    return () => {
+      if (webcamRef.current && webcamRef.current.stopWebcam) {
+        console.log("FaceRegister 컴포넌트 언마운트. 웹캠 중지 요청.");
+        webcamRef.current.stopWebcam();
+      }
+    };
+  }, [currentUserId, navigate]);
 
   const handleRegisterFace = async () => {
     if (!secureApiRequest) {
@@ -73,6 +95,14 @@ function FaceRegister() {
       setMessage("등록을 시도하기 전에 얼굴을 웹캠 중앙에 맞춰주세요.");
       return;
     }
+    // 정확도 조건 추가
+    if (webcamDetectionScore < REQUIRED_FACE_SCORE_FOR_REGISTER) {
+      setMessage(
+        `얼굴 정확도가 부족합니다 (${webcamDetectionScore.toFixed(2)}). ` +
+          `최소 ${REQUIRED_FACE_SCORE_FOR_REGISTER.toFixed(2)} 이상일 때 등록할 수 있습니다.`
+      );
+      return;
+    }
 
     setIsLoading(true);
     setMessage("얼굴 임베딩을 등록 중입니다...");
@@ -89,7 +119,7 @@ function FaceRegister() {
       formData.append("file", imageBlob, "face_register.jpg");
 
       const apiResponse = await secureApiRequest(
-        `/user/${currentUserId}/face-embedding`, // 서버에는 실제 userId를 전달
+        `/user/${currentUserId}/face-embedding`,
         {
           method: "POST",
           body: formData,
@@ -99,6 +129,11 @@ function FaceRegister() {
       setMessage(
         apiResponse.data?.message || `얼굴 임베딩이 성공적으로 등록되었습니다.`
       );
+
+      // ✅ 등록 성공 시 웹캠 중지
+      if (webcamRef.current && webcamRef.current.stopWebcam) {
+        webcamRef.current.stopWebcam();
+      }
     } catch (error) {
       console.error("얼굴 임베딩 등록 요청 중 오류 발생:", error);
       setMessage(
@@ -117,7 +152,6 @@ function FaceRegister() {
     <div className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.title}>얼굴 ID 등록</h1>
-        {/* 닉네임을 표시하고, 닉네임이 없을 경우 "알 수 없는 사용자"로 표시 */}
         <p className={styles.userIdText}>
           <span className={styles.userIdHighlight}>사용자:</span>{" "}
           {nickname || "알 수 없는 사용자"}
@@ -128,14 +162,18 @@ function FaceRegister() {
           onFaceDetected={handleFaceDetected}
           onNoFaceDetected={handleNoFaceDetected}
           onDetectionScoreUpdate={handleDetectionScoreUpdate}
-          minConfidence={0.7}
+          minConfidence={0.7} // 이 값은 WebcamFaceDetector 내부의 감지 로직에 사용
         />
 
         <div className={styles.buttonGroup}>
           <button
             onClick={handleRegisterFace}
             className={styles.primaryButton}
-            disabled={isLoading || !isFaceDetectedOnScreen}
+            disabled={
+              isLoading ||
+              !isFaceDetectedOnScreen ||
+              webcamDetectionScore < REQUIRED_FACE_SCORE_FOR_REGISTER
+            } // 정확도 조건 추가
           >
             {isLoading ? "등록 중..." : "현재 얼굴로 등록하기"}
           </button>

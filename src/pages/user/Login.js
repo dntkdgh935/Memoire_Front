@@ -182,7 +182,7 @@ function Login({ onLoginSuccess }) {
         {/* ✅ 마지막 로그인 방식 표시 */}
         {lastLoginMessage && (
           <p className={styles.lastLoginMessage}>
-            마지막 로그인 방식: <strong>{lastLoginMessage}</strong>
+            성공한 로그인 방식: <strong>{lastLoginMessage}</strong>
           </p>
         )}
         <form className={styles.form}>
