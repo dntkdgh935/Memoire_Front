@@ -12,63 +12,53 @@ import PageHeader from "../../components/common/PageHeader";
 function LibraryMain() {
   const navigate = useNavigate();
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
-  const [selectedTag, setSelectedTag] = useState("전체");
+  const [selectedTag, setSelectedTag] = useState(null);
   const [topTags, setTopTags] = useState([]);
   const [recColls, setRecColls] = useState([]);
   const loaderRef = useRef(null);
   const scrollContainerRef = useRef(null); // CollGrid 내부 스크롤 영역
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
+  useEffect(() => {
+    if (selectedTag === null) {
+      setSelectedTag("추천"); // 최초 진입 시만 실행
+    }
+  }, []);
 
-  const fetchCollections4LoginUser = async () => {
-    console.log("fetchCollections4LoginUser 수행중");
+  const recColls4LoginUser = async () => {
+    if (isLoading) return;
+    if (selectedTag === "") return;
+    setIsLoading(true); // 🚩 요청 시작
+    console.log("recColls4LoginUser 수행중, page:" + page);
     try {
+      console.log("출력 페이지:" + page);
       const res = await secureApiRequest(
-        `/api/library/discover/${selectedTag}/${userid}`,
+        `/api/library/discover/loginUser/${selectedTag}/${userid}`,
         {
           method: "GET",
+          params: { page },
         }
       );
-      console.log("받은 데이터");
-      console.log(res.data);
-      setRecColls(res.data);
-    } catch (err) {
-      console.error("요청중 실패");
-    }
-  };
-  const recColls4LoginUser = async () => {
-    console.log("recColls4LoginUser 수행중");
-    try {
-      // const res = await apiClient.get(`/api/library/recommend/${userid}`, {
-      //   params: { page },
-      // });
-      console.log("출력 페이지:" + page);
-      const res = await secureApiRequest(`/api/library/recommend/${userid}`, {
-        method: "GET",
-        params: { page },
-      });
-      console.log("받은 데이터");
-      console.log(res.data.content);
-
       if (res.data.content.length == 0) {
         // <== 지금 부모 프로세스를 다시 수행하게 하도록
         console.log("하나도 못받음");
-
         setPage(0);
         return;
       }
-
       setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
       console.error("요청중 실패");
       return [];
+    } finally {
+      setIsLoading(false); // ✅ 요청 완료
     }
   };
 
   // 비로그인 유저 - page에 대해 요청/ 못받을 경우, 0으로 페이지 변경, 받을 때까지 loading정보 가짐
   const fetchCollections4Anon = async () => {
     if (isLoading) return;
+    if (selectedTag === "") return;
     setIsLoading(true); // 🚩 요청 시작
     console.log("fetchCollections4Anon 수행중, page: " + page);
     try {
@@ -81,7 +71,6 @@ function LibraryMain() {
         setPage(0);
         return;
       }
-      console.log("page " + page + "받음");
       setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
@@ -92,15 +81,15 @@ function LibraryMain() {
     }
   };
 
-  //0. 마운트시..
-  /*
-  1) "전체" 탭으로 초기화, page도 0으로 초기화
-
-  ...) 하단 감지해야만 page set되도록?
-
-  */
   //1. 탭 변경시 setPage(-1)
   useEffect(() => {
+    // // ********************************
+    // if (isFirstRender.current && selectedTag === "추천") {
+    //   isFirstRender.current = false;
+    //   return; // ❌ 초기 렌더링 시 불필요한 초기화 막기
+    // }
+    // // ********************************
+
     console.log("탭 선택: " + selectedTag);
     setRecColls([]);
     setPage(-1); // 탭이 변경되었음을 표현.
@@ -111,7 +100,9 @@ function LibraryMain() {
   useEffect(() => {
     console.log("페이지 변경됨:" + page);
     if (isLoggedIn) {
-      recColls4LoginUser();
+      if (page >= 0) {
+        recColls4LoginUser();
+      }
     } else if (!isLoggedIn) {
       // if (page == -1) {
       //   // 새 탭의 새 페이지로 도달한 경우
@@ -143,20 +134,20 @@ function LibraryMain() {
     return () => {
       if (loaderRef.current) observer.unobserve(loaderRef.current);
     };
-  }, [selectedTag]);
+  }, [selectedTag, recColls]);
 
-  //TODO: fetch후에도 추가 요청 가능한 경우 진행하도록 코드 추가 (현재 0->2로 가는 문제)
-  useEffect(() => {
-    if (!isLoading && loaderRef.current) {
-      const rect = loaderRef.current.getBoundingClientRect();
-      const isVisible = rect.top < window.innerHeight;
+  // //TODO: fetch후에도 추가 요청 가능한 경우 진행하도록 코드 추가 (현재 0->2로 가는 문제)
+  // useEffect(() => {
+  //   if (!isLoading && loaderRef.current) {
+  //     const rect = loaderRef.current.getBoundingClientRect();
+  //     const isVisible = rect.top < window.innerHeight;
 
-      if (isVisible) {
-        console.log("🔥 fetch 후에도 loader가 보이므로 page 추가 요청");
-        setPage((prev) => prev + 1);
-      }
-    }
-  }, [recColls]);
+  //     if (isVisible) {
+  //       console.log("🔥 fetch 후에도 loader가 보이므로 page 추가 요청");
+  //       setPage((prev) => prev + 1);
+  //     }
+  //   }
+  // }, [recColls]);
 
   const handleLikeChange = async (updatedColl) => {
     if (isLoggedIn) {
