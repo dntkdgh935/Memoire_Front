@@ -34,6 +34,14 @@ function ArchiveVisit() {
   const [collections, setCollections] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
 
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+  });
+
   // 로그인 유저와 해당 아카이브 소유자에 대한 팔로우 상태 가져옴
   useEffect(() => {
     if (!myid || !ownerid) return; // ⭐ 유효한 경우만 진행

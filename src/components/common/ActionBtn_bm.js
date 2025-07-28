@@ -12,10 +12,15 @@ function ActionBtn_bm({ coll, onBookmarkChange }) {
     ? FaBookmark //
     : FaRegBookmark; //
 
+  const handleClick = (e) => {
+    e.stopPropagation(); // 👈 카드 클릭 이벤트로 전파되지 않도록 막기
+    onBookmarkChange(coll);
+  };
+
   return (
     <div
       className={`${styles.button} ${styles.bookmark}`}
-      onClick={() => onBookmarkChange(coll)}
+      onClick={handleClick}
     >
       <IconComponent className={styles.icon} style={iconStyle} />
       <span>{`북마크 ${coll.bookmarkCount}`} </span>

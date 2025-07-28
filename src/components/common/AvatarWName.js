@@ -17,7 +17,8 @@ function AvatarWName({ user, type }) {
   // // const { userid } = useContext(AuthContext);
   // console.log("[AvatarWName]:" + userid);
 
-  const handleAvatarClick = () => {
+  const handleAvatarClick = (e) => {
+    e.stopPropagation();
     console.log("heyyy 로그인 유저: " + loginUserId + ", authorid:" + userid);
 
     if (!isLoggedIn) {

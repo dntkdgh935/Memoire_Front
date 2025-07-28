@@ -8,6 +8,14 @@ import UserGrid from "../../components/library/UserGrid"; // 사용자 그리드
 import PageHeader from "../../components/common/PageHeader";
 
 function SearchUserResult() {
+  useEffect(() => {
+    if (isLoggedIn === false) {
+      alert("로그인을 하세요!");
+      navigate("/");
+      return;
+    }
+  });
+
   // URL에서 검색어를 추출 (쿼리 파라미터)
   const location = useLocation(); // 현재 URL 정보
   const searchQuery = new URLSearchParams(location.search).get("query");
