@@ -26,7 +26,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(6px);
   position: relative;
-  overflow-x: auto;
+  overflow: visible;
   max-width: 100%;
 }
 
@@ -44,25 +44,31 @@
   width: 100px;
   height: 160px;
   transform-style: preserve-3d;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
-  animation: cardEnter 0.4s ease forwards;
-  opacity: 0; /* 등장 전 숨김 */
+  animation: cardEnter 0.8s ease forwards;
+  opacity: 0;
 }
 
-/* 카드 순차 등장용 애니메이션 딜레이는 JS에서 style로 주입 */
-
-.cardWrapper:hover {
-  transform: translateY(-14px) scale(1.05);
+/* ✅ 호버 시 카드 살짝 위로 이동 */
+.cardWrapper:hover:not(.clicked):not(.flipped) {
+  transform: translateY(-24px) scale(1.1) rotateZ(-1.5deg);
   z-index: 100;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 16px 30px rgb(255, 231, 152);
 }
 
+/* 클릭 시 스타일 유지 */
 .cardWrapper.clicked {
   transform: scale(1.08);
   box-shadow: 0 0 0 4px rgba(220, 180, 100, 0.5);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   z-index: 101;
+}
+
+/* 클릭 + 호버 시 기존 상태 유지 */
+.cardWrapper.clicked:hover,
+.cardWrapper.flipped:hover {
+  transform: scale(1.08);
 }
 
 .cardWrapper.flipped .cardInner {

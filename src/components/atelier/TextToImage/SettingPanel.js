@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styles from "./SettingPanel.module.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../AuthProvider";
@@ -8,6 +8,11 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const [prompt, setPrompt] = useState("");
   const navigate = useNavigate();
   const { secureApiRequest } = useContext(AuthContext);
+
+  useEffect(() => {
+    setStyle("");
+    setPrompt("");
+  }, [selectedMemory]);
 
   const handleGenerate = async () => {
     if (!selectedMemory) return;

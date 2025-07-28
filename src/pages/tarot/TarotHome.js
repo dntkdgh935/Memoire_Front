@@ -1,23 +1,27 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader";
 import { AuthContext } from "../../AuthProvider";
 import styles from "./TarotHome.module.css";
 
 import tarotIntroVideo from "../../assets/videos/tarot_intro.mp4";
-import oneCardImg    from "../../assets/images/tarot_1card.png";
-import threeCardImg  from "../../assets/images/tarot_3card.png";
-import crossCardImg  from "../../assets/images/tarot_celtic.png";
-import deckImg       from "../../assets/images/tarot_deck.png"; // ✅ 새로 추가 (없으면 placeholder)
+import oneCardImg from "../../assets/images/tarot_1card.png";
+import threeCardImg from "../../assets/images/tarot_3card.png";
+import crossCardImg from "../../assets/images/tarot_celtic.png";
+import deckImg from "../../assets/images/tarot_deck.png"; // ✅ 새로 추가
 
 export default function TarotHome() {
   const { isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
+  const hasNavigatedRef = useRef(false);
 
-  if (!isLoggedIn) {
-    navigate("/");
-    return null;
+  useEffect(() => {
+  if (!isLoggedIn && !hasNavigatedRef.current) {
+    alert("로그인을 하세요!");
+    hasNavigatedRef.current = true;
+    navigate("/user/login");
   }
+}, [isLoggedIn, navigate]);
 
   const spreads = [
     {

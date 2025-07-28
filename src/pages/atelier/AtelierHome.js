@@ -1,5 +1,5 @@
 // src/pages/atelier/AtelierHome.js
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AtelierHome.module.css";
 import PageHeader from "../../components/common/PageHeader";
@@ -16,14 +16,16 @@ import atelierIntroVideo from "../../assets/videos/atelier_intro.mp4";
 function AtelierHome() {
   const { isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
+  const hasNavigatedRef = useRef(false);
 
-  useEffect(() => {
-    if (isLoggedIn === false) {
-      alert("로그인을 하세요!");
-      navigate("/user/login");
-      return;
-    }
-  }, [isLoggedIn, navigate]);
+  
+useEffect(() => {
+  if (!isLoggedIn && !hasNavigatedRef.current) {
+    alert("로그인을 하세요!");
+    hasNavigatedRef.current = true;
+    navigate("/user/login");
+  }
+}, [isLoggedIn, navigate]);
 
   if (!isLoggedIn) {
     navigate("/");

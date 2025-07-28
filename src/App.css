@@ -6,7 +6,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Pretendard", sans-serif;
-  overflow-y: hidden;
+  overflow-y: auto !important;
 }
 *,
 *::before,
@@ -226,13 +226,22 @@ body.theme-video
 }
 
 /* ────────────────────────────────────────────── */
+/* 2-c) 영상 전용 카드만 book-cover3.png 사용 */
+/* ────────────────────────────────────────────── */
+body.theme-video
+  div[class*="CollGrid_myMasonryGrid"]
+  div[class*="CollCard_card"]:has(video[class*="CollCard_video"]) {
+  background-image: url("./assets/images/book-cover3.png") !important;
+}
+
+/* ────────────────────────────────────────────── */
 /* 3) 제목(H3) — 책 중앙 위쪽 */
 /* ────────────────────────────────────────────── */
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
   div[class*="CollCard_card"]
   h3 {
-  position: absolute;
+  position: absolute ;
   top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -258,22 +267,25 @@ body.theme-video
   position: absolute !important;
   bottom: 48px !important;
   left: 16px !important;
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 8px;
   pointer-events: none;
   z-index: 1;
 }
+
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
   div[class*="CollCard_card"]
   img[class*="AvatarWName_avatarSmall"] {
   width: 24px;
   height: 24px;
-  margin-left: 15px;
+  margin-left: 40px;
+
   border-radius: 50%;
   object-fit: cover;
 }
+
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
   div[class*="CollCard_card"]
@@ -295,20 +307,25 @@ body.theme-video
   bottom: 24px;
   left: 16px;
   margin: 0;
-  margin-left: 15px;
+  margin-left: 40px;
   font-size: 0.9rem !important;
   color: rgba(255, 255, 255, 0.85) !important;
   pointer-events: none;
   z-index: 1;
+
 }
 
 /* ────────────────────────────────────────────── */
-/* 6) 표지 뒤의 원본 이미지·버튼 등 숨김 */
+/* 6) 표지 뒤의 원본 이미지·비디오·버튼 등 숨김 */
 /* ────────────────────────────────────────────── */
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
   div[class*="CollCard_card"]
   img[class*="CollCard_image"],
+body.theme-video
+  div[class*="CollGrid_myMasonryGrid"]
+  div[class*="CollCard_card"]
+  video[class*="CollCard_video"],
 body.theme-video
   div[class*="CollGrid_myMasonryGrid"]
   div[class*="CollCard_card"]
@@ -335,4 +352,46 @@ body.theme-video
   div[class*="CollCard_card"]
   img[alt="NO IMAGE"] {
   display: none !important;
+}
+
+body.theme-video [class*="labelOverlay"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important; /* 클릭 방지 */
+  transition: none !important;
+
+  background: none !important;
+  backdrop-filter: none !important;        /* 블러 제거 */
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  position: absolute !important;
+  top: 30px !important;        /* 책표지 상단에서 아래로 약간 떨어뜨림 */
+  left: 0;
+  width: 100%;
+  z-index: 5;
+}
+
+body.theme-video [class*="labelOverlay"] .label {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.theme-video [class*="labelOverlay"] .label h3,
+body.theme-video [class*="labelOverlay"] .label p {
+  color: #fff !important;
+  text-align: center !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+  margin: 2px 0 !important;
+}
+
+body.theme-video [class*="darkOverlay"] {
+  opacity: 0 !important;
+  transition: none !important;
 }
