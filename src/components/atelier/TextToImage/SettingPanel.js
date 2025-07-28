@@ -10,7 +10,7 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const handleGenerate = () => {
     if (!selectedMemory) return;
 
-    // ✅ 로딩 상태 먼저 설정
+    // ✅ 로딩 상태 설정
     onGenerate({ status: "loading" });
 
     const requestBody = {
