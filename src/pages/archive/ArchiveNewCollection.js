@@ -45,7 +45,10 @@ function ArchiveNewCollection() {
     if (
       collection.visibility !== "1" &&
       collection.visibility !== "2" &&
-      collection.visibility !== "3"
+      collection.visibility !== "3" &&
+      collection.visibility !== 1 &&
+      collection.visibility !== 2 &&
+      collection.visibility !== 3
     ) {
       alert("공유범위가 잘못 되었습니다.");
       return;
