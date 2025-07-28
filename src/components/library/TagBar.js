@@ -31,11 +31,11 @@ import styles from "./TagBar.module.css";
 
 function TagBar({ selectedTag, onTagSelect, savedTags = [] }) {
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
-  const defaultTags = ["전체"];
+  const defaultTags = ["추천"];
 
   // 로그인 상태일 때만 "팔로잉"과 "추천" 추가
   if (isLoggedIn) {
-    defaultTags.push("팔로잉", "추천");
+    defaultTags.push("팔로잉");
   }
 
   return (

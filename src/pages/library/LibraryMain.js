@@ -12,7 +12,7 @@ import PageHeader from "../../components/common/PageHeader";
 function LibraryMain() {
   const navigate = useNavigate();
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
-  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedTag, setSelectedTag] = useState("추천");
   const [topTags, setTopTags] = useState([]);
   const [recColls, setRecColls] = useState([]);
   const loaderRef = useRef(null);
@@ -20,49 +20,33 @@ function LibraryMain() {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
 
-  const fetchCollections4LoginUser = async () => {
-    console.log("fetchCollections4LoginUser 수행중");
+  const recColls4LoginUser = async () => {
+    if (isLoading) return;
+    if (selectedTag === "") return;
+    setIsLoading(true); // 🚩 요청 시작
+    console.log("recColls4LoginUser 수행중, page:" + page);
     try {
+      console.log("출력 페이지:" + page);
       const res = await secureApiRequest(
-        `/api/library/discover/${selectedTag}/${userid}`,
+        `/api/library/discover/loginUser/${selectedTag}/${userid}`,
         {
           method: "GET",
+          params: { page },
         }
       );
-      console.log("받은 데이터");
-      console.log(res.data);
-      setRecColls(res.data);
-    } catch (err) {
-      console.error("요청중 실패");
-    }
-  };
-  const recColls4LoginUser = async () => {
-    console.log("recColls4LoginUser 수행중");
-    try {
-      // const res = await apiClient.get(`/api/library/recommend/${userid}`, {
-      //   params: { page },
-      // });
-      console.log("출력 페이지:" + page);
-      const res = await secureApiRequest(`/api/library/recommend/${userid}`, {
-        method: "GET",
-        params: { page },
-      });
-      console.log("받은 데이터");
-      console.log(res.data.content);
-
       if (res.data.content.length == 0) {
         // <== 지금 부모 프로세스를 다시 수행하게 하도록
         console.log("하나도 못받음");
-
         setPage(0);
         return;
       }
-
       setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
       console.error("요청중 실패");
       return [];
+    } finally {
+      setIsLoading(false); // ✅ 요청 완료
     }
   };
 
@@ -82,7 +66,6 @@ function LibraryMain() {
         setPage(0);
         return;
       }
-      console.log("page " + page + "받음");
       setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
@@ -93,13 +76,6 @@ function LibraryMain() {
     }
   };
 
-  //0. 마운트시..
-  /*
-  1) "전체" 탭으로 초기화, page도 0으로 초기화
-
-  ...) 하단 감지해야만 page set되도록?
-
-  */
   //1. 탭 변경시 setPage(-1)
   useEffect(() => {
     console.log("탭 선택: " + selectedTag);
@@ -112,7 +88,9 @@ function LibraryMain() {
   useEffect(() => {
     console.log("페이지 변경됨:" + page);
     if (isLoggedIn) {
-      recColls4LoginUser();
+      if (page >= 0) {
+        recColls4LoginUser();
+      }
     } else if (!isLoggedIn) {
       // if (page == -1) {
       //   // 새 탭의 새 페이지로 도달한 경우
