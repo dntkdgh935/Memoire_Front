@@ -1,0 +1,41 @@
+.deckContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px;
+  padding: 2rem;
+  justify-items: center;
+}
+
+.card {
+  text-align: center;
+  background-color: #f9f7f3;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+.cardImage {
+  width: 100%;
+  max-width: 140px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.cardName {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #4d3b30;
+}
+
+.keywordList {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+  color: #555;
+}
