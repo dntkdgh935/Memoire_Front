@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useNavigate } from "react-router-dom";
 import styles from "./ArchiveNewCollection.module.css";
+import PageHeader from "../../components/common/PageHeader";
 
 function ArchiveNewCollection() {
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
@@ -25,7 +26,7 @@ function ArchiveNewCollection() {
     setCollection((prevCollection) => ({
       ...prevCollection,
       authorid: userid, //AuthProvider 에서 가져온 userid
-      color: "#000000",
+      color: "#ffffff",
     }));
   }, [isLoggedIn, userid, navigate]);
 
@@ -39,6 +40,14 @@ function ArchiveNewCollection() {
     const byteLength = new Blob([collection.collectionTitle]).size;
     if (byteLength > 255) {
       alert("컬렉션 제목은 최대 255바이트까지만 입력 가능합니다.");
+      return;
+    }
+    if (
+      collection.visibility !== "1" &&
+      collection.visibility !== "2" &&
+      collection.visibility !== "3"
+    ) {
+      alert("공유범위가 잘못 되었습니다.");
       return;
     }
 
@@ -56,6 +65,7 @@ function ArchiveNewCollection() {
 
   return (
     <>
+      <PageHeader pagename={`새 컬렉션`} />
       <div className={styles.container}>
         <form className={styles.form} onSubmit={handleNext}>
           <div className={styles.formRow}>

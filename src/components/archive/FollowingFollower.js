@@ -203,7 +203,9 @@ function FollowingFollower({ mode, excludeUserIds = [], onInviteComplete }) {
                   @{user.loginId || "소셜로그인"}
                 </div>
               </div>
-              {mode === "invite" || location.pathname === "/chat/new" ? (
+              {user.role === "ADMIN" ? (
+                <span className={styles.adminSpan}>관리자</span>
+              ) : mode === "invite" || location.pathname === "/chat/new" ? (
                 <input
                   type="checkbox"
                   className={styles.userCheckbox}

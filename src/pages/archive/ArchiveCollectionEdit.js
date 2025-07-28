@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ArchiveCollectionEdit.module.css";
+import PageHeader from "../../components/common/PageHeader";
 
 function ArchiveCollectionEdit() {
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
@@ -88,6 +89,14 @@ function ArchiveCollectionEdit() {
     const byteLength = new Blob([collection.collectionTitle]).size;
     if (byteLength > 255) {
       alert("컬렉션 제목은 최대 255바이트까지만 입력 가능합니다.");
+      return;
+    }
+    if (
+      collection.visibility !== "1" &&
+      collection.visibility !== "2" &&
+      collection.visibility !== "3"
+    ) {
+      alert("공유범위가 잘못 되었습니다.");
       return;
     }
     const data = new FormData();
@@ -181,6 +190,7 @@ function ArchiveCollectionEdit() {
 
   return (
     <>
+      <PageHeader pagename={`컬렉션 수정`} />
       <div className={styles.container}>
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formRow}>

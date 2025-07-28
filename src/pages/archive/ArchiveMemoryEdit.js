@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ArchiveMemoryEdit.module.css";
+import PageHeader from "../../components/common/PageHeader";
 
 function ArchiveMemoryEdit() {
   const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
@@ -189,6 +190,7 @@ function ArchiveMemoryEdit() {
 
   return (
     <>
+      <PageHeader pagename={`메모리 수정`} />
       <form onSubmit={handleUpload}>
         <div className={styles.container}>
           <div className={styles.leftPane}>
