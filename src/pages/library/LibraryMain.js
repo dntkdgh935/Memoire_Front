@@ -81,6 +81,7 @@ function LibraryMain() {
         setPage(0);
         return;
       }
+      console.log("page " + page + "받음");
       setRecColls((prev) => [...prev, ...res.data.content]);
       return res.data;
     } catch (err) {
@@ -94,33 +95,38 @@ function LibraryMain() {
   //0. 마운트시..
   /*
   1) "전체" 탭으로 초기화, page도 0으로 초기화
+
+  ...) 하단 감지해야만 page set되도록?
+
   */
   //1. 탭 변경시 setPage(-1)
   useEffect(() => {
     console.log("탭 선택: " + selectedTag);
-    setRecColls([]); // 💥 추천 결과 초기화
+    setRecColls([]);
     setPage(-1); // 탭이 변경되었음을 표현.
+    // setIsLoading(false);
   }, [selectedTag, userid, isLoggedIn]);
 
   //2. 페이지 변경시 추천 ...
   useEffect(() => {
+    console.log("페이지 변경됨:" + page);
     if (isLoggedIn) {
       recColls4LoginUser();
     } else if (!isLoggedIn) {
-      if (page == -1) {
-        // 새 탭의 새 페이지로 도달한 경우
-        setPage(0);
-      }
+      // if (page == -1) {
+      //   // 새 탭의 새 페이지로 도달한 경우
+      //   setPage(0);
+      // }
       if (page >= 0) {
         console.log("새 페이지:" + page);
         fetchCollections4Anon();
       }
     }
-  }, [page, isLoggedIn]);
+  }, [page, isLoggedIn]); // selectedTag
 
   //3. 기존 fetchCollections4Anon()완료 후 페이지 하단 감지
   useEffect(() => {
-    if (!loaderRef.current) return;
+    if (!loaderRef.current || isLoading) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -139,85 +145,18 @@ function LibraryMain() {
     };
   }, [selectedTag]);
 
-  // //4. 페이지가 0에서 증가시, 추천 계속 진행
+  //TODO: fetch후에도 추가 요청 가능한 경우 진행하도록 코드 추가 (현재 0->2로 가는 문제)
   useEffect(() => {
-    if (page <= 0) return; // 초기값일 때 제외
-    if (isLoading) return;
-    setIsLoading(true);
+    if (!isLoading && loaderRef.current) {
+      const rect = loaderRef.current.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight;
 
-    fetchCollections4Anon(); // 조건 없이 page 바뀔 때마다 실행
-  }, [page]);
-
-  //페이지 하단 감지 => 감지해 페이지 증가(setPage)
-  // useEffect(() => {
-  //   // if (!loaderRef.current || selectedTag !== "추천") return;
-  //   if (!loaderRef.current || isLoading) return;
-
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       if (entries[0].isIntersecting) {
-  //         console.log("⏬ 하단 도달 → setPage to:");
-  //         console.log(page + 1);
-  //         setPage((prev) => prev + 1);
-  //       }
-  //     },
-  //     {
-  //       threshold: 0.5, // 컨테이너의 끝에 완전히 도달했을 때만 감지
-  //     }
-  //   );
-  //   observer.observe(loaderRef.current);
-  //   return () => {
-  //     if (loaderRef.current) observer.unobserve(loaderRef.current);
-  //   };
-  // }, [selectedTag]);
-
-  // // 1. 탭 클릭 지정 완료시, coll및 page 0으로 초기화
-  // // 하고 첫 추천(X)
-  // useEffect(() => {
-  //   console.log("탭 선택: " + selectedTag);
-  //   setRecColls([]); // 💥 추천 결과 초기화
-  //   setPage(0); // 💥 페이지 초기화
-  // }, [selectedTag, userid, isLoggedIn]);
-
-  // // //페이지 0으로 변화할 때 fetch
-  // //페이지 변화 => 다음 페이지 요청 (-1~0도)
-  // // useEffect(() => {
-  // //   //로그인+추천
-  // //   console.log("페이지 변화에 따른 결과 받아오기");
-  // //   if (selectedTag === "추천" && isLoggedIn) {
-  // //     //&& page !== 0) {
-  // //     recColls4LoginUser();
-  // //   }
-  // //   //로그인 + 기타
-  // //   //비로그인
-  // //   else if (!isLoggedIn) {
-  // //     fetchCollections4Anon();
-  // //   }
-  // // }, [page, selectedTag]);
-
-  // // //2. 페이지가 0이됨+selectedTag 변경 -> 새로운 페이지에 대한 fetch 시작
-  // useEffect(() => {
-  //   console.log("📌 페이지 변화에 따른 fetch 시작:", page);
-
-  //   // 🔹 초기 진입 또는 reset 후 첫 요청
-  //   if (page === 0) {
-  //     if (selectedTag === "추천" && isLoggedIn) {
-  //       recColls4LoginUser();
-  //     } else if (!isLoggedIn) {
-  //       fetchCollections4Anon();
-  //     }
-  //   }
-
-  //   // 🔸 무한 스크롤에 따른 추가 요청
-  //   else if (page > 0) {
-  //     if (selectedTag === "추천" && isLoggedIn) {
-  //       recColls4LoginUser();
-  //     } else if (!isLoggedIn) {
-  //       fetchCollections4Anon();
-  //     }
-  //     // 로그인 + 태그 등 다른 조건은 필요 시 여기에 추가
-  //   }
-  // }, [page, selectedTag, isLoggedIn]);
+      if (isVisible) {
+        console.log("🔥 fetch 후에도 loader가 보이므로 page 추가 요청");
+        setPage((prev) => prev + 1);
+      }
+    }
+  }, [recColls]);
 
   const handleLikeChange = async (updatedColl) => {
     if (isLoggedIn) {
