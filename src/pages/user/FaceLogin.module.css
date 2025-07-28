@@ -54,6 +54,7 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   user-select: none;
+  width: 100%;
 }
 
 .loginButton:hover:not(:disabled) {
@@ -154,4 +155,71 @@
   color: #de4949;
   margin-top: 8px;
   text-align: center;
+}
+/* FaceLogin.module.css 파일에 아래 내용을 추가하거나 기존 .card 내용을 수정 */
+.loginBox {
+  background-color: #fdfbf8;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid #b0b0b0;
+  transition: transform 0.3s ease;
+}
+
+.loginBox:hover {
+  transform: scale(1.05);
+}
+
+.webcamSection {
+  margin-bottom: 20px;
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+}
+
+.input {
+  width: 100%; /* padding 고려 */
+  padding: 12px;
+  border: 1px solid #d4ccbb;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #5b4f46;
+  background-color: #fdfbf8;
+  box-sizing: border-box; /* padding이 너비에 포함되도록 */
+}
+
+.input:focus {
+  outline: none;
+  border-color: #5b4f46;
+  box-shadow: 0 0 0 2px rgba(91, 79, 70, 0.2);
+}
+
+.backLink span {
+  color: #5b4f46;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-top: 15px; /* Adjust as needed */
+  display: inline-block;
+}
+
+.backLink span:hover {
+  color: #4a3728;
+}
+
+/* 메시지 관련 클래스 이름도 CSS에 맞게 조정 */
+.messageLoading {
+  /* .loadingMessage를 .messageLoading으로 이름 변경 */
+  background-color: #fff7e7;
+  color: #5b4f46;
+}
+
+.messageNormal {
+  /* .normalMessage를 .messageNormal으로 이름 변경 */
+  background-color: #fdfbf8;
+  color: #5b4f46;
 }

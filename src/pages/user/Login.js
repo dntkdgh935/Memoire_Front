@@ -195,7 +195,7 @@ function Login({ onLoginSuccess }) {
               onKeyDown={handleKeyDown}
               placeholder="아이디"
               aria-label="User ID"
-              maxlength="12"
+              maxLength="12"
             />
           </div>
           <div className={styles.inputGroup}>
@@ -207,7 +207,7 @@ function Login({ onLoginSuccess }) {
               onKeyDown={handleKeyDown}
               placeholder="비밀번호"
               aria-label="Password"
-              maxlength="16"
+              maxLength="16"
             />
           </div>
           <div className={styles.checkboxGroup}>
