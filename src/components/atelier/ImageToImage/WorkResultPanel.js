@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import styles from "./WorkResultPanel.module.css";
 import loadingImg from "../../../assets/loading_pen.png";
 import errorImg from "../../../assets/error_rain.png";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../AuthProvider";
 
 export default function WorkResultPanel({
   result,
@@ -10,6 +11,8 @@ export default function WorkResultPanel({
   selectedCollectionId,
   originalMemoryTitle,
 }) {
+  const { secureApiRequest } = useContext(AuthContext);
+
   const isLoading = result?.status === "loading";
   const isError = result?.status === "error";
   const isSuccess = result?.status === "success" && result.imageUrl;
@@ -22,23 +25,32 @@ export default function WorkResultPanel({
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
+
     const payload = {
       collectionId: selectedCollectionId,
       ...result.resultDto,
       title: originalMemoryTitle,
     };
+
     try {
-      const response = await fetch(`/atelier/imtim/${selectedCollectionId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error("새 메모리 저장 실패");
-      alert("새 메모리로 저장되었습니다!");
+      const res = await secureApiRequest(
+        `/atelier/imtim/${selectedCollectionId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(res.data?.message || "새 메모리 저장 실패");
+      }
+
+      alert("✅ 새 메모리로 저장되었습니다!");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      alert("저장 중 오류 발생");
+      console.error("❌ 저장 중 오류:", err);
+      alert("저장 중 오류 발생: " + (err.message || ""));
     }
   };
 
@@ -49,17 +61,24 @@ export default function WorkResultPanel({
       return;
     }
     try {
-      const response = await fetch(`/atelier/imtim/save/${originalMemoryId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.resultDto),
-      });
-      if (!response.ok) throw new Error("덮어쓰기 실패");
-      alert("원본 메모리가 덮어쓰기 되었습니다!");
+      const res = await secureApiRequest(
+        `/atelier/imtim/save/${originalMemoryId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(result.resultDto),
+        }
+      );
+
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(res.data?.message || "메모리 덮어쓰기 실패");
+      }
+
+      alert("✅ 원본 메모리가 덮어쓰기 되었습니다!");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      alert("업데이트 중 오류 발생");
+      console.error("❌ 업데이트 중 오류 발생:", err);
+      alert("업데이트 중 오류 발생: " + (err.message || ""));
     }
   };
 

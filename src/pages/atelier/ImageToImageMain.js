@@ -13,7 +13,7 @@ export default function ImageToImageMain() {
   const [memories, setMemories] = useState([]);
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [result, setResult] = useState(null);
-  const { isLoggedIn, userid } = useContext(AuthContext);
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
@@ -27,41 +27,56 @@ export default function ImageToImageMain() {
 
   // 컬렉션 목록 조회
   useEffect(() => {
-    fetch(`/atelier/imtim/collections/${userid}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("컬렉션 조회 실패");
-        return res.json();
-      })
-      .then((data) => {
+    const fetchCollections = async () => {
+      try {
+        const res = await secureApiRequest(
+          `/atelier/video/collections/${userid}`
+        );
+        if (res.status !== 200) throw new Error("컬렉션 조회 실패");
+
+        const data = res.data;
         const formatted = data.map((c) => ({
           id: c.collectionid,
           title: c.collectionTitle,
         }));
         setCollections(formatted);
+
         if (formatted.length > 0) {
-          setSelectedCollectionId(formatted[0].id.toString());
+          setSelectedCollectionId(formatted[0].id);
         }
-      })
-      .catch((err) => console.error("컬렉션 가져오기 오류:", err));
+      } catch (err) {
+        console.error("❌ 컬렉션 가져오기 오류:", err);
+      }
+    };
+
+    fetchCollections();
   }, []);
 
   // 해당 컬렉션 메모리 목록 조회
   useEffect(() => {
     if (!selectedCollectionId) return;
-    fetch(`/atelier/imtim/collections/${selectedCollectionId}/memories`)
-      .then((res) => {
-        if (!res.ok) throw new Error("메모리 조회 실패");
-        return res.json();
-      })
-      .then((data) => {
+
+    const fetchMemories = async () => {
+      try {
+        const res = await secureApiRequest(
+          `/atelier/imtim/collections/${selectedCollectionId}/memories`
+        );
+
+        if (res.status !== 200) {
+          throw new Error("메모리 조회 실패");
+        }
+
+        const data = res.data;
         setMemories(data);
         setSelectedMemoryId(null);
         setResult(null);
-      })
-      .catch((err) => {
-        console.error("메모리 가져오기 오류:", err);
+      } catch (err) {
+        console.error("❌ 메모리 가져오기 오류:", err);
         setMemories([]);
-      });
+      }
+    };
+
+    fetchMemories();
   }, [selectedCollectionId]);
 
   // 선택된 메모리 객체

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styles from "./WorkResultPanel.module.css";
 import loadingImg from "../../../assets/loading_pen.png";
 import errorImg from "../../../assets/error_rain.png";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../AuthProvider";
 
 function WorkResultPanel({
   result,
@@ -15,6 +16,7 @@ function WorkResultPanel({
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { secureApiRequest } = useContext(AuthContext);
 
   useEffect(() => {
     if (result?.videoUrl) {
@@ -29,32 +31,45 @@ function WorkResultPanel({
   const handleSaveAsNewMemory = async () => {
     console.log("Saving new memory:", {
       collectionId: selectedCollectionId,
-      resultDto: result.resultDto,
+      resultDto: result?.resultDto,
     });
-    setLoading(true);
+
     if (!result?.resultDto) {
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
+
+    setLoading(true);
+    setError(false); // 이전 에러 초기화
+
     const payload = {
       collectionId: selectedCollectionId,
       ...result.resultDto,
       title: originalMemoryTitle,
     };
+
     try {
-      const response = await fetch(`/atelier/video/${selectedCollectionId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error("새 메모리 저장 실패");
-      alert("새 메모리로 저장되었습니다!");
+      const res = await secureApiRequest(
+        `/atelier/video/${selectedCollectionId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(res.data?.message || "새 메모리 저장 실패");
+      }
+
+      alert("✅ 새 메모리로 저장되었습니다!");
       navigate("/");
     } catch (err) {
-      setLoading(false);
+      console.error("❌ 저장 중 오류:", err);
       setError(true);
-      console.error(err);
-      alert("저장 중 오류 발생");
+      alert("저장 중 오류 발생: " + (err.message || ""));
+    } finally {
+      setLoading(false); // 성공/실패 상관없이 로딩 종료
     }
   };
 
@@ -64,18 +79,26 @@ function WorkResultPanel({
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
+
     try {
-      const response = await fetch(`/atelier/video/save/${originalMemoryId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.resultDto),
-      });
-      if (!response.ok) throw new Error("덮어쓰기 실패");
-      alert("원본 메모리가 덮어쓰기 되었습니다!");
+      const res = await secureApiRequest(
+        `/atelier/video/save/${originalMemoryId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(result.resultDto),
+        }
+      );
+
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(res.data?.message || "메모리 덮어쓰기 실패");
+      }
+
+      alert("✅ 원본 메모리가 덮어쓰기 되었습니다!");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      alert("업데이트 중 오류 발생");
+      console.error("❌ 업데이트 중 오류:", err);
+      alert("업데이트 중 오류 발생: " + (err.message || ""));
     }
   };
 
@@ -125,7 +148,12 @@ function WorkResultPanel({
 
       {!loading && !error && videoUrl && (
         <div className={styles.videoBox}>
-          <video src={videoUrl} controls poster={result.previewImageUrl} />
+          <video
+            src={videoUrl}
+            controls
+            poster={result.previewImageUrl}
+            className={styles.video}
+          />
           <button
             className={styles.secondaryBtn}
             onClick={handleOverwriteMemory}

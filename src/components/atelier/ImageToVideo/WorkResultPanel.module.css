@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  font-family: 'Pretendard', sans-serif;
+  font-family: "Pretendard", sans-serif;
   color: #4d3b30;
   background-color: #fdfaf7;
   padding: 24px;
@@ -91,7 +91,7 @@
 
 .primaryBtn,
 .secondaryBtn {
-  font-family: 'Pretendard', sans-serif;
+  font-family: "Pretendard", sans-serif;
   font-size: 14px;
   padding: 10px 16px;
   border-radius: 8px;
@@ -118,10 +118,16 @@
   background-color: #f1eae3;
 }
 
-/* ✅ 결과 없음 */
 .placeholder {
   font-size: 14px;
   color: #a79888;
   text-align: center;
-  margin-top: 24px; /* ✅ 여백 축소 */
+  margin-top: 24px;
+}
+
+.video {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
 }

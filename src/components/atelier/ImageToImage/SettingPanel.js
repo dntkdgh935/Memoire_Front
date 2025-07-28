@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styles from "./SettingPanel.module.css";
+import { AuthContext } from "../../../AuthProvider";
 
 export default function SettingPanel({ selectedMemory, onGenerate }) {
   const [stylePrompt, setStylePrompt] = useState("");
+  const { secureApiRequest } = useContext(AuthContext);
 
-  const handleGenerate = () => {
+  useEffect(() => {
+    setStylePrompt("");
+  }, [selectedMemory]);
+
+  const handleGenerate = async () => {
     if (!selectedMemory || !stylePrompt) return;
     console.log("selectedMemory:", selectedMemory);
 
@@ -15,20 +21,29 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
 
     console.log("payload ▶", payload);
 
-    fetch("/atelier/imtim/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("이미지 변환 실패");
-        return res.json();
-      })
-      .then((dto) => {
-        console.log("received DTO in SettingPanel", dto);
-        onGenerate(dto);
-      })
-      .catch((err) => console.error("변환 요청 오류:", err));
+    try {
+      const res = await secureApiRequest("/atelier/imtim/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.status === 413) {
+        alert("⚠️ 생성된 결과가 너무 커서 저장할 수 없습니다.");
+        return;
+      }
+
+      if (res.status < 200 || res.status >= 300) {
+        const errorText = res.data?.message || "이미지 변환 실패";
+        throw new Error(errorText);
+      }
+
+      const dto = res.data;
+      console.log("✅ received DTO in SettingPanel", dto);
+      onGenerate(dto);
+    } catch (err) {
+      console.error("❌ 변환 요청 오류:", err);
+    }
   };
 
   if (!selectedMemory) {
