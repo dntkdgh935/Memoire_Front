@@ -31,23 +31,19 @@ function WorkResultPanel({
   const handleSaveAsNewMemory = async () => {
     console.log("Saving new memory:", {
       collectionId: selectedCollectionId,
-      resultDto: result?.resultDto,
+      resultDto: result.resultDto,
     });
-
+    setLoading(true);
+    setError(false);
     if (!result?.resultDto) {
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
-
-    setLoading(true);
-    setError(false); // 이전 에러 초기화
-
     const payload = {
       collectionId: selectedCollectionId,
       ...result.resultDto,
       title: originalMemoryTitle,
     };
-
     try {
       const res = await secureApiRequest(
         `/atelier/video/${selectedCollectionId}`,
@@ -69,7 +65,7 @@ function WorkResultPanel({
       setError(true);
       alert("저장 중 오류 발생: " + (err.message || ""));
     } finally {
-      setLoading(false); // 성공/실패 상관없이 로딩 종료
+      setLoading(false);
     }
   };
 
@@ -79,7 +75,6 @@ function WorkResultPanel({
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
     }
-
     try {
       const res = await secureApiRequest(
         `/atelier/video/save/${originalMemoryId}`,
@@ -97,8 +92,8 @@ function WorkResultPanel({
       alert("✅ 원본 메모리가 덮어쓰기 되었습니다!");
       navigate("/");
     } catch (err) {
-      console.error("❌ 업데이트 중 오류:", err);
-      alert("업데이트 중 오류 발생: " + (err.message || ""));
+      console.error(err);
+      alert("업데이트 중 오류 발생");
     }
   };
 

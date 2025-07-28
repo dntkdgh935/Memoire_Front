@@ -91,7 +91,7 @@ export default function WorkResultPanel({
 
       {isLoading && (
         <div className={styles.loadingBox}>
-          <img src={result.imageUrl} alt="로딩 중" />
+          <img src={loadingImg} alt="로딩 중" />
           <p>
             이미지 생성중
             <br />
