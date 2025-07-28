@@ -105,6 +105,11 @@ export default function ImageToVideoMain() {
             selectedMemory={selectedMemory}
             onGenerate={(dto) => {
               console.log("imageToVideomain got dto", dto);
+              if (dto.status === "loading" || dto.status === "error") {
+                setResult(dto);
+                return;
+              }
+
               setResult({
                 status: "success",
                 resultDto: dto,

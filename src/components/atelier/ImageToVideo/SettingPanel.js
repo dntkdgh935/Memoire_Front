@@ -81,17 +81,22 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
 
       const data = res.data;
       console.log("TTS 생성 결과:", data);
+      onGenerate({ status: "success" });
       setTtsUrl(`http://localhost:8000${data.audio_url}`);
       setTtsGenerated(true);
     } catch (e) {
+      onGenerate({
+        status: "error",
+        errorMessage: e.message || "알 수 없는 오류",
+      });
       console.error("TTS 생성 오류:", e);
-      setTtsError(e.message || "TTS 생성 중 알 수 없는 오류");
     } finally {
       setTtsLoading(false);
     }
   };
 
   const handleGenerateVideo = async () => {
+    onGenerate({ status: "loading" });
     setVideoLoading(true);
     setVideoError(null);
 
@@ -125,10 +130,18 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
       }
 
       const dto = res.data;
-      onGenerate(dto);
+      onGenerate({
+        status: "success",
+        videoUrl: res.data.videoUrl, // ← API가 리턴하는 필드 이름 맞춰 주세요
+        previewImage: res.data.previewImageUrl, // (선택)
+        resultDto: res.data, // 나중 저장용 DTO
+      });
     } catch (err) {
+      onGenerate({
+        status: "error",
+        errorMessage: err.message || "알 수 없는 오류",
+      });
       console.error("영상 생성 오류:", err);
-      setVideoError(err.message || "영상 생성 중 알 수 없는 오류");
     } finally {
       setVideoLoading(false);
     }
@@ -246,7 +259,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
           </div>
 
           {ttsError && <p className={styles.errorText}>{ttsError}</p>}
-          <div className={styles.footer}>
+          <div className={styles.lipsync}>
             <button
               className={styles.generateBtn}
               onClick={handleGenerateTts}

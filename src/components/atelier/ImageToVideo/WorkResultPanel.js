@@ -12,10 +12,11 @@ function WorkResultPanel({
   selectedCollectionId,
 }) {
   const navigate = useNavigate();
+  const isLoading = result?.status === "loading";
+  const isError = result?.status === "error";
+  const isSuccess = result?.status === "success";
 
   const [videoUrl, setVideoUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const { secureApiRequest } = useContext(AuthContext);
 
   useEffect(() => {
@@ -23,7 +24,6 @@ function WorkResultPanel({
       const Url = `http://localhost:8080/upload_files${result.videoUrl}`;
       console.log("videoUrl: ", videoUrl);
       setVideoUrl(Url);
-      setError(null);
     }
   }, [result?.videoUrl]);
 
@@ -33,8 +33,6 @@ function WorkResultPanel({
       collectionId: selectedCollectionId,
       resultDto: result.resultDto,
     });
-    setLoading(true);
-    setError(false);
     if (!result?.resultDto) {
       alert("저장할 메모리 ID 또는 결과 데이터가 없습니다.");
       return;
@@ -62,10 +60,7 @@ function WorkResultPanel({
       navigate("/");
     } catch (err) {
       console.error("❌ 저장 중 오류:", err);
-      setError(true);
       alert("저장 중 오류 발생: " + (err.message || ""));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -104,44 +99,24 @@ function WorkResultPanel({
       </div>
       <div className={styles.title}>{originalMemoryTitle || "제목 없음"}</div>
 
-      {loading && (
+      {isLoading && (
         <div className={styles.loadingBox}>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
           <img src={loadingImg} alt="로딩 중" />
           <p>
             영상 생성중
             <br />
             잠시만 기다려주세요.
           </p>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
         </div>
       )}
-      {error && (
+      {isError && (
         <div className={styles.errorBox}>
           <img src={errorImg} alt="에러" />
-          <p className={styles.errorText}>오류: {error}</p>
+          <p className={styles.errorText}>오류: {result.errorMessage}</p>
         </div>
       )}
 
-      {!loading && !error && videoUrl && (
+      {isSuccess && videoUrl && (
         <div className={styles.videoBox}>
           <video
             src={videoUrl}
@@ -162,7 +137,7 @@ function WorkResultPanel({
       )}
 
       {/* 초기 안내 */}
-      {!videoUrl && !loading && !error && (
+      {!videoUrl && !isLoading && !isError && (
         <p className={styles.placeholder}>
           프롬프트를 입력하시고 영상을 생성해주세요.
         </p>

@@ -103,3 +103,8 @@ hr {
   border-top: 1px solid #e5ded7;
   margin: 16px 0;
 }
+
+.lipsync .generateBtn {
+  /* 기존 스타일 유지하면서 아래쪽 여백 추가 */
+  margin: 8px;
+}
