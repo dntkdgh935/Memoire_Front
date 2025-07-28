@@ -109,6 +109,11 @@ export default function ImageToImageMain() {
             selectedMemory={selectedMemory}
             onGenerate={(dto) => {
               console.log("imagetoimagemain got dto", dto);
+              if (dto.status === "loading" || dto.status === "error") {
+                setResult(dto);
+                return;
+              }
+
               const image = `http://localhost:8080/upload_files/memory_img/${dto.filename}`;
               setResult({
                 status: "success",
