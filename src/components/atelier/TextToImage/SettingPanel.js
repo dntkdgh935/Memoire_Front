@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styles from "./SettingPanel.module.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../AuthProvider";
 
 function SettingPanel({ selectedMemory, onGenerate }) {
   const [style, setStyle] = useState("");
   const [prompt, setPrompt] = useState("");
   const navigate = useNavigate();
+  const { secureApiRequest } = useContext(AuthContext);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!selectedMemory) return;
 
-    // ✅ 로딩 상태 설정
     onGenerate({ status: "loading" });
 
     const requestBody = {
@@ -26,18 +27,30 @@ function SettingPanel({ selectedMemory, onGenerate }) {
       content: selectedMemory.content || ""
     };
 
-    fetch("/api/atelier/image/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    })
-      .then((res) => res.json())
-      .then((data) => onGenerate(data))
-      .catch((err) => {
-        console.error("DALL·E generate error", err);
-        // ✅ 에러 상태 전달
-        onGenerate({ status: "error", errorMessage: err.message });
+    try {
+      const res = await secureApiRequest("/api/atelier/image/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
       });
+
+      if (res.status === 413) {
+        alert("⚠️ 생성된 결과가 너무 커서 저장할 수 없습니다.");
+        return;
+      }
+
+      if (res.status < 200 || res.status >= 300) {
+        const errorText = res.data?.message || "이미지 변환 실패";
+        throw new Error(errorText);
+      }
+
+      const dto = res.data;
+      console.log("✅ received DTO in SettingPanel", dto);
+      onGenerate(dto);
+    } catch (err) {
+      console.error("❌ 이미지 변환 요청 오류:", err);
+      onGenerate({ status: "error", errorMessage: err.message });
+    }
   };
 
   const handleNavigateToText = () => {
@@ -71,7 +84,10 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           <div className={styles.field}>
             <label>메모리 변환 옵션</label>
             <div className={styles.optionButtons}>
-              <button className={styles.option} onClick={handleNavigateToText}>
+              <button
+                className={styles.option}
+                onClick={handleNavigateToText}
+              >
                 AI 텍스트 변환
               </button>
               <button className={styles.optionActive}>AI 이미지 변환</button>
@@ -101,7 +117,11 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           </div>
 
           <div className={styles.footer}>
-            <button className={styles.generateBtn} onClick={handleGenerate}>
+            <button
+              className={styles.generateBtn}
+              onClick={handleGenerate}
+              disabled={!style && !prompt}
+            >
               적용 →
             </button>
           </div>

@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+// src/components/atelier/TextToText/SettingPanel.js
+
+import React, { useState, useContext } from "react";
 import styles from "./SettingPanel.module.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../AuthProvider";
 
 function SettingPanel({ selectedMemory, onGenerate }) {
   const [style, setStyle] = useState("");
   const [prompt, setPrompt] = useState("");
   const navigate = useNavigate();
+  const { secureApiRequest, userid } = useContext(AuthContext);
 
   const handleGenerate = () => {
     if (!selectedMemory) return;
 
-    fetch("/api/atelier/text/generate", {
+    secureApiRequest("/api/atelier/text/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -26,12 +30,12 @@ function SettingPanel({ selectedMemory, onGenerate }) {
         title: selectedMemory.title,
         option: prompt,
         memoryId: selectedMemory.memoryid,
-        userId: selectedMemory.userId || "demo"
+        userId: userid || "demo"
       })
     })
       .then(res => {
-        if (!res.ok) throw new Error("응답 실패");
-        return res.json();
+        if (res.status !== 200) throw new Error("응답 실패");
+        return res.data;
       })
       .then(data => {
         console.log("✅ FastAPI 응답 성공:", data);
@@ -40,10 +44,6 @@ function SettingPanel({ selectedMemory, onGenerate }) {
       .catch(err => {
         console.error("❌ GPT generate error", err);
       });
-  };
-
-  const handleNavigateToImage = () => {
-    navigate("/atelier/text2image");
   };
 
   return (
@@ -73,11 +73,7 @@ function SettingPanel({ selectedMemory, onGenerate }) {
           <div className={styles.field}>
             <label>메모리 변환 옵션</label>
             <div className={styles.optionButtons}>
-              {/* 이대로 저장 버튼 제거 */}
               <button className={styles.optionActive}>AI 텍스트 변환</button>
-              <button className={styles.option} onClick={handleNavigateToImage}>
-                AI 이미지 변환
-              </button>
             </div>
           </div>
 

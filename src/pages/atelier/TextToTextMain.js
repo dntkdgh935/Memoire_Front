@@ -1,4 +1,3 @@
-// src/pages/atelier/TextToTextMain.js
 import React, { useEffect, useState, useContext } from "react";
 import MemoryList from "../../components/atelier/common/MemoryList";
 import SettingPanel from "../../components/atelier/TextToText/SettingPanel";
@@ -14,8 +13,7 @@ function TextToTextMain() {
   const [selectedMemoryId, setSelectedMemoryId] = useState(null);
   const [result, setResult] = useState(null);
 
-  // AuthContext에서 userid 사용
-  const { isLoggedIn, userid } = useContext(AuthContext);
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext);
   const userId = userid;
 
   const selectedMemory =
@@ -26,10 +24,10 @@ function TextToTextMain() {
   // 1) 컬렉션 목록 조회
   useEffect(() => {
     if (!isLoggedIn || !userId) return;
-    fetch(`/api/collections/${userId}`)
+    secureApiRequest(`/api/collections/${userId}`) // ✅ 경로 수정
       .then((res) => {
-        if (!res.ok) throw new Error("컬렉션 조회 실패: " + res.status);
-        return res.json();
+        if (res.status !== 200) throw new Error("컬렉션 조회 실패: " + res.status);
+        return res.data;
       })
       .then((data) => {
         const formatted = Array.isArray(data)
@@ -47,10 +45,10 @@ function TextToTextMain() {
   // 2) 메모리 목록 조회
   useEffect(() => {
     if (!selectedCollectionId) return;
-    fetch(`/api/atelier/text/memories/${selectedCollectionId}`)
+    secureApiRequest(`/api/atelier/text/memories/${selectedCollectionId}`)
       .then((res) => {
-        if (!res.ok) throw new Error("메모리 목록 조회 실패: " + res.status);
-        return res.json();
+        if (res.status !== 200) throw new Error("메모리 목록 조회 실패: " + res.status);
+        return res.data;
       })
       .then((data) => {
         const textMemories = Array.isArray(data)
@@ -69,7 +67,6 @@ function TextToTextMain() {
     <>
       <PageHeader pagename="Atelier" />
       <div className={styles.container}>
-        {/* 왼쪽 + 중앙 패널을 하나의 큰 박스로 묶음 */}
         <div className={styles.combinedPanel}>
           <div className={styles.leftPanel}>
             <MemoryList
@@ -85,7 +82,6 @@ function TextToTextMain() {
             <SettingPanel selectedMemory={selectedMemory} onGenerate={setResult} />
           </div>
         </div>
-        {/* 오른쪽 패널 */}
         <div className={styles.rightPanel}>
           <WorkResultPanel
             result={result}

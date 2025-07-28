@@ -1,16 +1,14 @@
-// src/pages/tarot/TarotHome.js
-
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader";
 import { AuthContext } from "../../AuthProvider";
 import styles from "./TarotHome.module.css";
 
-// assets/videos, assets/images 에 위치한 파일들
 import tarotIntroVideo from "../../assets/videos/tarot_intro.mp4";
 import oneCardImg    from "../../assets/images/tarot_1card.png";
 import threeCardImg  from "../../assets/images/tarot_3card.png";
 import crossCardImg  from "../../assets/images/tarot_celtic.png";
+import deckImg       from "../../assets/images/tarot_deck.png"; // ✅ 새로 추가 (없으면 placeholder)
 
 export default function TarotHome() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -43,6 +41,13 @@ export default function TarotHome() {
       route: "/tarot/read/10",
       imageUrl: crossCardImg,
     },
+    {
+      key: "deck",
+      title: "타로 카드 도감", // ✅ 새 항목
+      description: "모든 타로 카드를 한눈에 살펴보세요.",
+      route: "/tarot/deck",
+      imageUrl: deckImg,
+    },
   ];
 
   return (
@@ -50,7 +55,7 @@ export default function TarotHome() {
       <PageHeader pagename="Tarot" />
 
       <div className={styles.container}>
-        {/* ① 소개 섹션 */}
+        {/* 소개 */}
         <div className={styles.intro}>
           <video
             src={tarotIntroVideo}
@@ -68,7 +73,7 @@ export default function TarotHome() {
           </p>
         </div>
 
-        {/* ② 체험하기 카드 그리드 */}
+        {/* 카드 목록 */}
         <div className={styles.cardGrid}>
           {spreads.map((s) => (
             <div

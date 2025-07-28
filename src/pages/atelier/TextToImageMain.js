@@ -8,7 +8,7 @@ import PageHeader from "../../components/common/PageHeader";
 import { AuthContext } from "../../AuthProvider";
 
 function TextToImageMain() {
-  const { isLoggedIn, userid } = useContext(AuthContext);
+  const { isLoggedIn, userid, secureApiRequest } = useContext(AuthContext); // ✅ secureApiRequest 포함
   const userId = userid;
 
   const [collections, setCollections] = useState([]);
@@ -22,47 +22,57 @@ function TextToImageMain() {
       ? memories.find((m) => m.memoryid?.toString() === selectedMemoryId.toString())
       : null;
 
-  // 1) 컬렉션 목록 조회
+  // ✅ 1) 컬렉션 목록 조회
   useEffect(() => {
     if (!isLoggedIn || !userId) return;
 
-    fetch(`/api/collections/${userId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("컬렉션 조회 실패: " + res.status);
-        return res.json();
-      })
-      .then((data) => {
+    const fetchCollections = async () => {
+      try {
+        const res = await secureApiRequest(`/api/collections/${userId}`);
+        if (res.status !== 200) throw new Error("컬렉션 조회 실패");
+
+        const data = res.data;
         const formatted = Array.isArray(data)
           ? data.map((c) => ({ id: c.collectionid.toString(), title: c.collectionTitle }))
           : [];
-        setCollections(formatted);
-        if (formatted.length > 0) setSelectedCollectionId(formatted[0].id);
-      })
-      .catch((err) => console.error("컬렉션 가져오기 오류:", err));
-  }, [isLoggedIn, userId]);
 
-  // 2) 메모리 목록 조회
+        setCollections(formatted);
+        if (formatted.length > 0) {
+          setSelectedCollectionId(formatted[0].id);
+        }
+      } catch (err) {
+        console.error("컬렉션 가져오기 오류:", err);
+      }
+    };
+
+    fetchCollections();
+  }, [isLoggedIn, userId, secureApiRequest]);
+
+  // ✅ 2) 메모리 목록 조회
   useEffect(() => {
     if (!selectedCollectionId) return;
 
-    fetch(`/api/atelier/text/memories/${selectedCollectionId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("메모리 목록 조회 실패: " + res.status);
-        return res.json();
-      })
-      .then((data) => {
+    const fetchMemories = async () => {
+      try {
+        const res = await secureApiRequest(`/api/atelier/text/memories/${selectedCollectionId}`);
+        if (res.status !== 200) throw new Error("메모리 목록 조회 실패");
+
+        const data = res.data;
         const textMemories = Array.isArray(data)
           ? data.filter((m) => m.memoryType?.toLowerCase() === "text")
           : [];
+
         setMemories(textMemories);
         setSelectedMemoryId(null);
         setResult(null);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("메모리 가져오기 실패:", err);
         setMemories([]);
-      });
-  }, [selectedCollectionId]);
+      }
+    };
+
+    fetchMemories();
+  }, [selectedCollectionId, secureApiRequest]);
 
   return (
     <>

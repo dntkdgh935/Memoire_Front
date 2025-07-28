@@ -14,6 +14,7 @@ import OAuth2CallbackSuccess from "../pages/user/OAuth2CallbackSuccess";
 import SocialSignUp from "../pages/user/SocialSignUp";
 import TarotHome from "../pages/tarot/TarotHome";
 import TarotPage from "../pages/tarot/TarotPage";
+import TarotDeckPage from "../pages/tarot/TarotDeckPage";
 
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
@@ -74,6 +75,8 @@ function AppRouter() {
         {/* /tarot/read/:count */}
         <Route path="read/:count" element={<TarotPage />} />
       </Route>
+
+      <Route path="/tarot/deck" element={<TarotDeckPage />} />
 
       {/* 아틀리에 홈 */}
       <Route path="/atelier" element={<AtelierHome />} />

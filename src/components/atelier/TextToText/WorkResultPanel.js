@@ -1,9 +1,11 @@
-import React from "react";
+// src/components/atelier/TextToText/WorkResultPanel.js
+
+import React, { useContext } from "react";
 import styles from "./WorkResultPanel.module.css";
+import { AuthContext } from "../../../AuthProvider";
 
 function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
-  console.log("✅ 전달되는 originalMemoryId:", originalMemoryId);
-  console.log("✅ 전달되는 originalMemoryTitle:", originalMemoryTitle);
+  const { secureApiRequest } = useContext(AuthContext);
 
   if (!result || !result.content) {
     return (
@@ -13,15 +15,19 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
     );
   }
 
-  const { date, content, memoryOrder, collectionId, title: resultTitle } = result;
+  const {
+    date,
+    content,
+    memoryOrder,
+    collectionId,
+    title: resultTitle,
+  } = result;
 
-  // ✅ 제목 표시 우선순위: originalMemoryTitle > result.title > '제목 없음'
   const title = originalMemoryTitle || resultTitle || "제목 없음";
 
-  // 새 메모리로 저장
   const handleSaveAsNewMemory = async () => {
     try {
-      const response = await fetch("/api/atelier/text/save", {
+      const response = await secureApiRequest("/api/atelier/text/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,23 +40,24 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
           memoryOrder,
         }),
       });
-      if (!response.ok) throw new Error("저장 실패");
+
+      if (response.status !== 200) throw new Error("저장 실패");
       alert("새 메모리로 저장되었습니다!");
-      window.location.reload(); // ✅ 저장 후 새로고침
+      window.location.reload();
     } catch (error) {
       console.error(error);
       alert("저장 중 오류 발생");
     }
   };
 
-  // 원본 덮어쓰기
   const handleOverwriteMemory = async () => {
     if (!originalMemoryId) {
       alert("원본 메모리 ID가 없습니다.");
       return;
     }
+
     try {
-      const response = await fetch(`/api/atelier/text/update/${originalMemoryId}`, {
+      const response = await secureApiRequest(`/api/atelier/text/update/${originalMemoryId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -60,9 +67,10 @@ function WorkResultPanel({ result, originalMemoryId, originalMemoryTitle }) {
           content,
         }),
       });
-      if (!response.ok) throw new Error("덮어쓰기 실패");
+
+      if (response.status !== 200) throw new Error("덮어쓰기 실패");
       alert("원본 메모리가 덮어쓰기 되었습니다!");
-      window.location.reload(); // ✅ 덮어쓰기 후 새로고침
+      window.location.reload();
     } catch (error) {
       console.error(error);
       alert("업데이트 중 오류 발생");
