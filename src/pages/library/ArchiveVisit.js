@@ -373,7 +373,7 @@ function ArchiveVisit() {
             <div>로딩 중입니다...</div>
           ) : (
             <CollGrid3
-              colls={activeTab == "myColl" ? collections : bookmarks}
+              colls={activeTab === "myColl" ? collections : bookmarks}
               onBookmarkChange={handleBookmarkChange}
               onLikeChange={handleLikeChange}
               onCollClick={handleCollClick}

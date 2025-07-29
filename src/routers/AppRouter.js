@@ -73,14 +73,34 @@ function AppRouter() {
       <Route path="/social-signup" element={<SocialSignUp />} />
 
       {/* Tarot 중첩 선언 */}
-      <Route path="/tarot" element={<Outlet />}>
+      <Route
+        path="/tarot"
+        element={
+          isLoggedIn ? <Outlet /> : <Navigate to="/user/login" replace />
+        }
+      >
         {/* 정확히 /tarot */}
-        <Route index element={<TarotHome />} />
+        <Route
+          index
+          element={
+            isLoggedIn ? <TarotHome /> : <Navigate to="/user/login" replace />
+          }
+        />
         {/* /tarot/read/:count */}
-        <Route path="read/:count" element={<TarotPage />} />
+        <Route
+          path="read/:count"
+          element={
+            isLoggedIn ? <TarotPage /> : <Navigate to="/user/login" replace />
+          }
+        />
       </Route>
 
-      <Route path="/tarot/deck" element={<TarotDeckPage />} />
+      <Route
+        path="/tarot/deck"
+        element={
+          isLoggedIn ? <TarotDeckPage /> : <Navigate to="/user/login" replace />
+        }
+      />
 
       {/* 아틀리에 */}
       <Route

@@ -45,7 +45,7 @@ function CollCard({ collection, onLikeChange, onBookmarkChange, onCollClick }) {
       <div
         className={styles.labelOverlay}
         // onClick={(e) => e.stopPropagation()}
-        style={{ backgroundColor: collection.color + "26" }}
+        style={{ backgroundColor: collection.color + "80" }}
       >
         <LibCollLabel
           coll={collection}
