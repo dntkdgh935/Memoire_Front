@@ -10,7 +10,6 @@ import { ThemeProvider, useTheme } from "./ThemeContext";
 
 import "./App.css";
 import "./assets/styles/variables-light.css";
-import "./assets/styles/variables-dark.css";
 
 import backgroundImage from "./assets/images/library_4k_background2.png"; // 4K 이미지 경로 (직접 넣어둔 이미지로 변경)
 
