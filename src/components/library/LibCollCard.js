@@ -94,6 +94,7 @@ function LibCollCard({
           <ActionBtn_like coll={coll} onLikeChange={onLikeChange} />
           <ActionBtn_bm coll={coll} onBookmarkChange={onBookmarkChange} />
         </div>
+
         {/**로그인 상태이고, 자기의 컬렉션일 때만 보이는 부분 */}
         {isLoggedIn && userid === coll.authorid && (
           <div className={styles.buttonRow}>

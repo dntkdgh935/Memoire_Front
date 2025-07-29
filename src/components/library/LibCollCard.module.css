@@ -8,8 +8,8 @@
   font-size: 13px;
   font-weight: 500;
   color: #5e4b3c;
-  background-color: #f2eee9;
-  border: 1px solid #ddd0c4;
+  /* background-color: #f2eee9; */
+  /* border: 1px solid #e9e1db; */
   border-radius: 9999px; /* pill 형태 */
   cursor: pointer;
   transition: all 0.2s ease;
@@ -133,7 +133,7 @@
 .cardFooter button {
   padding: 8px 15px;
   border-radius: 5px;
-  background-color: #ddd;
+  /* background-color: #ddd; */
   border: none;
   cursor: pointer;
 }
