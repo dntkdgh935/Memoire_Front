@@ -10,7 +10,7 @@ import styles from "./Header.module.css";
 import { AuthContext } from "../../AuthProvider";
 import NotificationDropdown from "./NotificationDropdown";
 import { useTheme } from "../../ThemeContext";
-import logoImg from "../../assets/images/logo.png";
+import logoImg from "../../assets/images/logo.svg";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
@@ -143,8 +143,7 @@ function Header() {
     <header className={styles.header}>
       {/* 왼쪽: 로고  */}
       <div className={styles.leftSection} onClick={() => navigate("/")}>
-        <img src={logoImg} alt="로고" className={styles.logoImage} />
-        <span className={styles.logoText}>MÉMOIRE</span>
+        <img src={logoImg} alt="로고" />
       </div>
 
       {/* 중앙: 검색 박스 */}
