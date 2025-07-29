@@ -6,7 +6,7 @@ import apiClient from "../../utils/axios";
 import axios from "axios";
 import styles from "./ArchiveVisit.module.css";
 import VisitProfileCard from "../../components/library/VisitProfileCard";
-import CollGrid from "../../components/common/CollGrid";
+import CollGrid3 from "../../components/common/CollGrid3";
 import { useNavigate } from "react-router-dom";
 import { useResetRecoilState } from "recoil";
 import PageHeader from "../../components/common/PageHeader";
@@ -372,7 +372,7 @@ function ArchiveVisit() {
           {isLoading ? (
             <div>로딩 중입니다...</div>
           ) : (
-            <CollGrid
+            <CollGrid3
               colls={activeTab == "myColl" ? collections : bookmarks}
               onBookmarkChange={handleBookmarkChange}
               onLikeChange={handleLikeChange}

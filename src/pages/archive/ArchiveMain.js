@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../AuthProvider";
 import ProfileCard from "../../components/archive/ProfileCard";
 import FollowingFollower from "../../components/archive/FollowingFollower";
-import CollGrid from "../../components/common/CollGrid";
+import CollGrid3 from "../../components/common/CollGrid3";
 import PageHeader from "../../components/common/PageHeader";
 import Modal from "../../components/common/Modal";
 
@@ -245,7 +245,7 @@ function ArchiveMain() {
               새 컬렉션
             </button>
           </div>
-          <CollGrid
+          <CollGrid3
             colls={collections}
             onBookmarkChange={handleBookmarkChange}
             onLikeChange={handleLikeChange}

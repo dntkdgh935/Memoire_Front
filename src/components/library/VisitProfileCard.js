@@ -104,15 +104,6 @@ function VisitProfileCard({
     fetchStuff();
   }, [ownerid]);
 
-  //   const handleEditProfile = () => {
-  //     alert("프로필 수정 기능이 실행됩니다!");
-  //   };
-
-  //   const handleStatusClick = () => {
-  //     setEditStatusMessage(statusMessage);
-  //     setIsEditingStatus(true);
-  //   };
-
   const handleAvatarClick = () => {
     setAvatarClicked(true);
     setTimeout(() => setAvatarClicked(false), 200);
@@ -186,7 +177,11 @@ function VisitProfileCard({
           <button className={styles["follow-btn"]} onClick={onFollowBtnClick}>
             {relBtnMsg}
           </button>
-          <p onClick={onBlockClick}>차단하기</p>
+          <div className={styles.blockWrapper}>
+            <p onClick={onBlockClick} className={styles.blockLink}>
+              차단하기
+            </p>
+          </div>
         </>
       )}
     </div>

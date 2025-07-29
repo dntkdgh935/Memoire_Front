@@ -72,7 +72,7 @@ function MemoryView({ selectedMemory, authorid, numMemories, onReportClick }) {
         </span>
 
         <h2 className={styles.title}>{title}</h2>
-        <button onClick={onReportClick}>🚩 신고</button>
+
         <hr className={styles.divider} />
         {isLoggedIn && (role === "ADMIN" || userid === authorid) && (
           <div className={styles.buttonGroup}>
@@ -81,6 +81,9 @@ function MemoryView({ selectedMemory, authorid, numMemories, onReportClick }) {
             </button>
             <button className={styles.button} onClick={handleDeleteClick}>
               삭제
+            </button>
+            <button className={styles.button} onClick={onReportClick}>
+              🚩 신고
             </button>
           </div>
         )}
