@@ -13,7 +13,6 @@ import PageHeader from "../../components/common/PageHeader";
 
 function ArchiveVisit() {
   const { userid: ownerid } = useParams();
-
   const [ownerNickname, setOwnerNickname] = useState("정보없음");
   const {
     isLoggedIn,
@@ -32,6 +31,7 @@ function ArchiveVisit() {
 
   //아카이브 소유자 컬렉션 목록
   const [collections, setCollections] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
 
   useEffect(() => {
@@ -115,6 +115,7 @@ function ArchiveVisit() {
     console.log("login user id: " + myid);
     if (ownerid) {
       const fetchStuff = async () => {
+        setIsLoading(true);
         try {
           const collectionsInfo = await secureApiRequest(
             `/api/library/archiveVisit?userid=${myid}&ownerid=${ownerid}`,
@@ -135,14 +136,6 @@ function ArchiveVisit() {
           }
         }
         try {
-          // const bookmarksInfo = await apiClient.get(
-          //   "/archive/bookmarkCollections",
-          //   {
-          //     params: {
-          //       userid: ownerid,
-          //     },
-          //   }
-          // );
           const bookmarksInfo = await secureApiRequest(
             `/archive/bookmarkCollections?userid=${ownerid}`,
             {
@@ -155,6 +148,7 @@ function ArchiveVisit() {
         } catch (error) {
           console.error("Error fetching user bookmarks:", error);
         }
+        setIsLoading(false);
       };
       fetchStuff();
     }
@@ -270,14 +264,6 @@ function ArchiveVisit() {
   const handleBookmarkCollClick = async () => {
     setActiveTab("bookmarkColl");
     try {
-      // const bookmarksInfo = await apiClient.get(
-      //   "/archive/bookmarkCollections",
-      //   {
-      //     params: {
-      //       userid: ownerid,
-      //     },
-      //   }
-      // );
       const bookmarksInfo = await secureApiRequest(
         `/archive/bookmarkCollections?userid=${ownerid}`,
         {
@@ -383,12 +369,16 @@ function ArchiveVisit() {
               유저가 북마크한 컬렉션
             </button>
           </div>
-          <CollGrid
-            colls={activeTab == "myColl" ? collections : bookmarks}
-            onBookmarkChange={handleBookmarkChange}
-            onLikeChange={handleLikeChange}
-            onCollClick={handleCollClick}
-          />
+          {isLoading ? (
+            <div>로딩 중입니다...</div>
+          ) : (
+            <CollGrid
+              colls={activeTab == "myColl" ? collections : bookmarks}
+              onBookmarkChange={handleBookmarkChange}
+              onLikeChange={handleLikeChange}
+              onCollClick={handleCollClick}
+            />
+          )}
         </div>
       </div>
     </>
