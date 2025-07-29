@@ -40,7 +40,13 @@ function AppRouter() {
       <Route
         path="/archive/*"
         element={
-          isLoggedIn ? <ArchiveRouter /> : <Navigate to="/user/login" replace />
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
+            <ArchiveRouter />
+          ) : (
+            <Navigate to="/user/login" replace />
+          )
         }
       />
       {/* 유저 */}
@@ -49,14 +55,22 @@ function AppRouter() {
       <Route
         path="/chat/*"
         element={
-          isLoggedIn ? <ChatRouter /> : <Navigate to="/user/login" replace />
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
+            <ChatRouter />
+          ) : (
+            <Navigate to="/user/login" replace />
+          )
         }
       />
       {/* 관리자 */}
       <Route
         path="/admin/*"
         element={
-          isLoggedIn && role === "ADMIN" ? (
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn && role === "ADMIN" ? (
             <AdminRouter />
           ) : isLoggedIn ? (
             <Navigate to="/" replace />
@@ -76,21 +90,39 @@ function AppRouter() {
       <Route
         path="/tarot"
         element={
-          isLoggedIn ? <Outlet /> : <Navigate to="/user/login" replace />
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
+            <Outlet />
+          ) : (
+            <Navigate to="/user/login" replace />
+          )
         }
       >
         {/* 정확히 /tarot */}
         <Route
           index
           element={
-            isLoggedIn ? <TarotHome /> : <Navigate to="/user/login" replace />
+            isLoggedIn === null ? (
+              <div>로딩 중...</div>
+            ) : isLoggedIn ? (
+              <TarotHome />
+            ) : (
+              <Navigate to="/user/login" replace />
+            )
           }
         />
         {/* /tarot/read/:count */}
         <Route
           path="read/:count"
           element={
-            isLoggedIn ? <TarotPage /> : <Navigate to="/user/login" replace />
+            isLoggedIn === null ? (
+              <div>로딩 중...</div>
+            ) : isLoggedIn ? (
+              <TarotPage />
+            ) : (
+              <Navigate to="/user/login" replace />
+            )
           }
         />
       </Route>
@@ -98,7 +130,13 @@ function AppRouter() {
       <Route
         path="/tarot/deck"
         element={
-          isLoggedIn ? <TarotDeckPage /> : <Navigate to="/user/login" replace />
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
+            <TarotDeckPage />
+          ) : (
+            <Navigate to="/user/login" replace />
+          )
         }
       />
 
@@ -106,7 +144,13 @@ function AppRouter() {
       <Route
         path="/atelier/*"
         element={
-          isLoggedIn ? <AtelierRouter /> : <Navigate to="/user/login" replace />
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
+            <AtelierRouter />
+          ) : (
+            <Navigate to="/user/login" replace />
+          )
         }
       />
     </Routes>
