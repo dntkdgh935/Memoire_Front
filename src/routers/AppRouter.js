@@ -3,13 +3,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 //sidebar를 통한 메인 이동
-import LibraryMain from "../pages/library/LibraryMain";
-import ArchiveMain from "../pages/archive/ArchiveMain";
-import AtelierHome from "../pages/atelier/AtelierHome";
-import TextToTextMain from "../pages/atelier/TextToTextMain";
-import TextToImageMain from "../pages/atelier/TextToImageMain";
-import ImageToImageMain from "../pages/atelier/ImageToImageMain";
-import ImageToVideoMain from "../pages/atelier/ImageToVideoMain";
+
 import OAuth2CallbackSuccess from "../pages/user/OAuth2CallbackSuccess";
 import SocialSignUp from "../pages/user/SocialSignUp";
 import TarotHome from "../pages/tarot/TarotHome";
@@ -19,6 +13,7 @@ import TarotDeckPage from "../pages/tarot/TarotDeckPage";
 //각 서비스별 페이지 이동
 import LibraryRouter from "./LibraryRouter";
 import ArchiveRouter from "./ArchiveRouter";
+import AtelierRouter from "./AtelierRouter";
 import UserRouter from "./UserRouter";
 import ChatRouter from "./ChatRouter";
 import AdminRouter from "./AdminRouter";
@@ -33,35 +28,44 @@ function AppRouter() {
       return; // 로그인 상태가 아직 결정되지 않은 경우
     }
   }, [isLoggedIn]);
+  console.log("AppRouter isLoggedIn:", isLoggedIn);
 
   return (
     <Routes>
+      {/* 라이브러리 */}
       <Route path="/" element={<Navigate to="/library" />} />
-
       <Route path="/library/*" element={<LibraryRouter />} />
+
+      {/* 아카이브 */}
       <Route
         path="/archive/*"
         element={
           isLoggedIn ? <ArchiveRouter /> : <Navigate to="/user/login" replace />
         }
       />
+      {/* 유저 */}
       <Route path="/user/*" element={<UserRouter />} />
+      {/* 채팅 */}
       <Route
         path="/chat/*"
         element={
           isLoggedIn ? <ChatRouter /> : <Navigate to="/user/login" replace />
         }
       />
+      {/* 관리자 */}
       <Route
         path="/admin/*"
         element={
           isLoggedIn && role === "ADMIN" ? (
             <AdminRouter />
+          ) : isLoggedIn ? (
+            <Navigate to="/" replace />
           ) : (
             <Navigate to="/user/login" replace />
           )
         }
       />
+
       <Route
         path="/oauth2/callback/success"
         element={<OAuth2CallbackSuccess />}
@@ -78,13 +82,13 @@ function AppRouter() {
 
       <Route path="/tarot/deck" element={<TarotDeckPage />} />
 
-      {/* 아틀리에 홈 */}
-      <Route path="/atelier" element={<AtelierHome />} />
-      {/* 서브 기능 페이지 */}
-      <Route path="/atelier/text2text" element={<TextToTextMain />} />
-      <Route path="/atelier/text2image" element={<TextToImageMain />} />
-      <Route path="/atelier/image2image" element={<ImageToImageMain />} />
-      <Route path="/atelier/image2video" element={<ImageToVideoMain />} />
+      {/* 아틀리에 */}
+      <Route
+        path="/atelier/*"
+        element={
+          isLoggedIn ? <AtelierRouter /> : <Navigate to="/user/login" replace />
+        }
+      />
     </Routes>
   );
 }
