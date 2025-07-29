@@ -1,22 +1,75 @@
 .dropdownContainer {
   position: absolute;
-  top: 40px;
+  top: 48px;
   right: 0;
-  width: 200px;
-  background-color: white;
-  border: 1px solid #ddd;
-  padding: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  z-index: 9999; /* 다른 요소들 위에 표시되도록 */
+  width: 280px;
+  background-color: var(--color-semi-white);
+  border: 1px solid var(--color-bright-outline);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
+  font-family: "Pretendard", sans-serif;
 }
+
+.dropdownContainer h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-main);
+  border-bottom: 1px solid var(--color-bright-outline);
+  padding-bottom: 8px;
+}
+
 .notificationItem {
-  margin-bottom: 10px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-bright-outline);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--color-normal-text);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.closeButton {
-  margin-top: 10px;
-  background-color: red;
-  color: white;
+
+.notificationItem p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notificationItem button {
+  align-self: flex-end;
+  background-color: var(--color-selected-checkbox);
+  color: #ffffff;
   border: none;
-  padding: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.notificationItem button:hover {
+  background-color: #029e91;
+}
+
+.closeButton {
+  width: 100%;
+  margin-top: 10px;
+  background-color: var(--color-secondary-main);
+  color: #fff;
+  border: none;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: #b9ae9e;
 }

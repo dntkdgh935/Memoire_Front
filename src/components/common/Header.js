@@ -208,9 +208,7 @@ function Header() {
         {isLoggedIn && (
           <div className={styles.bellWrapper} onClick={handleBellClick}>
             <FaBell className={styles.iconButton} />
-            {hasNotifications && (
-              <div className={styles.notificationBadge}>!</div>
-            )}
+            {hasNotifications && <span className={styles.notificationDot} />}
           </div>
         )}
 

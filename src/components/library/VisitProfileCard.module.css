@@ -241,3 +241,21 @@
   background-color: #bdbdbd;
   cursor: pointer;
 }
+
+.blockLink {
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  color: var(--color-main);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.blockLink:hover {
+  color: var(--color-selected-text); /* 예: #339187 */
+}
+
+.blockWrapper {
+  display: flex;
+  justify-content: center;
+}

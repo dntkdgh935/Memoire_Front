@@ -88,21 +88,33 @@ function LibCollCard({
           </span>
         ))}
       </div>
-      <div className={styles.cardFooter}>
-        <ActionBtn_like coll={coll} onLikeChange={onLikeChange} />
-        <ActionBtn_bm coll={coll} onBookmarkChange={onBookmarkChange} />
-      </div>
-      {/**로그인 상태이고, 자기의 컬렉션일 때만 보이는 부분 */}
-      {isLoggedIn && userid === coll.authorid && (
-        <div className={styles.interactedUsers}>
-          <div onClick={onOpenLilkedUsers} className={styles.likeUsers}>
-            좋아요한 유저
-          </div>
-          <div onClick={onOpenBookmarkedUsers} className={styles.bmUsers}>
-            북마크한 유저
-          </div>
+
+      <div className={styles.cardFooterRow}>
+        <div className={styles.cardFooter}>
+          <ActionBtn_like coll={coll} onLikeChange={onLikeChange} />
+          <ActionBtn_bm coll={coll} onBookmarkChange={onBookmarkChange} />
         </div>
-      )}
+
+        {/**로그인 상태이고, 자기의 컬렉션일 때만 보이는 부분 */}
+        {isLoggedIn && userid === coll.authorid && (
+          <div className={styles.buttonRow}>
+            <div className={styles.interactedUsers}>
+              <div
+                onClick={onOpenLilkedUsers}
+                className={styles.interactedButton}
+              >
+                좋아요한 유저
+              </div>
+              <div
+                onClick={onOpenBookmarkedUsers}
+                className={styles.interactedButton}
+              >
+                북마크한 유저
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className={styles.memoryList}>
         <MemoryList

@@ -1,6 +1,38 @@
 /*libCollcard.module.css*/
+
+.interactedButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5e4b3c;
+  /* background-color: #f2eee9; */
+  /* border: 1px solid #e9e1db; */
+  border-radius: 9999px; /* pill 형태 */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 8px;
+}
+/* 전체 영역 중앙 정렬 */
+.actionSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 중앙 정렬 핵심 */
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.interactedButton:hover {
+  /* background-color: #e9dfd7; */
+  color: #3e2f25;
+  /* border-color: #c7b8a8; */
+  /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); */
+}
+
 .cardContainer {
-  background-color: #f9f9f9;
+  /* background-color: #f9f9f9; */
   border-radius: 8px;
   padding: 20px;
   margin: 15px 0;
@@ -49,6 +81,48 @@
   margin-top: 20px;
 }
 
+.cardFooterRow {
+  display: flex;
+  flex-direction: column; /* 🔥 수직 정렬 */
+  align-items: center; /* 🔥 중앙 정렬 */
+  justify-content: space-between;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* 위아래 줄 각각 */
+/* ✅ 상위 컨테이너 */
+.actionSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 세로 줄 정렬 */
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* ✅ 각 버튼 줄 (두 줄 동일하게 적용) */
+.buttonRow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  width: fit-content; /* 🔥 줄 너비를 버튼에 딱 맞게 */
+}
+
+/* 기존 버튼 그룹 (좋아요/북마크) */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 유저 정보 버튼 */
+.interactedUsers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .cardFooter {
   display: flex;
   justify-content: space-between;
@@ -59,7 +133,7 @@
 .cardFooter button {
   padding: 8px 15px;
   border-radius: 5px;
-  background-color: #ddd;
+  /* background-color: #ddd; */
   border: none;
   cursor: pointer;
 }

@@ -10,6 +10,29 @@
   font-family: "Pretendard", sans-serif;
 }
 
+.bellWrapper {
+  position: relative; /* ✅ 이것이 기준 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.notificationDot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 7px;
+  height: 7px;
+  background-color: #e53935; /* 세련된 레드 #2196f3*/
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px white; /* 아이콘과의 경계 깔끔하게 */
+  z-index: 10;
+  pointer-events: none;
+}
+
 .leftSection {
   display: flex;
   align-items: center;

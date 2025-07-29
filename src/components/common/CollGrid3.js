@@ -4,9 +4,9 @@ import Masonry from "react-masonry-css";
 import CollCard from "./CollCard";
 import styles from "./CollGrid.module.css";
 
-function CollGrid({ colls, onLikeChange, onBookmarkChange, onCollClick }) {
+function CollGrid3({ colls, onLikeChange, onBookmarkChange, onCollClick }) {
   const breakpointColumnsObj = {
-    default: 7,
+    default: 6,
     1200: 3,
     768: 2,
     480: 1,
@@ -35,4 +35,4 @@ function CollGrid({ colls, onLikeChange, onBookmarkChange, onCollClick }) {
   );
 }
 
-export default CollGrid;
+export default CollGrid3;
