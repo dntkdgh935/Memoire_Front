@@ -1,4 +1,4 @@
-.pageHeader {
+/* .pageHeader {
   display: flex;
   align-items: center;
   font-family: "Pretendard", sans-serif;
@@ -21,4 +21,40 @@
 .pageTitle {
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
+  color: var(--color-main);
+} */
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Pretendard", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #2c2c2c;
+  padding: 16px 24px;
+  background-color: #fff;
+}
+
+.goBackButton {
+  background: none;
+  border: none;
+  font-family: "Pretendard", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #6a6a6a;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+
+.goBackButton:hover {
+  color: var(--color-main);
+}
+
+.pageTitle {
+  font-family: "Pretendard", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-main);
 }
