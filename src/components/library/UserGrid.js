@@ -6,7 +6,7 @@ import UserInfoCard from "./UserInfoCard";
 
 function UserGrid({ users, onFollowBtnClick, onInfoCardClick }) {
   const breakpointColumnsObj = {
-    default: 4,
+    default: 7,
     1200: 3,
     768: 2,
     480: 1,

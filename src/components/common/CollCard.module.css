@@ -30,6 +30,7 @@
   padding-left: 20px;
   padding-right: 20px;
   color: var(--color-normal-text);
+  line-height: 1.5;
 }
 
 .card:hover {

@@ -2,12 +2,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 30px;
+  padding: 0px 40px;
   background-color: white;
   color: #4d3b30;
   /* border-bottom: 1px solid #eee; */
   height: 60px;
   font-family: "Pretendard", sans-serif;
+  margin: 10px 0px 0px 0px;
 }
 
 .bellWrapper {

@@ -1,13 +1,11 @@
 // src/pages/library/LibraryMain.js
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/axios";
 
 import { AuthContext } from "../../AuthProvider";
-import axios from "axios";
 import TagBar from "../../components/library/TagBar";
 import CollGrid from "../../components/common/CollGrid";
-import PageHeader from "../../components/common/PageHeader";
 
 function LibraryMain() {
   const navigate = useNavigate();
@@ -83,17 +81,9 @@ function LibraryMain() {
 
   //1. 탭 변경시 setPage(-1)
   useEffect(() => {
-    // // ********************************
-    // if (isFirstRender.current && selectedTag === "추천") {
-    //   isFirstRender.current = false;
-    //   return; // ❌ 초기 렌더링 시 불필요한 초기화 막기
-    // }
-    // // ********************************
-
     console.log("탭 선택: " + selectedTag);
     setRecColls([]);
     setPage(-1); // 탭이 변경되었음을 표현.
-    // setIsLoading(false);
   }, [selectedTag, userid, isLoggedIn]);
 
   //2. 페이지 변경시 추천 ...
@@ -104,10 +94,6 @@ function LibraryMain() {
         recColls4LoginUser();
       }
     } else if (!isLoggedIn) {
-      // if (page == -1) {
-      //   // 새 탭의 새 페이지로 도달한 경우
-      //   setPage(0);
-      // }
       if (page >= 0) {
         console.log("새 페이지:" + page);
         fetchCollections4Anon();
@@ -230,7 +216,6 @@ function LibraryMain() {
   //TODO: 페이지별로 PageHeader 넣기
   return (
     <>
-      <PageHeader pagename="Discover" userid={userid} />
       <TagBar
         selectedTag={selectedTag}
         onTagSelect={setSelectedTag}

@@ -5,6 +5,10 @@
   gap: 8px;
 }
 
+.libCollAvatar {
+  margin: 10px;
+}
+
 .avatarSmall {
   width: 24px;
   height: 24px;
