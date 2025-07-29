@@ -26,7 +26,7 @@ export default function TarotPage() {
   return (
     <div className={styles.container}>
       <PageHeader pagename="타로 리딩" /> {/* ✅ 추가 */}
-      <h1 className={styles.header}>AI 타로 리딩</h1>
+      {/* <h1 className={styles.header}>AI 타로 리딩</h1> */}
 
       <div className={styles.controls}>
         {!reading ? (

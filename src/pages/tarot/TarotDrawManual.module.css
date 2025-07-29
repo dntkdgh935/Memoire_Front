@@ -20,10 +20,10 @@
   width: fit-content;
   height: 260px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(12, 0, 36, 0.9);
   border: 2px solid #d6c8b0;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 30px rgba(29, 0, 48, 0.25);
   backdrop-filter: blur(6px);
   position: relative;
   overflow: visible;
@@ -115,4 +115,63 @@
   font-size: 1.1rem;
   color: #5c4b3b;
   text-align: center;
+}
+
+.videoBox {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+  margin-bottom: 12px;
+}
+
+.wizardVideo {
+  max-width: 1100px;
+  max-height: 300px;
+  width: 90%;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  object-fit: cover;
+}
+
+.message {
+  text-align: center;
+  font-size: 18px;
+  color: #4D3B30;
+  margin-bottom: 20px;
+  font-family: "Pretendard", sans-serif;
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.fullscreenVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
+  filter: brightness(0.85) blur(1px);
+}
+
+.loadingMessage {
+  position: absolute;
+  bottom: 15%;
+  width: 100%;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #f2e7ff;
+  text-shadow: 2px 2px 8px rgba(50, 0, 90, 0.8);
+  font-family: "Pretendard", sans-serif;
+  z-index: 2;
 }
