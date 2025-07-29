@@ -24,6 +24,10 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
 
   const audioRef = useRef(null);
 
+  const TTS_SCRIPT_MAX = 500;
+  const TTS_SPEECH_MAX = 200;
+  const VIDEO_PROMPT_MAX = 200;
+
   useEffect(() => {
     setUseLipSync(false);
     setTtsEnabled(false);
@@ -129,12 +133,10 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
         throw new Error(errorText);
       }
 
-      const dto = res.data;
       onGenerate({
         status: "success",
-        videoUrl: res.data.videoUrl, // ← API가 리턴하는 필드 이름 맞춰 주세요
-        previewImage: res.data.previewImageUrl, // (선택)
-        resultDto: res.data, // 나중 저장용 DTO
+        videoUrl: res.data.videoUrl,
+        resultDto: res.data,
       });
     } catch (err) {
       onGenerate({
@@ -236,14 +238,18 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
 
           {/* 스크립트 */}
           <div className={styles.field}>
-            <label>TTS 스크립트</label>
+            <label>대사 톤/분위기 입력</label>
             <textarea
               rows={3}
               className={styles.textarea}
-              placeholder="예: 부드럽고 따뜻한 내레이션"
+              placeholder="예: 부드럽고 따뜻한 목소리"
               value={ttsScript}
               onChange={(e) => setTtsScript(e.target.value)}
+              maxLength={TTS_SCRIPT_MAX}
             />
+            <div className={styles.charCount}>
+              {ttsScript.length}/{TTS_SCRIPT_MAX}
+            </div>
           </div>
 
           {/* 대사 */}
@@ -255,7 +261,11 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
               placeholder="원하는 대사가 있으면 적어주세요"
               value={ttsSpeech}
               onChange={(e) => setTtsSpeech(e.target.value)}
+              maxLength={TTS_SPEECH_MAX}
             />
+            <div className={styles.charCount}>
+              {ttsSpeech.length}/{TTS_SPEECH_MAX}
+            </div>
           </div>
 
           {ttsError && <p className={styles.errorText}>{ttsError}</p>}
@@ -311,7 +321,11 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
                   placeholder="예: 따뜻한 카페 안에서의 장면"
                   value={videoPrompt}
                   onChange={(e) => setVideoPrompt(e.target.value)}
+                  maxLength={VIDEO_PROMPT_MAX}
                 />
+                <div className={styles.charCount}>
+                  {videoPrompt.length}/{VIDEO_PROMPT_MAX}
+                </div>
               </div>
 
               {videoError && <p className={styles.errorText}>{videoError}</p>}

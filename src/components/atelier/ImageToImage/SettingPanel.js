@@ -6,6 +6,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
   const [stylePrompt, setStylePrompt] = useState("");
   const { secureApiRequest } = useContext(AuthContext);
 
+  const IMAGE_PROMPT_MAX = 200;
+
   useEffect(() => {
     setStylePrompt("");
   }, [selectedMemory]);
@@ -13,6 +15,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
   const handleGenerate = async () => {
     if (!selectedMemory || !stylePrompt) return;
     console.log("selectedMemory:", selectedMemory);
+
+    onGenerate({ status: "loading" });
 
     const payload = {
       prompt: stylePrompt,
@@ -84,7 +88,11 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
           onChange={(e) => setStylePrompt(e.target.value)}
           placeholder="예: 빈티지, 모던"
           className={styles.input}
+          maxLength={IMAGE_PROMPT_MAX}
         />
+        <div className={styles.charCount}>
+          {stylePrompt.length}/{IMAGE_PROMPT_MAX}
+        </div>
       </div>
 
       {/* 실행 버튼 */}
