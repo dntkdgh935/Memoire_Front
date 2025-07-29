@@ -24,13 +24,21 @@ function LibraryRouter() {
       <Route
         path="/archive/:userid"
         element={
-          isLoggedIn ? <ArchiveVisit /> : <Navigate to="/user/login" replace />
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
+            <ArchiveVisit />
+          ) : (
+            <Navigate to="/user/login" replace />
+          )
         }
       />
       <Route
         path="/searchCollection"
         element={
-          isLoggedIn ? (
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
             <SearchCollResult />
           ) : (
             <Navigate to="/user/login" replace />
@@ -40,7 +48,9 @@ function LibraryRouter() {
       <Route
         path="/searchUser"
         element={
-          isLoggedIn ? (
+          isLoggedIn === null ? (
+            <div>로딩 중...</div>
+          ) : isLoggedIn ? (
             <SearchUserResult />
           ) : (
             <Navigate to="/user/login" replace />
