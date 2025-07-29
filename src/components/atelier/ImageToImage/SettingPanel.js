@@ -5,6 +5,7 @@ import { AuthContext } from "../../../AuthProvider";
 export default function SettingPanel({ selectedMemory, onGenerate }) {
   const [stylePrompt, setStylePrompt] = useState("");
   const { secureApiRequest } = useContext(AuthContext);
+  const [imageLoading, setImageLoading] = useState(false);
 
   const IMAGE_PROMPT_MAX = 200;
 
@@ -17,6 +18,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
     console.log("selectedMemory:", selectedMemory);
 
     onGenerate({ status: "loading" });
+    setImageLoading(true);
 
     const payload = {
       prompt: stylePrompt,
@@ -47,6 +49,8 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
       onGenerate(dto);
     } catch (err) {
       console.error("❌ 변환 요청 오류:", err);
+    } finally {
+      setImageLoading(false);
     }
   };
 
@@ -102,7 +106,7 @@ export default function SettingPanel({ selectedMemory, onGenerate }) {
           onClick={handleGenerate}
           disabled={!stylePrompt}
         >
-          AI 이미지 생성 →
+          {imageLoading ? "생성 중..." : "이미지 생성"}
         </button>
       </div>
     </div>
