@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/common/PageHeader";
 import Modal from "../../components/common/Modal";
 import default_profile from "../../assets/images/default_profile.jpg";
+import AvatarWName from "../../components/common/AvatarWName";
 
 function LibCollDetailView() {
   // useEffect(() => {
@@ -323,7 +324,14 @@ function LibCollDetailView() {
             <p>아직 좋아요한 유저가 없습니다.</p>
           ) : (
             likedUsers.map((user, index) => (
-              <div key={index} style={{ marginBottom: "1rem" }}>
+              <div
+                key={index}
+                style={{
+                  marginBottom: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 <img
                   src={
                     user.profileImagePath
@@ -331,7 +339,12 @@ function LibCollDetailView() {
                       : default_profile
                   }
                   alt={user.nickname}
-                  style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    objectFit: "cover", // 이미지 비율을 유지하면서 동그라미 안에 꽉 차게 표시
+                  }}
                 />
                 <span style={{ marginLeft: "0.5rem" }}>{user.nickname}</span>
               </div>
@@ -348,7 +361,14 @@ function LibCollDetailView() {
             <p>아직 북마크한 유저가 없습니다.</p>
           ) : (
             bmUsers.map((user, index) => (
-              <div key={index} style={{ marginBottom: "1rem" }}>
+              <div
+                key={index}
+                style={{
+                  marginBottom: "1rem",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 <img
                   src={
                     user.profileImagePath
@@ -356,7 +376,12 @@ function LibCollDetailView() {
                       : default_profile
                   }
                   alt={user.nickname}
-                  style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    objectFit: "cover", // 이미지 비율을 유지하면서 동그라미 안에 꽉 차게 표시
+                  }}
                 />
                 <span style={{ marginLeft: "0.5rem" }}>{user.nickname}</span>
               </div>

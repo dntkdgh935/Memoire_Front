@@ -4,6 +4,6 @@
   gap: 24px;
   align-items: flex-start;
   justify-content: center;
-  padding: 32px;
+  padding: 0 32px 32px 32px;
   flex-wrap: wrap; /* 화면 작을 때 아래로 떨어지게 */
 }
