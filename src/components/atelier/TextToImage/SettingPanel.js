@@ -8,11 +8,13 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const [prompt, setPrompt] = useState("");
   const navigate = useNavigate();
   const { secureApiRequest } = useContext(AuthContext);
+  const TEXT_PROMPT_MAX = 200;
 
   useEffect(() => {
     setStyle("");
     setPrompt("");
   }, [selectedMemory]);
+  
 
   const handleGenerate = async () => {
     if (!selectedMemory) return;
@@ -31,6 +33,7 @@ function SettingPanel({ selectedMemory, onGenerate }) {
       saveToMemory: true,
       content: selectedMemory.content || ""
     };
+
 
     try {
       const res = await secureApiRequest("/api/atelier/image/generate", {
@@ -118,8 +121,12 @@ function SettingPanel({ selectedMemory, onGenerate }) {
               className={styles.textarea}
               rows={3}
               placeholder="예: 따뜻하고 먹음직스러운 분위기, 약간의 광택 강조"
+              maxLength={TEXT_PROMPT_MAX}
             />
           </div>
+          <div className={styles.charCount}>
+          {prompt.length}/{TEXT_PROMPT_MAX}
+        </div>
 
           <div className={styles.footer}>
             <button

@@ -280,7 +280,7 @@ body.theme-video
   img[class*="AvatarWName_avatarSmall"] {
   width: 24px;
   height: 24px;
-  margin-left: 40px;
+  margin-left: 20px;
 
   border-radius: 50%;
   object-fit: cover;
@@ -307,7 +307,7 @@ body.theme-video
   bottom: 24px;
   left: 16px;
   margin: 0;
-  margin-left: 40px;
+  margin-left: 20px;
   font-size: 0.9rem !important;
   color: rgba(255, 255, 255, 0.85) !important;
   pointer-events: none;

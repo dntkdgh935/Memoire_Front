@@ -82,3 +82,10 @@
   font-size: 14px;
   font-family: 'Pretendard', sans-serif;
 }
+
+.charCount {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: right;
+  margin-top: 4px;
+}
