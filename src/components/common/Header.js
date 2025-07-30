@@ -11,6 +11,7 @@ import { AuthContext } from "../../AuthProvider";
 import NotificationDropdown from "./NotificationDropdown";
 import { useTheme } from "../../ThemeContext";
 import logoImg from "../../assets/images/logo.svg";
+import logoWhiteImg from "../../assets/images/logo-white.svg";
 
 function Header() {
   const [searchType, setSearchType] = useState("collection");
@@ -143,8 +144,8 @@ function Header() {
     <header className={styles.header}>
       {/* 왼쪽: 로고  */}
       <div className={styles.leftSection} onClick={() => navigate("/")}>
-        <img src={logoImg} alt="로고" />
-      </div>
+  <img src={useVideo ? logoWhiteImg : logoImg} alt="로고" />
+</div>
 
       {/* 중앙: 검색 박스 */}
       <div className={styles.centerSection}>
