@@ -17,7 +17,6 @@
   font-size: 18px;
   font-weight: 500;
   color: var(--color-main);
-  cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
 }
