@@ -2,7 +2,10 @@
   width: 100%;
   display: flex;
   gap: 12px;
-  padding: 10px 8px;
+  padding-top: 16px;
+  padding-right: 8px;
+  padding-bottom: 10px;
+  padding-left: 8px;
   background-color: white;
   /* border-bottom: 1px solid #eee; */
   overflow-x: auto;
@@ -14,7 +17,7 @@
   font-size: 14px;
   border: none;
   background-color: transparent;
-  color: #5e4b3c;
+  color: var(--color-main);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -22,11 +25,11 @@
 }
 
 .tagButton:hover {
-  background-color: #f0ece8;
+  background-color: var(--color-semi-white);
+  font-weight: bold;
 }
 
 .tagButton.active {
-  background-color: var(--color-main);
-  color: white;
+  background-color: var(--color-secondary-main);
   font-weight: bold;
 }
