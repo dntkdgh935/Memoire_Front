@@ -1,0 +1,201 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.loginBox {
+  background-color: #fdfaf6;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 440px; /* UserVerification 기준 */
+  text-align: center;
+  border: 1px solid #e0dcd7;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 입력 필드 스타일 통일 */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 8px; /* label과 input 사이 간격 */
+}
+
+.input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fffdfb;
+  transition: border-color 0.3s ease;
+  width: 100%; /* UserVerification 내부 input과 동일 */
+  height: 48px; /* 동일한 높이 */
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #b0a49b;
+  box-shadow: 0 0 0 3px rgba(176, 164, 155, 0.1);
+}
+
+/* ID 입력 + 중복 확인 버튼 조합 스타일 (현재 SocialSignUp에서는 사용되지 않지만, 원본 CSS에 있었으므로 포함) */
+.idInputGroup {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  align-items: center;
+}
+
+.idInputGroup .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.idCheckButton {
+  width: 120px;
+  height: 48px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.idCheckButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.idCheckButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 휴대폰 인증 컴포넌트가 전체 너비 맞추도록 하는 래퍼 (현재 SocialSignUp에서는 사용되지 않지만, 원본 CSS에 있었으므로 포함) */
+.userVerificationWrapper {
+  width: 100%;
+}
+
+/* DatePicker 관련 스타일 (생년월일 input) */
+.inputGroup .react-datepicker-wrapper {
+  width: 100%;
+  display: block;
+}
+
+.inputGroup .react-datepicker-wrapper .react-datepicker__input-container {
+  width: 100%;
+  display: block;
+}
+
+/* DatePicker 내부에 렌더링되는 실제 input 요소에 스타일 적용 */
+.inputGroup .react-datepicker-wrapper .react-datepicker__input-container input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fffdfb;
+  transition: border-color 0.3s ease;
+  width: 100% !important; /* 너비를 100%로 강제 적용 */
+  height: 48px !important; /* 높이를 48px로 강제 적용 */
+  box-sizing: border-box !important; /* box-sizing을 border-box로 강제 적용 */
+}
+
+/* 회원가입 버튼 */
+.submitButton {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #5b4534;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  height: 48px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #4a3728;
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 에러 메시지 */
+.errorMessage {
+  color: red;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* 컴포넌트 전체 컨테이너 */
+.socialSignUpContainer {
+  max-width: 440px; /* .loginBox의 max-width와 동일하게 설정 */
+  margin: 50px auto;
+  padding: 40px; /* .loginBox의 padding과 동일하게 설정 */
+  border: 1px solid #e0dcd7; /* .loginBox의 border와 동일 */
+  border-radius: 12px; /* .loginBox의 border-radius와 동일 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* .loginBox의 box-shadow와 동일 */
+  background-color: #fdfaf6; /* .loginBox의 background-color와 동일 */
+  text-align: center; /* 내부 요소 중앙 정렬 */
+}
+
+/* 제목 */
+.socialSignUpContainer h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 16px; /* 기존 title보다 약간 줄임 */
+}
+
+/* 설명 문구 */
+.socialSignUpContainer p {
+  font-size: 15px;
+  color: #5b4f46;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* 폼 요소 간격 */
+.socialSignUpContainer form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* .form의 gap과 동일 */
+}
+
+/* 레이블 스타일 */
+.label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+  text-align: left; /* 좌측 정렬 */
+}
