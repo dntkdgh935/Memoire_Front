@@ -20,7 +20,7 @@ function TagBar({ selectedTag, onTagSelect, savedTags = [] }) {
           className={`${styles.tagButton} ${selectedTag === tag ? styles.active : ""}`}
           onClick={() => onTagSelect(tag)}
         >
-          {tag}
+          {tag === "탐색" || tag === "팔로잉" ? tag : `#${tag}`}
         </button>
       ))}
     </div>
