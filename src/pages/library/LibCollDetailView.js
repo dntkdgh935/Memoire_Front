@@ -278,30 +278,35 @@ function LibCollDetailView() {
     <>
       <PageHeader pagename={`컬렉션 상세보기`} />
       <div className={styles.detailContainer}>
-        {collection ? (
-          <LibCollCard
-            coll={collection}
-            memoryList={memoryList}
-            onMemoryClick={handleMemoryClick}
-            onLikeChange={handleLikeChange}
-            onBookmarkChange={handleBookmarkChange}
-            selectedMemoryId={selectedMemoryId}
-            onOpenLilkedUsers={handleOpenLilkedUsers}
-            onOpenBookmarkedUsers={handleOpenBookmarkedUsers}
-          />
-        ) : (
-          <div>컬렉션 정보를 불러올 수 없습니다.</div>
-        )}
-        {collection ? (
-          <MemoryView
-            selectedMemory={selectedMemory}
-            authorid={collection.authorid}
-            numMemories={memoryList.length}
-            onReportClick={handleOpenReportModal}
-          />
-        ) : (
-          <div>컬렉션 정보를 불러올 수 없습니다.</div>
-        )}
+        <div className={styles.libCardWrapper}>
+          {collection ? (
+            <LibCollCard
+              coll={collection}
+              memoryList={memoryList}
+              onMemoryClick={handleMemoryClick}
+              onLikeChange={handleLikeChange}
+              onBookmarkChange={handleBookmarkChange}
+              selectedMemoryId={selectedMemoryId}
+              onOpenLilkedUsers={handleOpenLilkedUsers}
+              onOpenBookmarkedUsers={handleOpenBookmarkedUsers}
+            />
+          ) : (
+            <div>컬렉션 정보를 불러올 수 없습니다.</div>
+          )}
+        </div>
+
+        <div className={styles.memoryViewWrapper}>
+          {collection ? (
+            <MemoryView
+              selectedMemory={selectedMemory}
+              authorid={collection.authorid}
+              numMemories={memoryList.length}
+              onReportClick={handleOpenReportModal}
+            />
+          ) : (
+            <div>컬렉션 정보를 불러올 수 없습니다.</div>
+          )}
+        </div>
       </div>
       {isReportModalOpen && (
         <Modal onClose={() => setIsReportModalOpen(false)}>

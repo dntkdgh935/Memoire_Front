@@ -19,7 +19,7 @@ function LibraryMain() {
   const [page, setPage] = useState(0);
   useEffect(() => {
     if (selectedTag === null) {
-      setSelectedTag("추천"); // 최초 진입 시만 실행
+      setSelectedTag("탐색"); // 최초 진입 시만 실행
     }
   }, []);
 

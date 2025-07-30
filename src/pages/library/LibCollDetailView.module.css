@@ -1,9 +1,25 @@
 /* src/pages/library/LibCollDetailView.module.css */
 .detailContainer {
   display: flex;
-  gap: 24px;
+  flex-direction: row;
   align-items: flex-start;
   justify-content: center;
+  gap: 32px;
+
+  flex-wrap: nowrap; /* 🔥 줄바꿈 금지 */
+  width: 100%;
+  overflow-x: auto; /* 🔥 너비 부족 시 스크롤 처리 */
   padding: 0 32px 32px 32px;
-  flex-wrap: wrap; /* 화면 작을 때 아래로 떨어지게 */
+  box-sizing: border-box;
+}
+
+.libCardWrapper {
+  flex: 0 0 320px; /* 고정 너비 */
+  max-width: 320px;
+}
+
+.memoryViewWrapper {
+  flex: 1 1 auto;
+  min-width: 400px;
+  max-width: 800px; /* 💡 최대 폭 제한 */
 }
