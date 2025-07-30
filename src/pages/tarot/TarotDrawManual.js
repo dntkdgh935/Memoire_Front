@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import styles from "./TarotDrawManual.module.css";
 import { AuthContext } from "../../AuthProvider";
-
-const secureFastApiRequest = (path, options = {}, retry = true, authContext) => {
-  const fastapiBaseUrl = "http://127.0.0.1:8000";
-  return authContext.secureApiRequest(`${fastapiBaseUrl}${path}`, options, retry);
-};
+import axios from "axios";
 
 export default function TarotDrawManual({ count, onCompleted }) {
   const [deck, setDeck] = useState([]);
@@ -16,23 +12,26 @@ export default function TarotDrawManual({ count, onCompleted }) {
   const authContext = useContext(AuthContext);
 
   useEffect(() => {
-    secureFastApiRequest(`/tarot/draw/30`, { method: "GET" }, true, authContext)
-      .then((res) => {
+    const fetchDeck = async () => {
+      try {
+        const res = await authContext.secureApiRequest("http://127.0.0.1:8000/tarot/draw/30", {
+          method: "GET"
+        });
         const data = res.data;
-        console.log("🔮 받은 카드 목록:", data.cards);
         if (!data.cards || !Array.isArray(data.cards)) {
           throw new Error("카드 목록이 올바르지 않습니다.");
         }
         setDeck(data.cards);
         setFlipped(Array(data.cards.length).fill(false));
         setSelected([]);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("카드 덱 불러오기 실패:", err);
-      });
+      }
+    };
+    fetchDeck();
   }, [count]);
 
-  const handleClick = (i) => {
+  const handleClick = async (i) => {
     if (flipped[i] || selected.length >= count) return;
 
     const newFlipped = [...flipped];
@@ -44,31 +43,56 @@ export default function TarotDrawManual({ count, onCompleted }) {
 
     if (newSelected.length === count) {
       setLoading(true);
-      secureFastApiRequest(
-        `/tarot/read/${count}`,
-        {
-          method: "POST",
-          data: JSON.stringify({ cards: newSelected }),
-          headers: { "Content-Type": "application/json" },
-        },
-        true,
-        authContext
-      )
-        .then((res) => {
-          const data = res.data;
-          if (!data.reading) throw new Error("리딩 결과가 없습니다.");
-          onCompleted(newSelected, data.reading);
-        })
-        .catch((err) => {
-          console.error("타로 리딩 실패:", err);
-        })
-        .finally(() => setLoading(false));
+
+      // ✅ 카드 구조 변환 (불필요 필드 제거 + meaning 보장)
+      const convertedCards = newSelected.map((card) => ({
+        name: card.name || "",
+        image: card.image || "",
+        meaning: Array.isArray(card.keywords)
+          ? card.keywords.join(", ")
+          : (typeof card.meaning === "string" ? card.meaning : "의미 없음"),
+      }));
+
+      console.log("🃏 보내는 카드 목록", convertedCards);
+
+      if (!convertedCards.length) {
+        alert("카드 데이터가 비어 있습니다.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          `http://127.0.0.1:8000/tarot/read/${count}`,
+          { cards: convertedCards },
+          {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        const data = response.data;
+        if (!data.reading) throw new Error("리딩 결과가 없습니다.");
+        onCompleted(newSelected, data.reading);
+      } catch (err) {
+        console.error("❌ 타로 리딩 실패:", err);
+        if (err.response) {
+          console.error("🔍 상태 코드:", err.response.status);
+          console.error("🔍 에러 메시지:", err.response.statusText);
+          console.error("🔍 에러 응답 데이터:", err.response.data);
+        } else {
+          console.error("❌ 네트워크 또는 요청 설정 문제:", err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
   return (
     <div className={styles.container}>
-      {/* 🎥 마법사 영상 */}
+      {/* 🎥 상단 마법사 영상 */}
       <div className={styles.videoBox}>
         <video
           src={require("../../assets/videos/tarot_wizard.mp4")}
@@ -102,7 +126,11 @@ export default function TarotDrawManual({ count, onCompleted }) {
                 </div>
                 <div className={styles.cardFront}>
                   <img
-                    src={card.image.startsWith("/cards/") ? card.image : `/cards/${card.image}`}
+                    src={
+                      card.image.startsWith("/cards/")
+                        ? card.image
+                        : `/cards/${card.image}`
+                    }
                     alt={card.name}
                   />
                 </div>
@@ -112,21 +140,22 @@ export default function TarotDrawManual({ count, onCompleted }) {
         </div>
       </div>
 
+      {/* 🔮 리딩 중 오버레이 */}
       {loading && (
-  <div className={styles.loadingOverlay}>
-    <video
-      src={require("../../assets/videos/tarot_reading.mp4")}
-      autoPlay
-      muted
-      loop
-      playsInline
-      className={styles.fullscreenVideo}
-    />
-    <div className={styles.loadingMessage}>
-      카드 리딩 중입니다. 잠시 기다려주세요.
-    </div>
-  </div>
-)}
+        <div className={styles.loadingOverlay}>
+          <video
+            src={require("../../assets/videos/tarot_reading.mp4")}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className={styles.fullscreenVideo}
+          />
+          <div className={styles.loadingMessage}>
+            카드 리딩 중입니다. 잠시 기다려주세요.
+          </div>
+        </div>
+      )}
     </div>
   );
 }

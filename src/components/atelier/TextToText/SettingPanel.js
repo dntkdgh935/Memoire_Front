@@ -11,6 +11,8 @@ function SettingPanel({ selectedMemory, onGenerate }) {
   const navigate = useNavigate();
   const { secureApiRequest, userid } = useContext(AuthContext);
 
+  const TEXT_PROMPT_MAX = 200;
+
   useEffect(() => {
     setStyle("");
     setPrompt("");
@@ -108,8 +110,12 @@ function SettingPanel({ selectedMemory, onGenerate }) {
               className={styles.textarea}
               rows={3}
               placeholder="예: 슬픈 발라드 가사 형식으로 작성"
+              maxLength={TEXT_PROMPT_MAX}
             />
           </div>
+          <div className={styles.charCount}>
+          {prompt.length}/{TEXT_PROMPT_MAX}
+        </div>
 
           <div className={styles.footer}>
             <button className={styles.generateBtn} onClick={handleGenerate}>
