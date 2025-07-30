@@ -4,30 +4,30 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "../../utils/axios";
 import styles from "./SignUp.module.css";
 import CheckPwd from "../../components/user/CheckPwd";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import UserVerification from "../../components/user/UserVerification"; // UserVerification 임포트
+// DatePicker import 제거
+// import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
+import UserVerification from "../../components/user/UserVerification";
 
 function Signup() {
   const [formData, setFormData] = useState({
     loginId: "",
     password: "",
-    confirmPwd: "", // 비밀번호 확인 필드는 여전히 필요 (CheckPwd 컴포넌트에서 사용)
+    confirmPwd: "",
     name: "",
-    birthday: "",
+    birthday: "", // ✅ SocialSignUp과 동일하게 문자열로 초기화
     nickname: "",
-    role: "USER", // 권한은 'USER'로 고정
+    role: "USER",
     phone: "",
-    loginType: "original", // loginType 필드 추가 및 기본값 설정
+    loginType: "original",
   });
-  const [isIdAvailable, setIsIdAvailable] = useState(null); // null: 검사 전, true: 사용 가능, false: 중복
+  const [isIdAvailable, setIsIdAvailable] = useState(null);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [passwordScore, setPasswordScore] = useState(0);
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false); // 휴대폰 인증 상태 추가
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
 
   const navigate = useNavigate();
 
-  // loginId가 변경될 때마다 isIdAvailable 상태를 초기화하여 재검사를 유도
   useEffect(() => {
     setIsIdAvailable(null);
   }, [formData.loginId]);
@@ -47,7 +47,6 @@ function Signup() {
         setIsIdAvailable(true);
         alert("사용 가능한 아이디입니다.");
       } else {
-        // response.data === "duplicated"
         setIsIdAvailable(false);
         alert("이미 사용중인 아이디입니다. 아이디를 다시 작성하세요.");
       }
@@ -57,15 +56,39 @@ function Signup() {
     }
   };
 
+  // 생년월일 유효성 검사 함수 (SocialSignUp과 동일하게 YYYY-MM-DD 형식 확인)
+  const validateBirthday = (birthdayStr) => {
+    if (!birthdayStr) return false;
+
+    // YYYY-MM-DD 형식 확인
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(birthdayStr)) return false;
+
+    const parts = birthdayStr.split("-");
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const day = parseInt(parts[2], 10);
+
+    const date = new Date(year, month - 1, day); // month는 0부터 시작
+    const isValidDate =
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day;
+
+    if (!isValidDate) return false;
+
+    // 미래 날짜 방지
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 시간 정보를 제거하여 날짜만 비교
+    return date <= today;
+  };
+
   const validate = () => {
-    // 아이디 중복검사 상태 확인
     if (isIdAvailable === null) {
-      // 아이디 중복검사 버튼을 누르지 않았거나, 아직 응답이 오지 않은 경우
       alert("아이디 중복검사를 필수로 하여야 합니다.");
       return false;
     }
     if (isIdAvailable === false) {
-      // 아이디 중복검사 결과가 'duplicated'인 경우
       alert("사용 가능한 아이디가 아닙니다. 아이디를 다시 확인하세요.");
       return false;
     }
@@ -78,17 +101,16 @@ function Signup() {
       return false;
     }
     if (!isPhoneVerified) {
-      // 휴대폰 인증 여부 확인
       alert("휴대폰 인증을 완료해주세요.");
       return false;
     }
-    // 나머지 필드 유효성 검사 (필요하면 추가)
     if (!formData.name) {
       alert("이름을 입력해주세요.");
       return false;
     }
-    if (!formData.birthday) {
-      alert("생년월일을 선택해주세요.");
+    // 생년월일 유효성 검사 추가 (SocialSignUp과 동일)
+    if (!validateBirthday(formData.birthday)) {
+      alert("유효한 생년월일(YYYY-MM-DD 형식, 미래 날짜 불가)을 입력해주세요.");
       return false;
     }
     if (!formData.nickname) {
@@ -109,11 +131,6 @@ function Signup() {
     setPasswordScore(score);
   };
 
-  const handleDateChange = (date) => {
-    setFormData({ ...formData, birthday: date });
-  };
-
-  // UserVerification에서 호출될 인증 완료 콜백 함수
   const handlePhoneVerificationComplete = (verified) => {
     setIsPhoneVerified(verified);
   };
@@ -121,15 +138,14 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 모든 유효성 검사를 여기서 수행
     if (!validate()) {
-      return; // 유효성 검사 실패 시 함수 종료
+      return;
     }
 
     try {
-      // confirmPwd는 백엔드로 보내지 않으므로 전송 전에 제거
       const { confirmPwd, ...dataToSend } = formData;
 
+      // birthday는 이미 'YYYY-MM-DD' 문자열이므로 추가 변환 필요 없음
       const response = await apiClient.post("/user/signup", dataToSend);
 
       if (response.status === 200) {
@@ -138,7 +154,6 @@ function Signup() {
       }
     } catch (error) {
       console.error("회원가입 실패 : ", error);
-      // 백엔드에서 특정 오류 메시지를 보낸다면 파싱하여 표시 가능
       alert("회원 가입에 실패했습니다. 다시 시도해 주세요");
     }
   };
@@ -196,17 +211,17 @@ function Signup() {
               maxLength={5}
             />
           </div>
+          {/* ✅ SocialSignUp과 동일하게 type="date" input 사용 */}
           <div className={styles.inputGroup}>
-            <DatePicker
-              selected={formData.birthday}
-              onChange={handleDateChange}
-              placeholderText="생년월일"
-              dateFormat="yyyy-MM-dd"
+            <input
+              type="date" // ✅ type을 "date"로 변경
+              name="birthday"
               className={styles.input}
-              maxDate={new Date()}
-              showYearDropdown
-              scrollableYearDropdown
-              yearDropdownItemNumber={100}
+              placeholder="생년월일 (YYYY-MM-DD)" // placeholder는 type="date"에서 일부 브라우저에서 무시될 수 있습니다.
+              value={formData.birthday}
+              onChange={handleChange}
+              required
+              // maxLength는 type="date"에서 의미가 없습니다.
             />
           </div>
           <div className={styles.inputGroup}>

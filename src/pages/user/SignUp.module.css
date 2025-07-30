@@ -1,3 +1,5 @@
+/* src/pages/user/SignUp.module.css 파일 내용 (기존 내용에서 DatePicker 관련 스타일 제거) */
+
 .container {
   display: flex;
   justify-content: center;
@@ -12,7 +14,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 440px; /* UserVerification 기준 */
+  max-width: 440px;
   text-align: center;
   border: 1px solid #e0dcd7;
 }
@@ -31,16 +33,11 @@
 }
 
 /* 입력 필드 스타일 통일 */
-.inputGroup,
-.idInputGroup {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
 .inputGroup {
+  display: flex;
   flex-direction: column;
   text-align: left;
+  gap: 8px; /* label과 input 사이 간격 (필요시 조절) */
 }
 
 .input {
@@ -50,7 +47,7 @@
   border-radius: 8px;
   background-color: #fffdfb;
   transition: border-color 0.3s ease;
-  width: 100%; /* UserVerification 내부 input과 동일 */
+  width: 100%;
   height: 48px; /* 동일한 높이 */
   box-sizing: border-box;
 }
@@ -63,7 +60,10 @@
 
 /* ID 입력 + 중복 확인 버튼 조합 스타일 */
 .idInputGroup {
+  display: flex;
   width: 100%;
+  gap: 8px;
+  align-items: center;
 }
 
 .idInputGroup .input {
@@ -97,37 +97,10 @@
   cursor: not-allowed;
 }
 
-/* 휴대폰 인증 컴포넌트가 전체 너비 맞추도록 하는 래퍼 */
-.userVerificationWrapper {
-  width: 100%;
-}
-
-/* 비밀번호 필드 내부 CheckPwd 컴포넌트 input은 기존 스타일 input 적용됨 */
-
-/* 이름, 생년월일, 닉네임 입력 */
-/* DatePicker 관련 스타일을 더 명확하게 지정 */
-.inputGroup .react-datepicker-wrapper {
-  width: 100%;
-  display: block;
-}
-
-.inputGroup .react-datepicker-wrapper .react-datepicker__input-container {
-  width: 100%;
-  display: block;
-}
-
-/* DatePicker 내부에 렌더링되는 실제 input 요소에 스타일 적용 */
-.inputGroup .react-datepicker-wrapper .react-datepicker__input-container input {
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #fffdfb;
-  transition: border-color 0.3s ease;
-  width: 100% !important; /* 너비를 100%로 강제 적용 */
-  height: 48px !important; /* 높이를 48px로 강제 적용 */
-  box-sizing: border-box !important; /* box-sizing을 border-box로 강제 적용 */
-}
+/* ✅ DatePicker 관련 스타일 제거 (이전 답변에서 추가했던 것들) */
+/* .inputGroup .react-datepicker-wrapper { ... } */
+/* .inputGroup .react-datepicker-wrapper .react-datepicker__input-container { ... } */
+/* .inputGroup .react-datepicker-wrapper .react-datepicker__input-container input { ... } */
 
 /* 회원가입 버튼 */
 .loginButton {
@@ -151,43 +124,4 @@
 .loginButton:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-/* 체크박스 (해당 부분 유지) */
-.checkboxGroup {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  margin: 12px 0;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  color: #444;
-  cursor: pointer;
-}
-
-.checkbox {
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  accent-color: #5b4534;
-}
-
-/* 이미 존재하는 ID 안내 링크 스타일 */
-.signUpLink {
-  margin-top: 16px;
-}
-
-.signUpLink span {
-  font-size: 14px;
-  color: #5b4f46;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.signUpLink span:hover {
-  text-decoration: underline;
 }
