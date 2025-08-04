@@ -204,7 +204,7 @@ function FaceRegister() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>얼굴 ID 등록</h1>
+        <h1 className={styles.title}>Face ID 등록</h1>
         <p className={styles.userIdText}>
           <span className={styles.userIdHighlight}>사용자:</span>{" "}
           {nickname || "알 수 없는 사용자"}

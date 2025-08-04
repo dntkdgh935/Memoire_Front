@@ -119,7 +119,7 @@ function UserVerification({
       if (data.verificationCode) {
         setDisplayedCode(data.verificationCode); // 발급받은 인증번호를 저장
         showMessage(
-          `이 번호를 복사하여 <span class="${styles.highlightText}">kdong1230@naver.com</span>(으)로 MMS 문자 메시지를 보내주세요. ` +
+          `이 번호를 복사하여 <span class="${styles.highlightText}">설정한 이메일</span>(으)로 MMS 문자 메시지를 보내주세요. ` +
             `<br><span class="${styles.boldHighlight}">MMS 내용에는 반드시 인증번호만 포함</span>되어야 합니다.` +
             `<br>메일 발송 후 <span class="${styles.boldHighlight}">최소 10초 이상 기다린 후</span> 아래 "인증 확인" 버튼을 눌러주세요.`,
           "success"
